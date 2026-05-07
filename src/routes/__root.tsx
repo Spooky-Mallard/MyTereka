@@ -9,6 +9,10 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/app-sidebar";
+import { Bell, Search } from "lucide-react";
+import { Input } from "@/components/ui/input";
 
 function NotFoundComponent() {
   return (
@@ -72,11 +76,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "FinWise — Personal finance dashboard" },
+      { name: "description", content: "Track expenses, budgets and savings goals with FinWise." },
+      { name: "author", content: "FinWise" },
+      { property: "og:title", content: "FinWise — Personal finance dashboard" },
+      { property: "og:description", content: "Track expenses, budgets and savings goals with FinWise." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
@@ -113,7 +117,35 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <SidebarProvider>
+        <div className="flex min-h-screen w-full bg-background">
+          <AppSidebar />
+          <div className="flex flex-1 flex-col">
+            <header className="sticky top-0 z-30 flex h-16 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur md:px-6">
+              <SidebarTrigger />
+              <div className="relative hidden max-w-sm flex-1 md:block">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input placeholder="Search transactions, budgets..." className="h-9 rounded-full bg-secondary pl-9 border-transparent" />
+              </div>
+              <div className="ml-auto flex items-center gap-3">
+                <button className="grid h-9 w-9 place-items-center rounded-full bg-secondary text-foreground hover:bg-accent transition">
+                  <Bell className="h-4 w-4" />
+                </button>
+                <div className="flex items-center gap-2">
+                  <div className="grid h-9 w-9 place-items-center rounded-full bg-gradient-primary text-primary-foreground text-sm font-semibold">AM</div>
+                  <div className="hidden text-sm leading-tight md:block">
+                    <div className="font-medium">Alex Morgan</div>
+                    <div className="text-xs text-muted-foreground">Premium plan</div>
+                  </div>
+                </div>
+              </div>
+            </header>
+            <main className="flex-1 px-4 py-6 md:px-8 md:py-8">
+              <Outlet />
+            </main>
+          </div>
+        </div>
+      </SidebarProvider>
     </QueryClientProvider>
   );
 }
