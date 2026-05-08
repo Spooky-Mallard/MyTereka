@@ -1,4 +1,7 @@
-import { Link, useRouterState } from "@tanstack/react-router";
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
 import {
   LayoutDashboard,
   ArrowLeftRight,
@@ -20,7 +23,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
-import logoSvg from "@/assets/logo.svg";
 
 const navItems = [
   { title: "Dashboard", url: "/", icon: LayoutDashboard },
@@ -31,20 +33,20 @@ const navItems = [
 ];
 
 export function AppSidebar() {
-  const currentPath = useRouterState({ select: (r) => r.location.pathname });
+  const pathname = usePathname();
   const isActive = (path: string) =>
-    path === "/" ? currentPath === "/" : currentPath.startsWith(path);
+    path === "/" ? pathname === "/" : pathname.startsWith(path);
 
   return (
     <Sidebar collapsible="icon">
       {/* ── Logo ── */}
       <SidebarHeader className="px-4 py-5">
-        <Link to="/" className="flex items-center gap-3">
+        <Link href="/" className="flex items-center gap-3">
           <div
             className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
             style={{ background: "var(--gradient-primary)" }}
           >
-            <img src={logoSvg} alt="FinWise logo" className="h-6 w-6 object-contain" />
+            <img src="/logo.svg" alt="FinWise logo" className="h-6 w-6 object-contain" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span
@@ -82,23 +84,18 @@ export function AppSidebar() {
                       className="h-10 rounded-xl font-medium transition-all"
                       style={
                         active
-                          ? {
-                              background: "var(--accent)",
-                              color: "var(--primary)",
-                            }
-                          : {
-                              color: "var(--sidebar-foreground)",
-                            }
+                          ? { background: "var(--accent)", color: "var(--primary)" }
+                          : { color: "var(--sidebar-foreground)" }
                       }
                     >
-                      <a href={item.url} className="flex items-center gap-3 px-3">
+                      <Link href={item.url} className="flex items-center gap-3 px-3">
                         <item.icon
                           size={18}
                           strokeWidth={active ? 2.5 : 2}
                           style={{ color: active ? "var(--primary)" : "var(--muted-foreground)" }}
                         />
                         <span>{item.title}</span>
-                      </a>
+                      </Link>
                     </SidebarMenuButton>
                   </SidebarMenuItem>
                 );
@@ -110,10 +107,7 @@ export function AppSidebar() {
 
       {/* ── Footer ── */}
       <SidebarFooter className="px-2 pb-4">
-        <div
-          className="mb-3 h-px w-full"
-          style={{ background: "var(--sidebar-border)" }}
-        />
+        <div className="mb-3 h-px w-full" style={{ background: "var(--sidebar-border)" }} />
         <SidebarMenu className="gap-0.5">
           <SidebarMenuItem>
             <SidebarMenuButton
@@ -159,15 +153,10 @@ export function AppSidebar() {
             AM
           </div>
           <div className="flex-1 min-w-0">
-            <div
-              className="truncate text-sm font-semibold"
-              style={{ color: "var(--sidebar-foreground)" }}
-            >
+            <div className="truncate text-sm font-semibold" style={{ color: "var(--sidebar-foreground)" }}>
               Alex Morgan
             </div>
-            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
-              Premium
-            </div>
+            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>Premium</div>
           </div>
         </div>
       </SidebarFooter>
