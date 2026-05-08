@@ -1,9 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AppShell } from "@/components/app-shell";
 
 export const metadata: Metadata = {
-  title: { default: "FinWise", template: "%s — FinWise" },
+  title: { default: "MyTereka", template: "%s — MyTereka" },
   description: "Personal finance manager — track budgets, goals and spending.",
 };
 
@@ -17,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
       <body>
-        <AppShell>{children}</AppShell>
+        {children}
       </body>
     </html>
   );

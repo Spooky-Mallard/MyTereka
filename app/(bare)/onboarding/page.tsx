@@ -3,7 +3,6 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import Image from "next/image";
-import "../globals.css";
 
 const slides = [
   {
@@ -27,6 +26,7 @@ function DecorativePlant() {
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
+      style={{ width: "clamp(90px, 20vw, 151px)", height: "auto" }}
     >
       <g clipPath="url(#clip0_9022_2199)">
         <path
@@ -70,36 +70,44 @@ export default function OnboardingPage() {
       className="fixed inset-0 z-[9999] flex flex-col overflow-hidden"
       style={{ background: "var(--brand-green)" }}
     >
-      {/* ── Top — green, heading lives here ── */}
-      <div className="relative flex flex-[2] flex-col items-center justify-center px-10 pt-10">
+      {/* ── Top 38vh — green, heading ── */}
+      <div
+        className="relative flex flex-col items-center justify-center px-10"
+        style={{ height: "38vh" }}
+      >
         <h1
-          className="relative z-10 text-center text-3xl font-semibold capitalize leading-[39px]"
+          className="text-center font-semibold capitalize"
           style={{
             color: "var(--brand-dark-mid)",
             fontFamily: "Poppins, var(--font-sans)",
-            maxWidth: 289,
+            fontSize: "clamp(22px, 5vw, 30px)",
+            lineHeight: 1.3,
+            maxWidth: "min(289px, 80vw)",
           }}
         >
           {heading}
         </h1>
       </div>
 
-      {/* ── White card — rounded top, plant sits on its edge ── */}
+      {/* ── Bottom 62vh — pale card, rounded top ── */}
       <div
-        className="relative flex flex-[3] flex-col items-center justify-end pb-12"
+        className="relative flex flex-col items-center justify-end overflow-visible"
         style={{
+          height: "62vh",
           background: "var(--brand-green-pale)",
-          borderTopLeftRadius: 90,
-          borderTopRightRadius: 90,
+          borderTopLeftRadius: "clamp(48px, 12vw, 90px)",
+          borderTopRightRadius: "clamp(48px, 12vw, 90px)",
+          paddingBottom: "clamp(24px, 5vh, 48px)",
         }}
       >
-        {/* Plant — anchored to top-left of card, slanting left over the curve */}
+        {/* Plant — base at the top-left curve, leans left */}
         <div
           className="pointer-events-none absolute"
           style={{
-            left: 21,
-            top: -238,
-            transformOrigin: "bottom center",
+            left: "clamp(8px, 4vw, 24px)",
+            /* bottom of plant sits exactly on the card's top edge */
+            bottom: "100%",
+            transformOrigin: "bottom left",
             transform: "rotate(-8deg)",
             zIndex: 20,
           }}
@@ -107,21 +115,23 @@ export default function OnboardingPage() {
           <DecorativePlant />
         </div>
 
-        {/* Illustration — centered in card with light green circle behind */}
+        {/* Illustration + circle — sits in upper 50% of card */}
         <div
           className="absolute flex items-center justify-center"
-          style={{ top: 100, left: "50%", transform: "translateX(-50%)" }}
+          style={{
+            top: "8%",
+            left: "50%",
+            transform: "translateX(-50%)",
+          }}
         >
-          {/* Light green circle */}
           <div
             className="absolute rounded-full"
             style={{
-              width: 220,
-              height: 220,
+              width: "clamp(160px, 38vw, 220px)",
+              height: "clamp(160px, 38vw, 220px)",
               background: "var(--brand-green-circle)",
             }}
           />
-          {/* Illustration on top */}
           <div className="relative z-10">
             <Image
               src={image}
@@ -129,13 +139,17 @@ export default function OnboardingPage() {
               width={240}
               height={240}
               priority
-              style={{ objectFit: "contain" }}
+              style={{
+                objectFit: "contain",
+                width: "clamp(160px, 38vw, 240px)",
+                height: "clamp(160px, 38vw, 240px)",
+              }}
             />
           </div>
         </div>
 
-        {/* Dot indicators */}
-        <div className="mb-5 flex items-center gap-4">
+        {/* Dots */}
+        <div className="mb-4 flex items-center gap-4">
           {slides.map((_, i) => (
             <button
               key={i}
@@ -155,15 +169,17 @@ export default function OnboardingPage() {
           ))}
         </div>
 
-        {/* Next / Get Started button */}
+        {/* Next / Get Started */}
         <button
           onClick={handleNext}
-          className="flex h-[52px] w-full max-w-[240px] items-center justify-center rounded-full font-semibold capitalize transition hover:opacity-80 active:scale-[0.98]"
+          className="flex items-center justify-center rounded-full font-semibold capitalize transition hover:opacity-80 active:scale-[0.98]"
           style={{
             background: isLast ? "var(--brand-green)" : "var(--brand-dark)",
             color: isLast ? "#ffffff" : "var(--brand-green-pale)",
             fontFamily: "Poppins, var(--font-sans)",
-            fontSize: 20,
+            fontSize: "clamp(16px, 4vw, 20px)",
+            height: "clamp(44px, 7vh, 52px)",
+            width: "min(240px, 65vw)",
             boxShadow: "0 4px 16px rgba(0,0,0,0.18)",
           }}
         >
