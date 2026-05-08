@@ -2,8 +2,6 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { categoryMeta, formatCurrency, formatDate, transactions } from "@/lib/mock-data";
 import { Plus, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/transactions")({
   head: () => ({
@@ -25,36 +23,105 @@ function TransactionsPage() {
     () =>
       transactions
         .filter((t) => (filter === "all" ? true : t.type === filter))
-        .filter((t) => (q ? `${t.note} ${t.category}`.toLowerCase().includes(q.toLowerCase()) : true))
+        .filter((t) =>
+          q ? `${t.note} ${t.category}`.toLowerCase().includes(q.toLowerCase()) : true,
+        )
         .sort((a, b) => b.date.localeCompare(a.date)),
     [filter, q],
   );
 
+  const totalIncome = list.filter((t) => t.type === "income").reduce((s, t) => s + t.amount, 0);
+  const totalExpense = list.filter((t) => t.type === "expense").reduce((s, t) => s + t.amount, 0);
+
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
+      {/* ── Header ── */}
       <div className="flex flex-wrap items-end justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl">Transactions</h1>
-          <p className="text-sm text-muted-foreground">{list.length} entries</p>
+          <h1 className="text-2xl font-bold tracking-tight md:text-3xl" style={{ color: "var(--foreground)" }}>
+            Transactions
+          </h1>
+          <p className="mt-0.5 text-sm" style={{ color: "var(--muted-foreground)" }}>
+            {list.length} entr{list.length === 1 ? "y" : "ies"}
+          </p>
         </div>
-        <Button className="gap-2 rounded-full bg-primary text-primary-foreground hover:bg-primary-light">
-          <Plus className="h-4 w-4" /> Add transaction
-        </Button>
+        <button
+          className="flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
+          style={{ background: "var(--primary)", boxShadow: "0 4px 12px rgba(79,70,229,0.30)" }}
+        >
+          <Plus size={16} strokeWidth={2.5} />
+          Add transaction
+        </button>
       </div>
 
-      <div className="flex flex-wrap items-center gap-3 rounded-2xl bg-card p-3 shadow-card">
-        <div className="relative flex-1 min-w-[180px]">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search..." className="h-10 rounded-full bg-secondary pl-9 border-transparent" />
+      {/* ── Summary chips ── */}
+      <div className="flex flex-wrap gap-3">
+        <div
+          className="flex-1 min-w-[140px] rounded-2xl p-4"
+          style={{ background: "var(--card)", boxShadow: "var(--shadow-card)" }}
+        >
+          <div className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Total income</div>
+          <div className="mt-1 text-xl font-bold" style={{ color: "var(--success)" }}>
+            +{formatCurrency(totalIncome)}
+          </div>
         </div>
-        <div className="flex rounded-full bg-secondary p-1">
+        <div
+          className="flex-1 min-w-[140px] rounded-2xl p-4"
+          style={{ background: "var(--card)", boxShadow: "var(--shadow-card)" }}
+        >
+          <div className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Total expenses</div>
+          <div className="mt-1 text-xl font-bold" style={{ color: "var(--danger)" }}>
+            -{formatCurrency(totalExpense)}
+          </div>
+        </div>
+        <div
+          className="flex-1 min-w-[140px] rounded-2xl p-4"
+          style={{ background: "var(--card)", boxShadow: "var(--shadow-card)" }}
+        >
+          <div className="text-xs font-medium" style={{ color: "var(--muted-foreground)" }}>Net</div>
+          <div
+            className="mt-1 text-xl font-bold"
+            style={{ color: totalIncome - totalExpense >= 0 ? "var(--success)" : "var(--danger)" }}
+          >
+            {totalIncome - totalExpense >= 0 ? "+" : ""}{formatCurrency(totalIncome - totalExpense)}
+          </div>
+        </div>
+      </div>
+
+      {/* ── Filters bar ── */}
+      <div
+        className="flex flex-wrap items-center gap-3 rounded-2xl p-3"
+        style={{ background: "var(--card)", boxShadow: "var(--shadow-card)" }}
+      >
+        <div className="relative flex-1 min-w-[180px]">
+          <Search
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2"
+            size={15}
+            style={{ color: "var(--muted-foreground)" }}
+          />
+          <input
+            type="text"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search transactions…"
+            className="finwise-input h-10 rounded-full pl-9 text-sm"
+            style={{ height: 40 }}
+          />
+        </div>
+        <div
+          className="flex rounded-full p-1"
+          style={{ background: "var(--surface-alt)" }}
+        >
           {(["all", "income", "expense"] as Filter[]).map((f) => (
             <button
               key={f}
               onClick={() => setFilter(f)}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium capitalize transition ${
-                filter === f ? "bg-card text-foreground shadow-sm" : "text-muted-foreground hover:text-foreground"
-              }`}
+              className="rounded-full px-4 py-1.5 text-sm font-medium capitalize transition"
+              style={
+                filter === f
+                  ? { background: "var(--card)", color: "var(--foreground)", boxShadow: "var(--shadow-sm)" }
+                  : { color: "var(--muted-foreground)" }
+              }
             >
               {f}
             </button>
@@ -62,32 +129,67 @@ function TransactionsPage() {
         </div>
       </div>
 
-      <ul className="divide-y rounded-2xl bg-card shadow-card">
-        {list.map((t) => {
-          const meta = categoryMeta[t.category];
-          const Icon = meta?.icon ?? Plus;
-          return (
-            <li key={t.id} className="flex items-center gap-3 px-5 py-4">
-              <span
-                className="grid h-11 w-11 place-items-center rounded-xl"
-                style={{ background: `color-mix(in oklab, ${meta?.tint} 15%, transparent)`, color: meta?.tint }}
-              >
-                <Icon className="h-5 w-5" />
-              </span>
-              <div className="flex-1">
-                <div className="text-sm font-medium">{t.note}</div>
-                <div className="text-xs text-muted-foreground">{t.category} · {formatDate(t.date)}</div>
-              </div>
-              <div className={`text-sm font-semibold ${t.type === "income" ? "text-success" : "text-foreground"}`}>
-                {t.type === "income" ? "+" : "-"}{formatCurrency(t.amount)}
-              </div>
-            </li>
-          );
-        })}
-        {list.length === 0 && (
-          <li className="px-5 py-10 text-center text-sm text-muted-foreground">No transactions match your filters.</li>
+      {/* ── List ── */}
+      <div
+        className="overflow-hidden rounded-2xl"
+        style={{ background: "var(--card)", boxShadow: "var(--shadow-card)" }}
+      >
+        {list.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 px-5 py-16 text-center">
+            <div
+              className="flex h-16 w-16 items-center justify-center rounded-2xl text-3xl"
+              style={{ background: "var(--surface-alt)" }}
+            >
+              🔍
+            </div>
+            <div className="font-semibold" style={{ color: "var(--foreground)" }}>No transactions found</div>
+            <div className="text-sm" style={{ color: "var(--muted-foreground)" }}>
+              Try adjusting your search or filter.
+            </div>
+          </div>
+        ) : (
+          <ul>
+            {list.map((t, i) => {
+              const meta = categoryMeta[t.category];
+              const Icon = meta?.icon ?? Plus;
+              const isIncome = t.type === "income";
+              return (
+                <li
+                  key={t.id}
+                  className="flex items-center gap-3 px-5 py-4 transition hover:opacity-90 cursor-pointer"
+                  style={{ borderTop: i > 0 ? "1px solid var(--border)" : undefined }}
+                >
+                  <span
+                    className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+                    style={{
+                      background: meta?.tint
+                        ? `color-mix(in srgb, ${meta.tint} 15%, transparent)`
+                        : "var(--surface-alt)",
+                      color: meta?.tint ?? "var(--muted-foreground)",
+                    }}
+                  >
+                    <Icon size={18} />
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate text-sm font-medium" style={{ color: "var(--foreground)" }}>
+                      {t.note}
+                    </div>
+                    <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>
+                      {t.category} · {formatDate(t.date)}
+                    </div>
+                  </div>
+                  <div
+                    className="text-sm font-semibold"
+                    style={{ color: isIncome ? "var(--success)" : "var(--danger)" }}
+                  >
+                    {isIncome ? "+" : "-"}{formatCurrency(t.amount)}
+                  </div>
+                </li>
+              );
+            })}
+          </ul>
         )}
-      </ul>
+      </div>
     </div>
   );
 }
