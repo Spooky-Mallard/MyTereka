@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { User, Lock, Bell, Palette, Globe, DollarSign, HelpCircle, MessageCircle, LogOut, Trash2, ChevronRight, Moon, Sun, Shield } from "lucide-react";
 
 function useTheme() {
@@ -28,7 +29,9 @@ function useTheme() {
 
 function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   return (
-    <button onClick={onToggle} className="relative flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200"
+    <button
+      onClick={(e) => { e.stopPropagation(); onToggle(); }}
+      className="relative flex h-6 w-11 shrink-0 items-center rounded-full transition-colors duration-200"
       style={{ background: on ? "var(--primary)" : "var(--surface-alt)" }} aria-checked={on} role="switch">
       <span className="absolute h-4 w-4 rounded-full bg-white shadow transition-transform duration-200"
         style={{ transform: on ? "translateX(24px)" : "translateX(4px)" }} />
@@ -36,10 +39,10 @@ function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
   );
 }
 
-function SettingRow({ icon: Icon, label, sub, iconColor, iconBg, right, danger, onClick }:
-  { icon: React.ElementType; label: string; sub?: string; iconColor: string; iconBg: string; right?: React.ReactNode; danger?: boolean; onClick?: () => void }) {
-  return (
-    <button onClick={onClick} className="flex w-full items-center gap-3 rounded-xl p-3 text-left transition hover:opacity-80 active:scale-[0.99]" style={{ background: "transparent" }}>
+function SettingRow({ icon: Icon, label, sub, iconColor, iconBg, right, danger, onClick, href }:
+  { icon: React.ElementType; label: string; sub?: string; iconColor: string; iconBg: string; right?: React.ReactNode; danger?: boolean; onClick?: () => void; href?: string }) {
+  const inner = (
+    <>
       <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl" style={{ background: iconBg, color: iconColor }}>
         <Icon size={16} />
       </span>
@@ -48,7 +51,21 @@ function SettingRow({ icon: Icon, label, sub, iconColor, iconBg, right, danger, 
         {sub && <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>{sub}</div>}
       </div>
       {right ?? <ChevronRight size={16} style={{ color: "var(--muted-foreground)" }} />}
-    </button>
+    </>
+  );
+
+  if (href) {
+    return (
+      <Link href={href} className="flex w-full items-center gap-3 rounded-xl p-3 transition hover:opacity-80 active:scale-[0.99]" style={{ background: "transparent" }}>
+        {inner}
+      </Link>
+    );
+  }
+
+  return (
+    <div onClick={onClick} className="flex w-full cursor-pointer items-center gap-3 rounded-xl p-3 transition hover:opacity-80 active:scale-[0.99]" style={{ background: "transparent" }}>
+      {inner}
+    </div>
   );
 }
 
@@ -88,17 +105,17 @@ export default function ProfilePage() {
       </div>
 
       <SettingsCard title="Account">
-        <SettingRow icon={User} label="Edit profile" sub="Name, photo, currency" iconColor="var(--primary)" iconBg="rgba(79,70,229,0.12)" />
-        <SettingRow icon={Lock} label="Change password" sub="Update your login password" iconColor="#6366F1" iconBg="rgba(99,102,241,0.12)" />
-        <SettingRow icon={Shield} label="Two-factor auth" sub="Extra layer of security" iconColor="var(--success)" iconBg="rgba(16,185,129,0.12)" />
+        <SettingRow icon={User} label="Edit profile" sub="Name, photo, currency" iconColor="var(--primary)" iconBg="rgba(79,70,229,0.12)" href="/profile/edit" />
+        <SettingRow icon={Lock} label="Change password" sub="Update your login password" iconColor="#6366F1" iconBg="rgba(99,102,241,0.12)" href="/profile/password" />
+        <SettingRow icon={Shield} label="Two-factor auth" sub="Extra layer of security" iconColor="var(--success)" iconBg="rgba(16,185,129,0.12)" href="/profile/2fa" />
       </SettingsCard>
 
       <SettingsCard title="Preferences">
         <SettingRow icon={dark ? Moon : Sun} label="Dark mode" sub={dark ? "Currently dark" : "Currently light"}
           iconColor="var(--warning)" iconBg="rgba(245,158,11,0.12)" right={<Toggle on={dark} onToggle={toggle} />} onClick={toggle} />
-        <SettingRow icon={DollarSign} label="Currency" sub="USD — US Dollar" iconColor="var(--success)" iconBg="rgba(16,185,129,0.12)" />
-        <SettingRow icon={Globe} label="Language" sub="English" iconColor="#14B8A6" iconBg="rgba(20,184,166,0.12)" />
-        <SettingRow icon={Palette} label="Appearance" sub="Theme, accent color" iconColor="#8B5CF6" iconBg="rgba(139,92,246,0.12)" />
+        <SettingRow icon={DollarSign} label="Currency" sub="USD — US Dollar" iconColor="var(--success)" iconBg="rgba(16,185,129,0.12)" href="/profile/currency" />
+        <SettingRow icon={Globe} label="Language" sub="English" iconColor="#14B8A6" iconBg="rgba(20,184,166,0.12)" href="/profile/language" />
+        <SettingRow icon={Palette} label="Appearance" sub="Theme, accent color" iconColor="#8B5CF6" iconBg="rgba(139,92,246,0.12)" href="/profile/appearance" />
       </SettingsCard>
 
       <SettingsCard title="Notifications">
@@ -109,8 +126,8 @@ export default function ProfilePage() {
       </SettingsCard>
 
       <SettingsCard title="Support">
-        <SettingRow icon={HelpCircle} label="Help center" sub="FAQs and guides" iconColor="#6366F1" iconBg="rgba(99,102,241,0.12)" />
-        <SettingRow icon={MessageCircle} label="Online support" sub="Chat with our team" iconColor="var(--primary)" iconBg="rgba(79,70,229,0.12)" />
+        <SettingRow icon={HelpCircle} label="Help center" sub="FAQs and guides" iconColor="#6366F1" iconBg="rgba(99,102,241,0.12)" href="/help" />
+        <SettingRow icon={MessageCircle} label="Online support" sub="Chat with our team" iconColor="var(--primary)" iconBg="rgba(79,70,229,0.12)" href="/support" />
       </SettingsCard>
 
       <SettingsCard title="Danger zone">
