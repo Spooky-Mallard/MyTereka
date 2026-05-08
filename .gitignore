@@ -32,3 +32,4 @@ dist-ssr
 *.sw?
 .next/dev
 CLAUDE.md
+documentation

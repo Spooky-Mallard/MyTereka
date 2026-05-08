@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=League+Spartan:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -105,6 +105,17 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
   --shadow-card: 0 2px 8px rgba(79, 70, 229, 0.08);
+
+  /* ── MyTereka brand (from launch.css + Onboarding.css) ── */
+  --brand-green: #00D09E;
+  --brand-green-light: #17C6A5;
+  --brand-green-pale: #F1FFF3;
+  --brand-green-circle: #DFF7E2;
+  --brand-dark: #052224;
+  --brand-dark-mid: #0E3E3E;
+  --brand-dark-text: #093030;
+  --brand-dark-black: #031314;
+  --brand-yellow: #FFCC00;
 }
 
 /* ═══════════════════════════════════════════
