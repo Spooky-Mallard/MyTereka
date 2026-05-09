@@ -34,7 +34,7 @@ export default function LaunchPage() {
   };
 
   return (
-    <div style={{ ...overlay, background: "var(--brand-green)" }}>
+    <div style={{ ...overlay, background: "var(--primary)" }}>
       <div className="flex flex-col items-center gap-6">
         <LogoMark color="#ffffff" />
         <span

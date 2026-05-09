@@ -3,11 +3,12 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: { default: "MyTereka", template: "%s — MyTereka" },
-  description: "Personal finance manager — track budgets, goals and spending.",
+  description: "Gamified financial management for Ugandan youth.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
-  const themeScript = `(function(){try{var t=localStorage.getItem('fw-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();`;
+  /* Dark mode default. Key: mt-theme. No flash on load. */
+  const themeScript = `(function(){try{var t=localStorage.getItem('mt-theme');document.documentElement.setAttribute('data-theme',t||'dark');}catch(e){document.documentElement.setAttribute('data-theme','dark');}})();`;
 
   return (
     <html lang="en" suppressHydrationWarning>
@@ -15,9 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line react/no-danger */}
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
       </head>
-      <body>
-        {children}
-      </body>
+      <body>{children}</body>
     </html>
   );
 }

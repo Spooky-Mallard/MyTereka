@@ -106,7 +106,7 @@ export default function OnboardingPage() {
           style={{
             left: "clamp(8px, 4vw, 24px)",
             /* bottom of plant sits exactly on the card's top edge */
-            bottom: "100%",
+            bottom: "93%",
             transformOrigin: "bottom left",
             transform: "rotate(-8deg)",
             zIndex: 20,

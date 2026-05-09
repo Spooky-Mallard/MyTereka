@@ -1,11 +1,12 @@
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@400;500;600;700&family=League+Spartan:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
 @custom-variant dark (&:is([data-theme="dark"] *), &[data-theme="dark"]);
 
 @theme inline {
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
+  --font-body: Calibri, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 
   /* ── Border radius ── */
   --radius-sm: 8px;
@@ -55,15 +56,17 @@
 }
 
 /* ═══════════════════════════════════════════
-   LIGHT MODE TOKENS
+   DARK MODE (DEFAULT — MyTereka Dark Navy)
 ═══════════════════════════════════════════ */
-:root {
+:root,
+[data-theme="dark"] {
   --radius: 12px;
 
-  --primary: #4F46E5;
+  /* ── Brand ── */
+  --primary: #00B894;
   --primary-foreground: #ffffff;
-  --primary-light: #6366F1;
-  --primary-dark: #3730A3;
+  --primary-light: #1DD1A1;
+  --primary-dark: #00A381;
 
   --success: #10B981;
   --success-foreground: #ffffff;
@@ -72,87 +75,90 @@
   --warning: #F59E0B;
   --warning-foreground: #1c1917;
 
-  --background: #F9FAFB;
-  --foreground: #111827;
-  --card: #ffffff;
-  --card-foreground: #111827;
-  --popover: #ffffff;
-  --popover-foreground: #111827;
-  --surface-alt: #F3F4F6;
-  --secondary: #F3F4F6;
-  --secondary-foreground: #111827;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  --accent: #EEF2FF;
-  --accent-foreground: #3730A3;
-  --destructive: #EF4444;
-  --destructive-foreground: #ffffff;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #4F46E5;
-
-  --sidebar: #ffffff;
-  --sidebar-foreground: #111827;
-  --sidebar-primary: #4F46E5;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #EEF2FF;
-  --sidebar-accent-foreground: #3730A3;
-  --sidebar-border: #E5E7EB;
-  --sidebar-ring: #4F46E5;
-
-  --gradient-primary: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
-  --shadow-card: 0 2px 8px rgba(79, 70, 229, 0.08);
-
-  /* ── MyTereka brand (from launch.css + Onboarding.css) ── */
-  --brand-green: #00D09E;
-  --brand-green-light: #17C6A5;
-  --brand-green-pale: #F1FFF3;
-  --brand-green-circle: #DFF7E2;
-  --brand-dark: #052224;
-  --brand-dark-mid: #0E3E3E;
-  --brand-dark-text: #093030;
-  --brand-dark-black: #031314;
-  --brand-yellow: #FFCC00;
-}
-
-/* ═══════════════════════════════════════════
-   DARK MODE TOKENS
-═══════════════════════════════════════════ */
-[data-theme="dark"] {
-  --background: #0F172A;
+  /* ── Surfaces ── */
+  --background: #0D2137;
   --foreground: #F1F5F9;
-  --card: #1E293B;
+  --card: #1A2F45;
   --card-foreground: #F1F5F9;
-  --popover: #1E293B;
+  --popover: #1A2F45;
   --popover-foreground: #F1F5F9;
-  --surface-alt: #334155;
-  --secondary: #334155;
+  --surface-alt: #243B55;
+  --secondary: #243B55;
   --secondary-foreground: #F1F5F9;
-  --muted: #334155;
+  --muted: #2D4A6B;
   --muted-foreground: #94A3B8;
-  --accent: #1E3A5F;
+  --accent: #1A3A52;
   --accent-foreground: #F1F5F9;
   --destructive: #EF4444;
   --destructive-foreground: #ffffff;
-  --border: #334155;
-  --input: #334155;
-  --ring: #6366F1;
+  --border: #2D4A6B;
+  --input: #2D4A6B;
+  --ring: #00B894;
 
-  --sidebar: #1E293B;
+  /* ── Sidebar ── */
+  --sidebar: #0A1929;
   --sidebar-foreground: #F1F5F9;
-  --sidebar-primary: #6366F1;
+  --sidebar-primary: #00B894;
   --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #1e3a5f;
+  --sidebar-accent: #1A2F45;
   --sidebar-accent-foreground: #F1F5F9;
-  --sidebar-border: #334155;
-  --sidebar-ring: #6366F1;
+  --sidebar-border: #1A2F45;
+  --sidebar-ring: #00B894;
 
-  --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.30);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
-  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.40);
+  /* ── Brand aliases (for onboarding/launch compatibility) ── */
+  --brand-green: #00B894;
+  --brand-green-light: #1DD1A1;
+  --brand-green-pale: #E8F8F4;
+  --brand-green-circle: #C3EFE7;
+  --brand-dark: #0A1929;
+  --brand-dark-mid: #0D2137;
+  --brand-dark-text: #0D2137;
+
+  /* ── Gradients / shadows ── */
+  --gradient-primary: linear-gradient(135deg, #00B894, #1DD1A1);
+  --gradient-card: linear-gradient(135deg, #0D2137, #1A2F45);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
+  --shadow-card: 0 2px 8px rgba(0, 184, 148, 0.12);
+}
+
+/* ═══════════════════════════════════════════
+   LIGHT MODE TOKENS (override)
+═══════════════════════════════════════════ */
+[data-theme="light"] {
+  --background: #F0FAF7;
+  --foreground: #0D2137;
+  --card: #ffffff;
+  --card-foreground: #0D2137;
+  --popover: #ffffff;
+  --popover-foreground: #0D2137;
+  --surface-alt: #E6F4F0;
+  --secondary: #E6F4F0;
+  --secondary-foreground: #0D2137;
+  --muted: #D1EBE4;
+  --muted-foreground: #5A7A6E;
+  --accent: #C7EBE1;
+  --accent-foreground: #0D2137;
+  --destructive: #EF4444;
+  --destructive-foreground: #ffffff;
+  --border: #B0D9CE;
+  --input: #B0D9CE;
+  --ring: #00B894;
+
+  --sidebar: #ffffff;
+  --sidebar-foreground: #0D2137;
+  --sidebar-primary: #00B894;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #E6F4F0;
+  --sidebar-accent-foreground: #0D2137;
+  --sidebar-border: #D1EBE4;
+  --sidebar-ring: #00B894;
+
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.10);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.14);
+  --shadow-card: 0 2px 8px rgba(0, 184, 148, 0.10);
 }
 
 /* ═══════════════════════════════════════════
@@ -173,10 +179,14 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-sans);
+    font-family: var(--font-body);
     font-feature-settings: "cv11", "ss01";
     line-height: 1.5;
     min-height: 100vh;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-sans);
   }
 
   h1 { font-size: 28px; font-weight: 700; line-height: 36px; letter-spacing: -0.01em; }
@@ -194,11 +204,12 @@
   .bg-gradient-primary { background: var(--gradient-primary); }
 
   .shadow-card { box-shadow: var(--shadow-card); }
-  .shadow-finwise-sm { box-shadow: var(--shadow-sm); }
-  .shadow-finwise-md { box-shadow: var(--shadow-md); }
-  .shadow-finwise-lg { box-shadow: var(--shadow-lg); }
+  .shadow-sm   { box-shadow: var(--shadow-sm); }
+  .shadow-md   { box-shadow: var(--shadow-md); }
+  .shadow-lg   { box-shadow: var(--shadow-lg); }
 
-  .amount-income { color: var(--success); }
+  /* Always use these classes for money amounts */
+  .amount-income  { color: var(--success); }
   .amount-expense { color: var(--danger); }
 
   .card-base {
@@ -208,10 +219,12 @@
     padding: 24px;
   }
 
+  /* Budget progress states */
   .budget-ok   { background: var(--success); }
   .budget-warn { background: var(--warning); }
   .budget-over { background: var(--danger); }
 
+  /* Skeleton shimmer */
   .skeleton {
     background: linear-gradient(
       90deg,
@@ -224,6 +237,7 @@
     border-radius: var(--radius-md);
   }
 
+  /* Mobile bottom nav */
   .bottom-nav {
     position: fixed;
     bottom: 0;
@@ -232,7 +246,7 @@
     z-index: 50;
     background: var(--card);
     border-top: 1px solid var(--border);
-    box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.20);
     display: flex;
     align-items: center;
     justify-content: space-around;
@@ -256,9 +270,12 @@
     min-width: 52px;
     border: none;
     background: transparent;
+    font-family: var(--font-sans);
   }
 
-  .bottom-nav-item.active { color: var(--primary); }
+  .bottom-nav-item.active {
+    color: var(--primary);
+  }
 
   .bottom-nav-item.fab {
     background: var(--primary);
@@ -268,8 +285,52 @@
     height: 52px;
     padding: 0;
     justify-content: center;
-    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.40);
+    box-shadow: 0 4px 12px rgba(0, 184, 148, 0.45);
     margin-top: -12px;
+  }
+
+  /* Streak dots (gamification) */
+  .streak-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+  }
+
+  .streak-dot-empty {
+    width: 10px;
+    height: 10px;
+    border-radius: var(--radius-full);
+    background: var(--muted);
+    border: 1.5px solid var(--border);
+  }
+
+  /* XP bar */
+  .xp-bar {
+    height: 6px;
+    background: var(--surface-alt);
+    border-radius: var(--radius-full);
+    overflow: hidden;
+  }
+
+  .xp-bar-fill {
+    height: 100%;
+    background: var(--gradient-primary);
+    border-radius: var(--radius-full);
+    transition: width 0.5s ease;
+  }
+
+  /* Level badge */
+  .level-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 10px;
+    border-radius: var(--radius-full);
+    background: var(--primary);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    font-family: var(--font-sans);
   }
 }
 
@@ -282,6 +343,8 @@
    COMPONENT OVERRIDES
 ═══════════════════════════════════════════ */
 
+/* Input (formerly finwise-input → mytereka-input, but keep alias) */
+.mytereka-input,
 .finwise-input {
   height: 52px;
   border: 1.5px solid var(--border);
@@ -293,14 +356,19 @@
   transition: border-color 0.15s;
   width: 100%;
 }
+.mytereka-input:focus,
 .finwise-input:focus {
   outline: none;
   border-color: var(--primary);
   background: var(--card);
+  box-shadow: 0 0 0 3px rgba(0, 184, 148, 0.15);
 }
+.mytereka-input::placeholder,
 .finwise-input::placeholder { color: var(--muted-foreground); }
+.mytereka-input.error,
 .finwise-input.error { border-color: var(--danger); }
 
+/* Progress bar */
 .progress-track {
   height: 8px;
   background: var(--surface-alt);
@@ -316,16 +384,49 @@
 .progress-fill.warn { background: var(--warning); }
 .progress-fill.over { background: var(--danger); }
 
+/* Goal ring (SVG circular progress) */
 .goal-ring-svg  { transform: rotate(-90deg); }
 .goal-ring-bg   { fill: none; stroke: var(--surface-alt); }
 .goal-ring-fill { fill: none; stroke: var(--primary); stroke-linecap: round; transition: stroke-dashoffset 0.5s ease; }
 
+/* Sidebar active state */
 [data-sidebar="menu-button"][data-active="true"] {
   background: var(--accent) !important;
   color: var(--primary) !important;
   font-weight: 600;
 }
 
+/* Sonner toast overrides */
 [data-sonner-toaster] [data-type="success"] { --normal-bg: var(--success); --normal-text: #fff; }
 [data-sonner-toaster] [data-type="error"]   { --normal-bg: var(--danger);  --normal-text: #fff; }
 [data-sonner-toaster] [data-type="warning"] { --normal-bg: var(--warning); --normal-text: #1c1917; }
+
+/* Goal map path animations */
+@keyframes pulse-node {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.1); opacity: 0.8; }
+}
+
+.goal-map-node-active {
+  animation: pulse-node 2s ease-in-out infinite;
+}
+
+@keyframes float-avatar {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-4px); }
+}
+
+.goal-map-avatar {
+  animation: float-avatar 3s ease-in-out infinite;
+}
+
+/* XP gain pop animation */
+@keyframes xp-pop {
+  0% { transform: scale(0.8) translateY(0); opacity: 0; }
+  40% { transform: scale(1.2) translateY(-8px); opacity: 1; }
+  100% { transform: scale(1) translateY(-16px); opacity: 0; }
+}
+
+.xp-pop {
+  animation: xp-pop 0.8s ease forwards;
+}

@@ -3,13 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
-  LayoutDashboard,
+  House,
   ArrowLeftRight,
-  PieChart,
+  BarChart2,
+  PiggyBank,
   Target,
-  Settings,
-  LogOut,
   User,
+  LogOut,
+  Plus,
 } from "lucide-react";
 import {
   Sidebar,
@@ -23,37 +24,38 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { mockUser } from "@/lib/mock-data";
 
 const navItems = [
-  { title: "Dashboard", url: "/", icon: LayoutDashboard },
+  { title: "Home",         url: "/",             icon: House },
   { title: "Transactions", url: "/transactions", icon: ArrowLeftRight },
-  { title: "Analytics", url: "/analytics", icon: PieChart },
-  { title: "Budgets", url: "/budgets", icon: Target },
-  { title: "Goals", url: "/goals", icon: PieChart },
+  { title: "Analytics",    url: "/analytics",    icon: BarChart2 },
+  { title: "Budgets",      url: "/budgets",      icon: PiggyBank },
+  { title: "Goals",        url: "/goals",        icon: Target },
 ];
 
-export function AppSidebar() {
+export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
   const pathname = usePathname();
   const isActive = (path: string) =>
     path === "/" ? pathname === "/" : pathname.startsWith(path);
 
   return (
-    <Sidebar collapsible="icon">
+    <Sidebar collapsible="icon" style={{ background: "var(--sidebar)" }}>
       {/* ── Logo ── */}
       <SidebarHeader className="px-4 py-5">
         <Link href="/" className="flex items-center gap-3">
           <div
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-            style={{ background: "var(--gradient-primary)" }}
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl overflow-hidden"
+            style={{ background: "var(--primary)" }}
           >
-            <img src="/logo.svg" alt="FinWise logo" className="h-6 w-6 object-contain" />
+            <img src="/logo.svg" alt="MyTereka" className="h-6 w-6 object-contain" />
           </div>
           <div className="flex flex-col leading-tight group-data-[collapsible=icon]:hidden">
             <span
               className="text-lg font-bold tracking-tight"
-              style={{ color: "var(--sidebar-foreground)" }}
+              style={{ color: "var(--primary)", fontFamily: "Poppins, sans-serif" }}
             >
-              FinWise
+              MyTereka
             </span>
             <span className="text-xs" style={{ color: "var(--muted-foreground)" }}>
               Personal finance
@@ -84,7 +86,7 @@ export function AppSidebar() {
                       className="h-10 rounded-xl font-medium transition-all"
                       style={
                         active
-                          ? { background: "var(--accent)", color: "var(--primary)" }
+                          ? { background: "rgba(0,184,148,0.15)", color: "var(--primary)" }
                           : { color: "var(--sidebar-foreground)" }
                       }
                     >
@@ -100,6 +102,19 @@ export function AppSidebar() {
                   </SidebarMenuItem>
                 );
               })}
+
+              {/* Add transaction button */}
+              <SidebarMenuItem>
+                <SidebarMenuButton
+                  tooltip="Add Transaction"
+                  className="h-10 rounded-xl font-medium transition-all mt-2"
+                  style={{ background: "var(--primary)", color: "#fff" }}
+                  onClick={onAdd}
+                >
+                  <Plus size={18} strokeWidth={2.5} />
+                  <span>Add Transaction</span>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -107,26 +122,27 @@ export function AppSidebar() {
 
       {/* ── Footer ── */}
       <SidebarFooter className="px-2 pb-4">
-        <div className="mb-3 h-px w-full" style={{ background: "var(--sidebar-border)" }} />
+        <div className="mb-2 h-px w-full" style={{ background: "var(--sidebar-border)" }} />
         <SidebarMenu className="gap-0.5">
           <SidebarMenuItem>
             <SidebarMenuButton
+              asChild
               tooltip="Profile"
               className="h-10 rounded-xl font-medium transition-all"
-              style={{ color: "var(--sidebar-foreground)" }}
+              isActive={pathname.startsWith("/profile")}
+              style={
+                pathname.startsWith("/profile")
+                  ? { background: "rgba(0,184,148,0.15)", color: "var(--primary)" }
+                  : { color: "var(--sidebar-foreground)" }
+              }
             >
-              <User size={18} style={{ color: "var(--muted-foreground)" }} />
-              <span>Profile</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              tooltip="Settings"
-              className="h-10 rounded-xl font-medium transition-all"
-              style={{ color: "var(--sidebar-foreground)" }}
-            >
-              <Settings size={18} style={{ color: "var(--muted-foreground)" }} />
-              <span>Settings</span>
+              <Link href="/profile" className="flex items-center gap-3 px-3">
+                <User
+                  size={18}
+                  style={{ color: pathname.startsWith("/profile") ? "var(--primary)" : "var(--muted-foreground)" }}
+                />
+                <span>Profile</span>
+              </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
@@ -147,16 +163,16 @@ export function AppSidebar() {
           style={{ background: "var(--surface-alt)" }}
         >
           <div
-            className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
+            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
             style={{ background: "var(--gradient-primary)" }}
           >
-            AM
+            {mockUser.initials}
           </div>
           <div className="flex-1 min-w-0">
             <div className="truncate text-sm font-semibold" style={{ color: "var(--sidebar-foreground)" }}>
-              Alex Morgan
+              {mockUser.name}
             </div>
-            <div className="text-xs" style={{ color: "var(--muted-foreground)" }}>Premium</div>
+            <span className="level-badge">{mockUser.level}</span>
           </div>
         </div>
       </SidebarFooter>
