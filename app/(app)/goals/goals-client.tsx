@@ -1,15 +1,17 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import { Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2, CalendarDays } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
-import { createGoal } from '@/lib/actions/goals'
+import { createGoal, contributeToGoal } from '@/lib/actions/goals'
+import { getAccountsForUser } from '@/lib/actions/transactions'
 import type { goals } from '@/lib/schema'
 import type { InferSelectModel } from 'drizzle-orm'
 
 type GoalRow = InferSelectModel<typeof goals>
+type AccountRow = { id: string; name: string; balance: number; type: string }
 
 const iconMap: Record<string, React.ElementType> = {
   laptop:  Laptop,
@@ -40,56 +42,199 @@ function GoalRing({ pct, size = 80 }: { pct: number; size?: number }) {
   )
 }
 
-function GoalCard({ goal }: { goal: GoalRow }) {
-  const pct  = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
-  const Icon = goal.icon ? iconMap[goal.icon] ?? Target : Target
+function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void }) {
+  const router = useRouter()
+  const [accounts,   setAccounts]   = useState<AccountRow[]>([])
+  const [accountId,  setAccountId]  = useState('')
+  const [amount,     setAmount]     = useState('')
+  const [note,       setNote]       = useState('')
+  const [saving,     setSaving]     = useState(false)
+  const [loadingAcc, setLoadingAcc] = useState(true)
+
+  useEffect(() => {
+    getAccountsForUser()
+      .then((accs) => {
+        setAccounts(accs)
+        if (accs.length) setAccountId(accs[0].id)
+      })
+      .finally(() => setLoadingAcc(false))
+  }, [])
+
+  async function handleContribute() {
+    if (!amount || Number(amount) <= 0) { toast.error('Enter a valid amount'); return }
+    if (!accountId)                      { toast.error('Select an account');   return }
+    const numAmount = Math.round(Number(amount))
+    const acc = accounts.find((a) => a.id === accountId)
+    if (acc && numAmount > acc.balance) {
+      toast.error('Insufficient balance in selected account')
+      return
+    }
+    setSaving(true)
+    try {
+      const result = await contributeToGoal(goal.id, numAmount, accountId, note || undefined)
+      if (result.completed) {
+        toast.success(`Goal "${result.goalName}" completed! 🎉`)
+      } else {
+        toast.success(`Contribution saved — ${formatUGX(numAmount)}`)
+      }
+      onClose()
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to save contribution')
+    } finally {
+      setSaving(false)
+    }
+  }
 
   return (
-    <div className="rounded-2xl p-5 cursor-pointer"
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+              Add Contribution
+            </h2>
+            <p className="text-sm mt-0.5" style={{ color: 'var(--muted-foreground)' }}>{goal.name}</p>
+          </div>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+        </div>
+
+        {/* Remaining */}
+        <div className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-alt)' }}>
+          <div className="text-xs mb-1" style={{ color: 'var(--muted-foreground)' }}>Remaining</div>
+          <div className="text-lg font-bold" style={{ color: 'var(--primary)' }}>
+            {formatUGX(Math.max(0, goal.targetAmount - goal.currentAmount))}
+          </div>
+        </div>
+
+        {/* Amount */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Amount (UGX)
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold"
+              style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0"
+              value={amount} onChange={(e) => setAmount(e.target.value)}
+              className="mytereka-input pl-16 font-bold"
+              style={{ color: 'var(--primary)' }} />
+          </div>
+        </div>
+
+        {/* Account */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Source account
+          </label>
+          {loadingAcc ? (
+            <div className="mytereka-input flex items-center gap-2">
+              <Loader2 size={14} className="animate-spin" />
+              <span className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Loading...</span>
+            </div>
+          ) : (
+            <select value={accountId} onChange={(e) => setAccountId(e.target.value)}
+              className="mytereka-input appearance-none">
+              {accounts.map((a) => (
+                <option key={a.id} value={a.id}>
+                  {a.name} — {formatUGX(a.balance)}
+                </option>
+              ))}
+            </select>
+          )}
+        </div>
+
+        {/* Note */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Note (optional)
+          </label>
+          <input type="text" placeholder="e.g. Monthly savings"
+            value={note} onChange={(e) => setNote(e.target.value)}
+            className="mytereka-input" />
+        </div>
+
+        <button onClick={handleContribute} disabled={saving}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+          style={{ background: 'var(--gradient-primary)' }}>
+          {saving && <Loader2 size={16} className="animate-spin" />}
+          Add Contribution
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: GoalRow) => void }) {
+  const pct      = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
+  const Icon     = goal.icon ? iconMap[goal.icon] ?? Target : Target
+  const remaining = Math.max(0, goal.targetAmount - goal.currentAmount)
+  const barColor = goal.isCompleted ? 'var(--success)' : pct >= 75 ? 'var(--primary-light)' : 'var(--primary)'
+
+  return (
+    <div className="rounded-2xl p-5 flex flex-col gap-4"
       style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-      <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
-          <GoalRing pct={pct} size={72} />
-          <span className="absolute inset-0 flex items-center justify-center"
-            style={{ color: goal.isCompleted ? 'var(--primary)' : 'var(--muted-foreground)' }}>
-            {goal.isCompleted ? <Trophy size={20} /> : <Icon size={18} />}
-          </span>
+      {/* Header row */}
+      <div className="flex items-start gap-3">
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+          style={{ background: goal.isCompleted ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
+                   color: goal.isCompleted ? 'var(--primary)' : 'var(--muted-foreground)' }}>
+          {goal.isCompleted ? <Trophy size={20} /> : <Icon size={20} />}
         </div>
 
         <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <span className="font-semibold truncate" style={{ color: 'var(--foreground)' }}>
-              {goal.name}
-            </span>
-            {goal.isLocked && (
-              <Lock size={13} style={{ color: 'var(--warning)', flexShrink: 0 }} />
-            )}
+          <div className="flex items-center gap-2 flex-wrap">
+            <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{goal.name}</span>
+            {goal.isLocked && <Lock size={13} style={{ color: 'var(--warning)' }} />}
             {goal.isCompleted && (
               <span className="rounded-full px-2 py-0.5 text-xs font-semibold"
-                style={{ background: 'var(--primary)22', color: 'var(--primary)' }}>
+                style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
                 Done
               </span>
             )}
           </div>
-
-          <div className="mt-1 text-sm font-bold" style={{ color: 'var(--foreground)' }}>
-            {formatUGX(goal.currentAmount)}
-            <span className="text-xs font-normal ml-1" style={{ color: 'var(--muted-foreground)' }}>
-              of {formatUGX(goal.targetAmount)}
-            </span>
-          </div>
-
           {goal.targetDate && (
-            <div className="mt-0.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-              Target: {new Date(goal.targetDate).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })}
+            <div className="mt-0.5 text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
+              <CalendarDays size={11} />
+              {new Date(goal.targetDate).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })}
             </div>
           )}
         </div>
 
         <div className="shrink-0 text-right">
-          <div className="text-lg font-bold" style={{ color: 'var(--primary)' }}>{pct}%</div>
+          <div className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{pct}%</div>
         </div>
       </div>
+
+      {/* Progress bar */}
+      <div>
+        <div className="progress-track" style={{ height: 8 }}>
+          <div className="progress-fill" style={{ width: `${pct}%`, background: barColor, borderRadius: 'var(--radius-full)' }} />
+        </div>
+        <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          <span>Saved: <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{formatUGX(goal.currentAmount)}</span></span>
+          <span>Target: <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{formatUGX(goal.targetAmount)}</span></span>
+        </div>
+        {!goal.isCompleted && (
+          <div className="mt-0.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            Remaining: <span className="font-semibold" style={{ color: 'var(--warning)' }}>{formatUGX(remaining)}</span>
+          </div>
+        )}
+      </div>
+
+      {/* Add Contribution button */}
+      {!goal.isCompleted && (
+        <button
+          onClick={() => onContribute(goal)}
+          className="flex items-center justify-center gap-2 w-full rounded-full py-2.5 text-sm font-semibold transition hover:opacity-90 active:scale-95"
+          style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)', border: '1px solid rgba(0,184,148,0.3)' }}>
+          <Plus size={15} strokeWidth={2.5} />
+          Add Contribution
+        </button>
+      )}
     </div>
   )
 }
@@ -122,13 +267,10 @@ function GoalMap({ goals: goalList }: { goals: GoalRow[] }) {
   return (
     <div className="overflow-y-auto" style={{ maxHeight: 520 }}>
       <svg width={svgWidth} height={svgHeight} style={{ display: 'block', margin: '0 auto' }}>
-        {/* Path segments */}
         {pathParts.map((d, i) => (
           <path key={i} d={d} fill="none" stroke="var(--border)" strokeWidth={4}
             strokeDasharray="8 6" strokeLinecap="round" />
         ))}
-
-        {/* Nodes */}
         {nodes.map(({ g, x, y, done, Icon }, i) => (
           <g key={g.id}>
             <circle cx={x} cy={y} r={nodeR + 4} fill={done ? 'var(--primary)' : 'var(--card)'}
@@ -194,14 +336,12 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
           <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
         </div>
 
-        {/* Name */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Goal name</label>
           <input type="text" placeholder="e.g. New Laptop" value={name} onChange={(e) => setName(e.target.value)}
             className="mytereka-input" />
         </div>
 
-        {/* Target amount */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Target amount (UGX)</label>
           <div className="relative">
@@ -211,7 +351,6 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Target date */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Target date (optional)</label>
           <div className="relative">
@@ -222,7 +361,6 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Icon picker */}
         <div>
           <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Icon</label>
           <div className="flex flex-wrap gap-2">
@@ -243,7 +381,6 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        {/* Locked toggle */}
         <div className="flex items-center justify-between">
           <div>
             <div className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Lock savings</div>
@@ -271,8 +408,9 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
 type Tab = 'goals' | 'map'
 
 export function GoalsClient({ data }: { data: GoalRow[] }) {
-  const [tab,     setTab]     = useState<Tab>('goals')
-  const [showNew, setShowNew] = useState(false)
+  const [tab,          setTab]          = useState<Tab>('goals')
+  const [showNew,      setShowNew]      = useState(false)
+  const [contributeGoal, setContributeGoal] = useState<GoalRow | null>(null)
 
   const active    = data.filter((g) => !g.isCompleted)
   const completed = data.filter((g) => g.isCompleted)
@@ -330,7 +468,9 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
         <div className="flex flex-col gap-4">
           {active.length > 0 && (
             <div className="flex flex-col gap-3">
-              {active.map((g) => <GoalCard key={g.id} goal={g} />)}
+              {active.map((g) => (
+                <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
+              ))}
             </div>
           )}
           {completed.length > 0 && (
@@ -339,7 +479,9 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
                 style={{ color: 'var(--muted-foreground)' }}>
                 Completed
               </div>
-              {completed.map((g) => <GoalCard key={g.id} goal={g} />)}
+              {completed.map((g) => (
+                <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
+              ))}
             </div>
           )}
         </div>
@@ -350,6 +492,9 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
       )}
 
       {showNew && <NewGoalModal onClose={() => setShowNew(false)} />}
+      {contributeGoal && (
+        <ContributeModal goal={contributeGoal} onClose={() => setContributeGoal(null)} />
+      )}
     </div>
   )
 }

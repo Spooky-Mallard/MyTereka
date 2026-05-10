@@ -26,6 +26,14 @@ const DEFAULT_INCOME_CATEGORIES = [
   { name: 'Other',           icon: 'plus-circle', color: '#94A3B8' },
 ]
 
+const DEFAULT_INVESTMENT_CATEGORIES = [
+  { name: 'Savings',     icon: 'piggy-bank',  color: '#00B894' },
+  { name: 'SACCO',       icon: 'building',    color: '#3B82F6' },
+  { name: 'Stocks',      icon: 'trending-up', color: '#8B5CF6' },
+  { name: 'Crypto',      icon: 'bitcoin',     color: '#F59E0B' },
+  { name: 'Fixed Deposit', icon: 'lock',      color: '#10B981' },
+]
+
 const DEFAULT_ACCOUNTS = [
   { name: 'MTN Mobile Money', type: 'mobile_money' as const, balance: 0 },
   { name: 'Cash',             type: 'cash'         as const, balance: 0 },
@@ -65,6 +73,9 @@ export async function registerUser(formData: FormData) {
     })),
     ...DEFAULT_INCOME_CATEGORIES.map((c) => ({
       ...c, userId: user.id, type: 'income' as const, isDefault: true,
+    })),
+    ...DEFAULT_INVESTMENT_CATEGORIES.map((c) => ({
+      ...c, userId: user.id, type: 'investment' as const, isDefault: true,
     })),
   ])
 

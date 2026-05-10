@@ -8,15 +8,17 @@ import {
   User, Lock, Bell, Globe, HelpCircle, MessageCircle,
   LogOut, Trash2, ChevronRight, Moon, Sun, Shield, Star, Flame,
   Upload, FileText, CheckCircle2, AlertCircle, Loader2,
+  Plus, X, Wallet, Banknote, Building2, Users, ArrowRightLeft, CalendarDays,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { importTransactions } from '@/lib/actions/transactions'
+import { importTransactions, createAccount, deleteAccount, getAccountsForUser, transferBetweenAccounts } from '@/lib/actions/transactions'
 import type { ImportRow } from '@/lib/actions/transactions'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
+import { formatUGX } from '@/lib/format'
 
 /* All defined badges so unearned ones still show (greyed) */
 const ALL_BADGES = [
@@ -370,7 +372,314 @@ function CSVImport() {
   )
 }
 
-type ProfileTab = 'settings' | 'badges' | 'import'
+const ACCOUNT_TYPE_ICONS: Record<string, React.ElementType> = {
+  cash:         Banknote,
+  mobile_money: Wallet,
+  bank:         Building2,
+  sacco:        Users,
+}
+
+type AccountRow = { id: string; name: string; type: string; balance: number; icon: string | null; color: string | null }
+
+function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose: () => void }) {
+  const router = useRouter()
+  const [fromId,  setFromId]  = useState(accounts[0]?.id ?? '')
+  const [toId,    setToId]    = useState(accounts[1]?.id ?? accounts[0]?.id ?? '')
+  const [amount,  setAmount]  = useState('')
+  const [fee,     setFee]     = useState('0')
+  const [note,    setNote]    = useState('')
+  const [date,    setDate]    = useState(new Date().toISOString().split('T')[0])
+  const [saving,  setSaving]  = useState(false)
+
+  async function handleTransfer() {
+    if (!amount || Number(amount) <= 0) { toast.error('Enter a valid amount'); return }
+    if (fromId === toId) { toast.error('From and To accounts must differ'); return }
+    const numAmount = Math.round(Number(amount))
+    const numFee    = Math.round(Number(fee) || 0)
+    const fromAcc   = accounts.find((a) => a.id === fromId)
+    if (fromAcc && numAmount + numFee > fromAcc.balance) {
+      toast.error('Insufficient balance (including fee)')
+      return
+    }
+    setSaving(true)
+    try {
+      await transferBetweenAccounts({ fromAccountId: fromId, toAccountId: toId, amount: numAmount, fee: numFee, note: note || undefined, date })
+      toast.success(`Transfer of ${formatUGX(numAmount)} recorded`)
+      onClose()
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Transfer failed')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            Transfer Between Accounts
+          </h2>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+        </div>
+
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>From</label>
+            <select value={fromId} onChange={(e) => setFromId(e.target.value)} className="mytereka-input appearance-none text-sm">
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+          <div>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>To</label>
+            <select value={toId} onChange={(e) => setToId(e.target.value)} className="mytereka-input appearance-none text-sm">
+              {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
+            </select>
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Amount (UGX)</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0" value={amount}
+              onChange={(e) => setAmount(e.target.value)} className="mytereka-input pl-16 font-bold" />
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Transaction fee (UGX) — leave 0 if none
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0" value={fee}
+              onChange={(e) => setFee(e.target.value)} className="mytereka-input pl-16" />
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Date</label>
+          <div className="relative">
+            <CalendarDays size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
+            <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mytereka-input pl-10" />
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Note (optional)</label>
+          <input type="text" placeholder="e.g. MTN to Stanbic" value={note} onChange={(e) => setNote(e.target.value)} className="mytereka-input" />
+        </div>
+
+        <button onClick={handleTransfer} disabled={saving}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+          style={{ background: 'var(--gradient-primary)' }}>
+          {saving && <Loader2 size={16} className="animate-spin" />}
+          Transfer
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AddAccountModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter()
+  const [name,    setName]    = useState('')
+  const [type,    setType]    = useState<'cash' | 'mobile_money' | 'bank' | 'sacco'>('cash')
+  const [balance, setBalance] = useState('0')
+  const [saving,  setSaving]  = useState(false)
+
+  async function handleSave() {
+    if (!name.trim()) { toast.error('Enter an account name'); return }
+    setSaving(true)
+    try {
+      await createAccount({ name: name.trim(), type, balance: Math.round(Number(balance) || 0) })
+      toast.success('Account added')
+      onClose()
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to add account')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const accountTypes: Array<{ value: typeof type; label: string }> = [
+    { value: 'cash',         label: 'Cash' },
+    { value: 'mobile_money', label: 'Mobile Money' },
+    { value: 'bank',         label: 'Bank' },
+    { value: 'sacco',        label: 'SACCO' },
+  ]
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>Add Account</h2>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Account name</label>
+          <input type="text" placeholder="e.g. MTN Mobile Money" value={name} onChange={(e) => setName(e.target.value)} className="mytereka-input" />
+        </div>
+
+        <div>
+          <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Type</label>
+          <div className="grid grid-cols-2 gap-2">
+            {accountTypes.map(({ value, label }) => {
+              const Icon = ACCOUNT_TYPE_ICONS[value]
+              return (
+                <button key={value} onClick={() => setType(value)}
+                  className="flex items-center gap-2 rounded-xl p-3 text-sm font-medium transition-all"
+                  style={{
+                    background: type === value ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
+                    border: type === value ? '1.5px solid var(--primary)' : '1.5px solid transparent',
+                    color: type === value ? 'var(--primary)' : 'var(--foreground)',
+                  }}>
+                  <Icon size={16} />
+                  {label}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Current balance (UGX)
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0" value={balance}
+              onChange={(e) => setBalance(e.target.value)} className="mytereka-input pl-16 font-bold" />
+          </div>
+        </div>
+
+        <button onClick={handleSave} disabled={saving}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+          style={{ background: 'var(--gradient-primary)' }}>
+          {saving && <Loader2 size={16} className="animate-spin" />}
+          Add Account
+        </button>
+      </div>
+    </div>
+  )
+}
+
+function AccountsManager() {
+  const router = useRouter()
+  const [accounts,    setAccounts]    = useState<AccountRow[]>([])
+  const [loading,     setLoading]     = useState(true)
+  const [showAdd,     setShowAdd]     = useState(false)
+  const [showTransfer,setShowTransfer]= useState(false)
+  const [deleting,    setDeleting]    = useState<string | null>(null)
+
+  useEffect(() => {
+    getAccountsForUser()
+      .then((accs) => setAccounts(accs as AccountRow[]))
+      .finally(() => setLoading(false))
+  }, [])
+
+  async function handleDelete(id: string) {
+    setDeleting(id)
+    try {
+      await deleteAccount(id)
+      setAccounts((a) => a.filter((x) => x.id !== id))
+      toast.success('Account removed')
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to delete')
+    } finally {
+      setDeleting(null)
+    }
+  }
+
+  const totalBalance = accounts.reduce((s, a) => s + a.balance, 0)
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Total */}
+      <div className="rounded-2xl p-4 flex items-center justify-between"
+        style={{ background: 'var(--surface-alt)' }}>
+        <div>
+          <div className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>Total Balance</div>
+          <div className="text-xl font-bold mt-0.5" style={{ color: 'var(--primary)' }}>{formatUGX(totalBalance)}</div>
+        </div>
+        {accounts.length >= 2 && (
+          <button onClick={() => setShowTransfer(true)}
+            className="flex items-center gap-2 rounded-full px-4 py-2 text-sm font-semibold transition hover:opacity-90"
+            style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)', border: '1px solid rgba(0,184,148,0.3)' }}>
+            <ArrowRightLeft size={14} />
+            Transfer
+          </button>
+        )}
+      </div>
+
+      {loading ? (
+        <div className="flex h-20 items-center justify-center">
+          <Loader2 size={22} className="animate-spin" style={{ color: 'var(--primary)' }} />
+        </div>
+      ) : accounts.length === 0 ? (
+        <div className="flex flex-col items-center gap-3 rounded-2xl py-10 text-center"
+          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+          <Wallet size={32} style={{ color: 'var(--muted-foreground)' }} />
+          <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>No accounts yet</div>
+          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Add your first account to track balances</div>
+        </div>
+      ) : (
+        <div className="flex flex-col gap-2">
+          {accounts.map((acct) => {
+            const Icon = ACCOUNT_TYPE_ICONS[acct.type] ?? Wallet
+            return (
+              <div key={acct.id} className="flex items-center gap-3 rounded-2xl px-4 py-3"
+                style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+                  style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)' }}>
+                  <Icon size={18} />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{acct.name}</div>
+                  <div className="text-xs capitalize" style={{ color: 'var(--muted-foreground)' }}>
+                    {acct.type.replace('_', ' ')}
+                  </div>
+                </div>
+                <div className="text-right">
+                  <div className="text-sm font-bold" style={{ color: 'var(--primary)' }}>{formatUGX(acct.balance)}</div>
+                </div>
+                <button
+                  onClick={() => handleDelete(acct.id)}
+                  disabled={deleting === acct.id}
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
+                  style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
+                  {deleting === acct.id ? <Loader2 size={13} className="animate-spin" /> : <X size={13} />}
+                </button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+
+      <button onClick={() => setShowAdd(true)}
+        className="flex items-center justify-center gap-2 w-full rounded-full py-3 text-sm font-semibold transition hover:opacity-90"
+        style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)', border: '1px solid rgba(0,184,148,0.3)' }}>
+        <Plus size={15} strokeWidth={2.5} /> Add Account
+      </button>
+
+      {showAdd && <AddAccountModal onClose={() => { setShowAdd(false); getAccountsForUser().then((a) => setAccounts(a as AccountRow[])) }} />}
+      {showTransfer && <TransferModal accounts={accounts} onClose={() => { setShowTransfer(false); getAccountsForUser().then((a) => setAccounts(a as AccountRow[])) }} />}
+    </div>
+  )
+}
+
+type ProfileTab = 'settings' | 'badges' | 'import' | 'accounts'
 
 export function ProfileClient({
   profile,
@@ -448,11 +757,12 @@ export function ProfileClient({
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-2xl p-1" style={{ background: 'var(--surface-alt)' }}>
+      <div className="flex rounded-2xl p-1 flex-wrap gap-1" style={{ background: 'var(--surface-alt)' }}>
         {([
-          { key: 'settings', label: '⚙️ Settings' },
-          { key: 'badges',   label: '🏅 Badges' },
-          { key: 'import',   label: '📥 Import' },
+          { key: 'settings',  label: '⚙️ Settings' },
+          { key: 'accounts',  label: '💳 Accounts' },
+          { key: 'badges',    label: '🏅 Badges' },
+          { key: 'import',    label: '📥 Import' },
         ] as { key: ProfileTab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setActiveTab(key)}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
@@ -550,6 +860,19 @@ export function ProfileClient({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Accounts tab */}
+      {activeTab === 'accounts' && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-2xl p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+            <div className="mb-1 text-sm font-bold" style={{ color: 'var(--foreground)' }}>My Accounts</div>
+            <div className="mb-4 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+              Add your cash, mobile money, bank, or SACCO accounts. Set the opening balance and track transfers between them.
+            </div>
+            <AccountsManager />
+          </div>
         </div>
       )}
 

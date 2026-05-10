@@ -19,7 +19,7 @@ export function AddTransactionSheet({
   onClose: () => void
 }) {
   const router = useRouter()
-  const [type,     setType]     = useState<'expense' | 'income'>('expense')
+  const [type,     setType]     = useState<'expense' | 'income' | 'investment'>('expense')
   const [amount,   setAmount]   = useState('')
   const [catId,    setCatId]    = useState('')
   const [accountId,setAccountId] = useState('')
@@ -63,7 +63,8 @@ export function AddTransactionSheet({
         note:   note || undefined,
         date,
       })
-      toast.success(`${type === 'income' ? 'Income' : 'Expense'} saved — ${formatUGX(Number(amount))}`)
+      const label = type === 'income' ? 'Income' : type === 'expense' ? 'Expense' : 'Investment'
+      toast.success(`${label} saved — ${formatUGX(Number(amount))}`)
       setAmount(''); setCatId(''); setNote('')
       onClose()
       router.refresh()
@@ -96,16 +97,19 @@ export function AddTransactionSheet({
         ) : (
           <div className="px-6 pb-8 flex flex-col gap-5">
             {/* Type toggle */}
-            <div className="grid grid-cols-2 rounded-xl p-1" style={{ background: 'var(--surface-alt)' }}>
-              {(['expense', 'income'] as const).map((t) => (
-                <button key={t} onClick={() => setType(t)}
-                  className="rounded-lg py-2.5 text-sm font-semibold capitalize transition-all"
-                  style={type === t
-                    ? { background: 'var(--card)', color: t === 'income' ? 'var(--success)' : 'var(--danger)', boxShadow: 'var(--shadow-sm)' }
-                    : { color: 'var(--muted-foreground)' }}>
-                  {t}
-                </button>
-              ))}
+            <div className="grid grid-cols-3 rounded-xl p-1" style={{ background: 'var(--surface-alt)' }}>
+              {(['expense', 'income', 'investment'] as const).map((t) => {
+                const activeColor = t === 'income' ? 'var(--success)' : t === 'expense' ? 'var(--danger)' : 'var(--primary)'
+                return (
+                  <button key={t} onClick={() => setType(t)}
+                    className="rounded-lg py-2.5 text-sm font-semibold capitalize transition-all"
+                    style={type === t
+                      ? { background: 'var(--card)', color: activeColor, boxShadow: 'var(--shadow-sm)' }
+                      : { color: 'var(--muted-foreground)' }}>
+                    {t}
+                  </button>
+                )
+              })}
             </div>
 
             {/* Amount */}
@@ -121,7 +125,7 @@ export function AddTransactionSheet({
                 <input type="number" inputMode="numeric" placeholder="0"
                   value={amount} onChange={(e) => setAmount(e.target.value)}
                   className="mytereka-input pl-16 text-xl font-bold"
-                  style={{ color: type === 'income' ? 'var(--success)' : 'var(--danger)' }} />
+                  style={{ color: type === 'income' ? 'var(--success)' : type === 'expense' ? 'var(--danger)' : 'var(--primary)' }} />
               </div>
             </div>
 

@@ -69,7 +69,7 @@ type Props = {
 }
 
 export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals }: Props) {
-  const [hideBalance, setHideBalance] = useState(false)
+  const [hideBalance, setHideBalance] = useState(true)
 
   const totalIncome  = recentTxns.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const totalExpense = recentTxns.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)

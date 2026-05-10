@@ -4,7 +4,7 @@ import {
 } from 'drizzle-orm/pg-core'
 
 export const accountTypeEnum     = pgEnum('account_type',       ['cash', 'mobile_money', 'bank', 'sacco'])
-export const transactionTypeEnum = pgEnum('transaction_type',   ['income', 'expense', 'transfer'])
+export const transactionTypeEnum = pgEnum('transaction_type',   ['income', 'expense', 'transfer', 'investment'])
 export const periodEnum          = pgEnum('period',             ['weekly', 'monthly'])
 export const autoDebitEnum       = pgEnum('auto_debit_schedule',['daily', 'weekly', 'monthly'])
 export const levelEnum           = pgEnum('level',              ['Beginner', 'Saver', 'Consistent', 'Master', 'Grand Master'])
@@ -49,15 +49,17 @@ export const categories = pgTable('categories', {
 })
 
 export const transactions = pgTable('transactions', {
-  id:         uuid('id').defaultRandom().primaryKey(),
-  userId:     uuid('user_id').references(() => users.id,     { onDelete: 'cascade' }).notNull(),
-  accountId:  uuid('account_id').references(() => accounts.id).notNull(),
-  categoryId: uuid('category_id').references(() => categories.id).notNull(),
-  type:       transactionTypeEnum('type').notNull(),
-  amount:     integer('amount').notNull(),
-  note:       text('note'),
-  date:       date('date').notNull(),
-  createdAt:  timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  id:          uuid('id').defaultRandom().primaryKey(),
+  userId:      uuid('user_id').references(() => users.id,     { onDelete: 'cascade' }).notNull(),
+  accountId:   uuid('account_id').references(() => accounts.id).notNull(),
+  categoryId:  uuid('category_id').references(() => categories.id).notNull(),
+  type:        transactionTypeEnum('type').notNull(),
+  amount:      integer('amount').notNull(),
+  note:        text('note'),
+  date:        date('date').notNull(),
+  goalId:      uuid('goal_id').references(() => goals.id, { onDelete: 'set null' }),
+  transferFee: integer('transfer_fee'),
+  createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
 export const budgets = pgTable('budgets', {
