@@ -1,17 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
   User, Lock, Bell, Globe, HelpCircle, MessageCircle,
   LogOut, Trash2, ChevronRight, Moon, Sun, Shield, Star, Flame,
+  Upload, FileText, CheckCircle2, AlertCircle, Loader2,
 } from 'lucide-react'
+import { toast } from 'sonner'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
+import { importTransactions } from '@/lib/actions/transactions'
+import type { ImportRow } from '@/lib/actions/transactions'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
 
 /* All defined badges so unearned ones still show (greyed) */
@@ -103,7 +107,211 @@ function SettingsCard({ title, children }: { title: string; children: React.Reac
   )
 }
 
-type ProfileTab = 'settings' | 'badges'
+function parseCSV(text: string): ImportRow[] {
+  const lines = text.trim().split('\n').filter(Boolean)
+  if (lines.length < 2) return []
+
+  const header = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/[^a-z]/g, ''))
+  const idx = (names: string[]) => names.map((n) => header.indexOf(n)).find((i) => i >= 0) ?? -1
+
+  const dateIdx     = idx(['date'])
+  const typeIdx     = idx(['type'])
+  const itemIdx     = idx(['item', 'description', 'name', 'note'])
+  const categoryIdx = idx(['category', 'cat'])
+  const amountIdx   = idx(['amount', 'total', 'price'])
+  const qtyIdx      = idx(['quantity', 'qty', 'count'])
+
+  const rows: ImportRow[] = []
+
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(',').map((c) => c.trim().replace(/^"|"$/g, ''))
+
+    const rawDate  = dateIdx  >= 0 ? cols[dateIdx]  : ''
+    const rawType  = typeIdx  >= 0 ? cols[typeIdx]  : 'expense'
+    const rawItem  = itemIdx  >= 0 ? cols[itemIdx]  : ''
+    const rawCat   = categoryIdx >= 0 ? cols[categoryIdx] : 'Other'
+    const rawAmt   = amountIdx >= 0 ? cols[amountIdx] : '0'
+    const rawQty   = qtyIdx   >= 0 ? cols[qtyIdx]   : ''
+
+    // Normalise type
+    const typeLower = rawType.toLowerCase()
+    const type: 'income' | 'expense' =
+      typeLower.includes('income') || typeLower.includes('credit') ? 'income' : 'expense'
+
+    // Parse date — try multiple formats
+    let date = ''
+    const d = new Date(rawDate)
+    if (!isNaN(d.getTime())) {
+      date = d.toISOString().split('T')[0]
+    } else {
+      // try DD/MM/YYYY
+      const parts = rawDate.split(/[\/\-]/)
+      if (parts.length === 3) {
+        const [a, b, c] = parts
+        const attempt = new Date(`${c}-${b.padStart(2,'0')}-${a.padStart(2,'0')}`)
+        if (!isNaN(attempt.getTime())) date = attempt.toISOString().split('T')[0]
+      }
+    }
+    if (!date) continue // skip rows with unparseable date
+
+    const amount = parseFloat(rawAmt.replace(/[^0-9.]/g, ''))
+    if (isNaN(amount) || amount <= 0) continue
+
+    const quantity = rawQty ? parseFloat(rawQty) : undefined
+
+    rows.push({ date, type, item: rawItem, category: rawCat || 'Other', amount, quantity })
+  }
+
+  return rows
+}
+
+function CSVImport() {
+  const router = useRouter()
+  const fileRef   = useRef<HTMLInputElement>(null)
+  const [preview, setPreview]   = useState<ImportRow[]>([])
+  const [fileName, setFileName] = useState('')
+  const [importing, setImporting] = useState(false)
+  const [result, setResult]     = useState<{ imported: number; skipped: number } | null>(null)
+
+  function handleFile(file: File) {
+    setFileName(file.name)
+    setResult(null)
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const text = e.target?.result as string
+      const rows = parseCSV(text)
+      setPreview(rows)
+    }
+    reader.readAsText(file)
+  }
+
+  async function handleImport() {
+    if (!preview.length) return
+    setImporting(true)
+    try {
+      const res = await importTransactions(preview)
+      setResult(res)
+      toast.success(`Imported ${res.imported} transactions`)
+      setPreview([])
+      setFileName('')
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Import failed')
+    } finally {
+      setImporting(false)
+    }
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Drop zone */}
+      <div
+        onClick={() => fileRef.current?.click()}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
+        className="flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed py-10 text-center transition hover:opacity-80"
+        style={{ borderColor: 'var(--border)', background: 'var(--surface-alt)' }}
+      >
+        <Upload size={32} style={{ color: 'var(--primary)', opacity: 0.7 }} />
+        <div>
+          <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
+            Drop your StackSaver CSV here
+          </div>
+          <div className="mt-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            or click to browse — columns: date, type, item, category, amount, quantity
+          </div>
+        </div>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".csv,text/csv"
+          className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
+        />
+      </div>
+
+      {/* Result */}
+      {result && (
+        <div className="flex items-center gap-3 rounded-xl px-4 py-3"
+          style={{ background: 'rgba(0,184,148,0.10)', border: '1px solid rgba(0,184,148,0.25)' }}>
+          <CheckCircle2 size={18} style={{ color: 'var(--primary)' }} />
+          <span className="text-sm" style={{ color: 'var(--foreground)' }}>
+            <strong>{result.imported}</strong> imported · <strong>{result.skipped}</strong> skipped
+          </span>
+        </div>
+      )}
+
+      {/* Preview */}
+      {preview.length > 0 && (
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-2">
+            <FileText size={15} style={{ color: 'var(--muted-foreground)' }} />
+            <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
+              {fileName} — {preview.length} rows to import
+            </span>
+          </div>
+
+          <div className="overflow-hidden rounded-xl" style={{ background: 'var(--surface-alt)' }}>
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Date','Type','Item','Category','Amount'].map((h) => (
+                      <th key={h} className="px-3 py-2 text-left font-semibold"
+                        style={{ color: 'var(--muted-foreground)' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {preview.slice(0, 8).map((r, i) => (
+                    <tr key={i} style={{ borderBottom: i < Math.min(preview.length,8)-1 ? '1px solid var(--border)' : undefined }}>
+                      <td className="px-3 py-2" style={{ color: 'var(--foreground)' }}>{r.date}</td>
+                      <td className="px-3 py-2">
+                        <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
+                          style={{ background: r.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                            color: r.type === 'income' ? 'var(--success)' : 'var(--danger)' }}>
+                          {r.type}
+                        </span>
+                      </td>
+                      <td className="px-3 py-2 max-w-[120px] truncate" style={{ color: 'var(--foreground)' }}>{r.item}</td>
+                      <td className="px-3 py-2" style={{ color: 'var(--foreground)' }}>{r.category}</td>
+                      <td className="px-3 py-2 font-semibold"
+                        style={{ color: r.type === 'income' ? 'var(--success)' : 'var(--danger)' }}>
+                        {r.type === 'income' ? '+' : '−'}{r.amount.toLocaleString()}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {preview.length > 8 && (
+              <div className="px-3 py-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                +{preview.length - 8} more rows
+              </div>
+            )}
+          </div>
+
+          {preview.some((r) => !r.date) && (
+            <div className="flex items-center gap-2 rounded-xl px-3 py-2 text-xs"
+              style={{ background: 'rgba(245,158,11,0.10)', color: 'var(--warning)' }}>
+              <AlertCircle size={13} />
+              Some rows have invalid dates and will be skipped
+            </div>
+          )}
+
+          <button onClick={handleImport} disabled={importing}
+            className="w-full rounded-full py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+            style={{ background: 'var(--gradient-primary)' }}>
+            {importing && <Loader2 size={16} className="animate-spin" />}
+            Import {preview.length} Transactions
+          </button>
+        </div>
+      )}
+    </div>
+  )
+}
+
+type ProfileTab = 'settings' | 'badges' | 'import'
 
 export function ProfileClient({
   profile,
@@ -185,6 +393,7 @@ export function ProfileClient({
         {([
           { key: 'settings', label: '⚙️ Settings' },
           { key: 'badges',   label: '🏅 Badges' },
+          { key: 'import',   label: '📥 Import' },
         ] as { key: ProfileTab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setActiveTab(key)}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
@@ -282,6 +491,25 @@ export function ProfileClient({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Import tab */}
+      {activeTab === 'import' && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-2xl p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+            <div className="mb-1 text-sm font-bold" style={{ color: 'var(--foreground)' }}>
+              Import from StackSaver
+            </div>
+            <div className="mb-4 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+              Export your ledger as CSV from StackSaver and upload here. Columns needed:
+              <code className="mx-1 rounded px-1 py-0.5 text-[10px]" style={{ background: 'var(--surface-alt)', color: 'var(--primary)' }}>
+                date, type, item, category, amount, quantity
+              </code>
+              — quantity is optional.
+            </div>
+            <CSVImport />
+          </div>
         </div>
       )}
 

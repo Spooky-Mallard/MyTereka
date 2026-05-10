@@ -1,8 +1,11 @@
 'use client'
 
 import { useState } from 'react'
-import { Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star } from 'lucide-react'
+import { useRouter } from 'next/navigation'
+import { Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2, CalendarDays } from 'lucide-react'
+import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
+import { createGoal } from '@/lib/actions/goals'
 import type { goals } from '@/lib/schema'
 import type { InferSelectModel } from 'drizzle-orm'
 
@@ -145,10 +148,131 @@ function GoalMap({ goals: goalList }: { goals: GoalRow[] }) {
   )
 }
 
+const GOAL_ICONS = ['laptop','plane','car','home','book','heart','trophy','target','star'] as const
+
+function NewGoalModal({ onClose }: { onClose: () => void }) {
+  const router = useRouter()
+  const [name,       setName]       = useState('')
+  const [target,     setTarget]     = useState('')
+  const [targetDate, setTargetDate] = useState('')
+  const [icon,       setIcon]       = useState('target')
+  const [locked,     setLocked]     = useState(false)
+  const [saving,     setSaving]     = useState(false)
+
+  async function handleSave() {
+    if (!name.trim())               { toast.error('Enter a goal name'); return }
+    if (!target || Number(target) <= 0) { toast.error('Enter a target amount'); return }
+    setSaving(true)
+    try {
+      await createGoal({
+        name:         name.trim(),
+        targetAmount: Math.round(Number(target)),
+        targetDate:   targetDate || undefined,
+        icon,
+        isLocked:     locked,
+      })
+      toast.success('Goal created')
+      onClose()
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to create goal')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            New Goal
+          </h2>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+        </div>
+
+        {/* Name */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Goal name</label>
+          <input type="text" placeholder="e.g. New Laptop" value={name} onChange={(e) => setName(e.target.value)}
+            className="mytereka-input" />
+        </div>
+
+        {/* Target amount */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Target amount (UGX)</label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0" value={target}
+              onChange={(e) => setTarget(e.target.value)} className="mytereka-input pl-14 font-bold" />
+          </div>
+        </div>
+
+        {/* Target date */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Target date (optional)</label>
+          <div className="relative">
+            <CalendarDays size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
+              style={{ color: 'var(--muted-foreground)' }} />
+            <input type="date" value={targetDate} onChange={(e) => setTargetDate(e.target.value)}
+              className="mytereka-input pl-10" />
+          </div>
+        </div>
+
+        {/* Icon picker */}
+        <div>
+          <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Icon</label>
+          <div className="flex flex-wrap gap-2">
+            {GOAL_ICONS.map((ic) => {
+              const Icon = iconMap[ic] ?? Target
+              return (
+                <button key={ic} onClick={() => setIcon(ic)}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl transition-all"
+                  style={{
+                    background: icon === ic ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
+                    border: icon === ic ? '1.5px solid var(--primary)' : '1.5px solid transparent',
+                    color: icon === ic ? 'var(--primary)' : 'var(--muted-foreground)',
+                  }}>
+                  <Icon size={18} />
+                </button>
+              )
+            })}
+          </div>
+        </div>
+
+        {/* Locked toggle */}
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>Lock savings</div>
+            <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>Prevent withdrawals until target date</div>
+          </div>
+          <button onClick={() => setLocked((l) => !l)}
+            className="relative flex h-6 w-11 shrink-0 items-center rounded-full transition-colors"
+            style={{ background: locked ? 'var(--primary)' : 'var(--surface-alt)' }}>
+            <span className="absolute h-4 w-4 rounded-full bg-white shadow transition-transform"
+              style={{ transform: locked ? 'translateX(24px)' : 'translateX(4px)' }} />
+          </button>
+        </div>
+
+        <button onClick={handleSave} disabled={saving}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+          style={{ background: 'var(--gradient-primary)' }}>
+          {saving && <Loader2 size={16} className="animate-spin" />}
+          Create Goal
+        </button>
+      </div>
+    </div>
+  )
+}
+
 type Tab = 'goals' | 'map'
 
 export function GoalsClient({ data }: { data: GoalRow[] }) {
-  const [tab, setTab] = useState<Tab>('goals')
+  const [tab,     setTab]     = useState<Tab>('goals')
+  const [showNew, setShowNew] = useState(false)
 
   const active    = data.filter((g) => !g.isCompleted)
   const completed = data.filter((g) => g.isCompleted)
@@ -166,6 +290,7 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
           </p>
         </div>
         <button
+          onClick={() => setShowNew(true)}
           className="flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
           style={{ background: 'var(--primary)', boxShadow: '0 4px 12px rgba(0,184,148,0.35)' }}>
           <Plus size={16} strokeWidth={2.5} /> New goal
@@ -195,7 +320,8 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
               Set a savings goal to start your journey
             </div>
           </div>
-          <button className="flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition hover:opacity-90"
+          <button onClick={() => setShowNew(true)}
+            className="flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition hover:opacity-90"
             style={{ background: 'var(--primary)' }}>
             <Plus size={16} /> Create Goal
           </button>
@@ -222,6 +348,8 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
           <GoalMap goals={data} />
         </div>
       )}
+
+      {showNew && <NewGoalModal onClose={() => setShowNew(false)} />}
     </div>
   )
 }

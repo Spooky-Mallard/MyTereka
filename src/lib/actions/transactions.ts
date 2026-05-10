@@ -7,7 +7,7 @@ import { eq, and, desc, sql, gte, lte } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
 import { todayISO } from '@/lib/format'
 
-async function updateStreak(userId: string) {
+export async function updateStreak(userId: string) {
   const today     = todayISO()
   const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
 
@@ -176,4 +176,90 @@ export async function deleteTransaction(id: string) {
       .delete(transactions)
       .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
   })
+}
+
+export type ImportRow = {
+  date:     string   // YYYY-MM-DD
+  type:     'income' | 'expense'
+  item:     string   // used as note
+  category: string   // matched or created
+  amount:   number
+  quantity?: number
+}
+
+export async function importTransactions(rows: ImportRow[]): Promise<{ imported: number; skipped: number }> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const userId = session.user.id
+
+  // Load user categories once
+  const userCats = await db.select().from(categories).where(eq(categories.userId, userId))
+
+  let imported = 0
+  let skipped  = 0
+
+  // Load user accounts — use first available
+  const userAccounts = await db
+    .select({ id: accounts.id, type: accounts.type })
+    .from(accounts)
+    .where(eq(accounts.userId, userId))
+
+  if (!userAccounts.length) throw new Error('No accounts found. Please create an account first.')
+
+  // Prefer cash or mobile_money account as default for imports
+  const defaultAccount =
+    userAccounts.find((a) => a.type === 'cash') ??
+    userAccounts.find((a) => a.type === 'mobile_money') ??
+    userAccounts[0]
+
+  for (const row of rows) {
+    try {
+      // Find or create matching category
+      const normalised = row.category.trim()
+      let cat = userCats.find(
+        (c) => c.name.toLowerCase() === normalised.toLowerCase() && c.type === row.type,
+      )
+
+      if (!cat) {
+        const [inserted] = await db
+          .insert(categories)
+          .values({ userId, name: normalised, type: row.type, isDefault: false })
+          .returning()
+        cat = inserted
+        userCats.push(inserted)
+      }
+
+      const amount = row.quantity ? row.amount * row.quantity : row.amount
+
+      await db.transaction(async (tx) => {
+        await tx.insert(transactions).values({
+          userId,
+          accountId:  defaultAccount.id,
+          categoryId: cat!.id,
+          type:       row.type,
+          amount:     Math.round(amount),
+          note:       row.item || null,
+          date:       row.date,
+        })
+
+        const delta = row.type === 'income' ? amount : -amount
+        await tx
+          .update(accounts)
+          .set({ balance: sql`balance + ${Math.round(delta)}` })
+          .where(eq(accounts.id, defaultAccount.id))
+      })
+
+      imported++
+    } catch {
+      skipped++
+    }
+  }
+
+  // Award XP for the batch
+  if (imported > 0) {
+    await awardXP(userId, 'transaction_logged', imported * 5, `Imported ${imported} transactions`)
+    await updateStreak(userId)
+  }
+
+  return { imported, skipped }
 }

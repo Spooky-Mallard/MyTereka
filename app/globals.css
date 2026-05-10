@@ -254,6 +254,10 @@
     padding: 0 8px;
   }
 
+  @media (min-width: 768px) {
+    .bottom-nav { display: none !important; }
+  }
+
   .bottom-nav-item {
     display: flex;
     flex-direction: column;

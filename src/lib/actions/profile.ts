@@ -63,3 +63,24 @@ export async function getEarnedBadges(): Promise<EarnedBadge[]> {
     .where(eq(userBadges.userId, session.user.id))
     .orderBy(desc(userBadges.earnedAt))
 }
+
+export type AccountOption = { id: string; name: string; type: string; balance: number }
+export type CategoryOption = { id: string; name: string; type: string; icon: string | null; color: string | null }
+
+export async function getUserAccounts(): Promise<AccountOption[]> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const { accounts } = await import('@/lib/schema')
+  const { eq } = await import('drizzle-orm')
+  return db.select({ id: accounts.id, name: accounts.name, type: accounts.type, balance: accounts.balance })
+    .from(accounts).where(eq(accounts.userId, session.user.id))
+}
+
+export async function getUserCategories(): Promise<CategoryOption[]> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const { categories } = await import('@/lib/schema')
+  const { eq } = await import('drizzle-orm')
+  return db.select({ id: categories.id, name: categories.name, type: categories.type, icon: categories.icon, color: categories.color })
+    .from(categories).where(eq(categories.userId, session.user.id))
+}
