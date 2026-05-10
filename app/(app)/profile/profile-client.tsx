@@ -111,20 +111,27 @@ function parseCSV(text: string): ImportRow[] {
   const lines = text.trim().split('\n').filter(Boolean)
   if (lines.length < 2) return []
 
-  const header = lines[0].split(',').map((h) => h.trim().toLowerCase().replace(/[^a-z]/g, ''))
+  // Auto-detect delimiter: tab-separated (TSV) or comma-separated (CSV)
+  const firstLine = lines[0]
+  const delim = firstLine.includes('\t') ? '\t' : ','
+
+  const splitLine = (line: string) =>
+    line.split(delim).map((c) => c.trim().replace(/^"|"$/g, ''))
+
+  const header = splitLine(firstLine).map((h) => h.toLowerCase().replace(/[^a-z]/g, ''))
   const idx = (names: string[]) => names.map((n) => header.indexOf(n)).find((i) => i >= 0) ?? -1
 
   const dateIdx     = idx(['date'])
   const typeIdx     = idx(['type'])
   const itemIdx     = idx(['item', 'description', 'name', 'note'])
   const categoryIdx = idx(['category', 'cat'])
-  const amountIdx   = idx(['amount', 'total', 'price'])
+  const amountIdx   = idx(['amountugx', 'amount', 'total', 'price'])
   const qtyIdx      = idx(['quantity', 'qty', 'count'])
 
   const rows: ImportRow[] = []
 
   for (let i = 1; i < lines.length; i++) {
-    const cols = lines[i].split(',').map((c) => c.trim().replace(/^"|"$/g, ''))
+    const cols = splitLine(lines[i])
 
     const rawDate  = dateIdx  >= 0 ? cols[dateIdx]  : ''
     const rawType  = typeIdx  >= 0 ? cols[typeIdx]  : 'expense'
@@ -167,15 +174,17 @@ function parseCSV(text: string): ImportRow[] {
 
 function CSVImport() {
   const router = useRouter()
-  const fileRef   = useRef<HTMLInputElement>(null)
-  const [preview, setPreview]   = useState<ImportRow[]>([])
+  const fileRef    = useRef<HTMLInputElement>(null)
+  const [preview,  setPreview]  = useState<ImportRow[]>([])
   const [fileName, setFileName] = useState('')
   const [importing, setImporting] = useState(false)
-  const [result, setResult]     = useState<{ imported: number; skipped: number } | null>(null)
+  const [progress,  setProgress] = useState(0)   // 0–100
+  const [result,    setResult]   = useState<{ imported: number; skipped: number } | null>(null)
 
   function handleFile(file: File) {
     setFileName(file.name)
     setResult(null)
+    setProgress(0)
     const reader = new FileReader()
     reader.onload = (e) => {
       const text = e.target?.result as string
@@ -188,14 +197,33 @@ function CSVImport() {
   async function handleImport() {
     if (!preview.length) return
     setImporting(true)
+    setProgress(5)
+
+    // Simulate progress while the server action runs
+    const tick = setInterval(() => {
+      setProgress((p) => (p < 85 ? p + Math.random() * 12 : p))
+    }, 300)
+
     try {
       const res = await importTransactions(preview)
-      setResult(res)
-      toast.success(`Imported ${res.imported} transactions`)
-      setPreview([])
-      setFileName('')
-      router.refresh()
+      clearInterval(tick)
+      setProgress(100)
+
+      setTimeout(() => {
+        setResult(res)
+        setPreview([])
+        setFileName('')
+        setProgress(0)
+        router.refresh()
+      }, 600)
+
+      toast.success(`Import complete — ${res.imported} transactions added`, {
+        description: res.skipped > 0 ? `${res.skipped} rows skipped (invalid data)` : 'All rows imported successfully',
+        duration: 5000,
+      })
     } catch (e: unknown) {
+      clearInterval(tick)
+      setProgress(0)
       toast.error(e instanceof Error ? e.message : 'Import failed')
     } finally {
       setImporting(false)
@@ -206,48 +234,77 @@ function CSVImport() {
     <div className="flex flex-col gap-4">
       {/* Drop zone */}
       <div
-        onClick={() => fileRef.current?.click()}
+        onClick={() => !importing && fileRef.current?.click()}
         onDragOver={(e) => e.preventDefault()}
-        onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f) handleFile(f) }}
+        onDrop={(e) => { e.preventDefault(); const f = e.dataTransfer.files[0]; if (f && !importing) handleFile(f) }}
         className="flex cursor-pointer flex-col items-center gap-3 rounded-2xl border-2 border-dashed py-10 text-center transition hover:opacity-80"
-        style={{ borderColor: 'var(--border)', background: 'var(--surface-alt)' }}
+        style={{
+          borderColor: 'var(--border)',
+          background: 'var(--surface-alt)',
+          cursor: importing ? 'not-allowed' : 'pointer',
+          opacity: importing ? 0.6 : 1,
+        }}
       >
         <Upload size={32} style={{ color: 'var(--primary)', opacity: 0.7 }} />
         <div>
           <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
-            Drop your StackSaver CSV here
+            Drop your StackSaver export here
           </div>
           <div className="mt-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-            or click to browse — columns: date, type, item, category, amount, quantity
+            Supports CSV and TSV — columns: Date, Type, Item, Category, Quantity, Amount (UGX)
           </div>
         </div>
         <input
           ref={fileRef}
           type="file"
-          accept=".csv,text/csv"
+          accept=".csv,.tsv,text/csv,text/tab-separated-values"
           className="hidden"
           onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFile(f) }}
         />
       </div>
 
-      {/* Result */}
+      {/* Progress bar — shown while importing */}
+      {importing && (
+        <div className="flex flex-col gap-2">
+          <div className="flex items-center justify-between text-xs">
+            <span className="flex items-center gap-2" style={{ color: 'var(--foreground)' }}>
+              <Loader2 size={13} className="animate-spin" style={{ color: 'var(--primary)' }} />
+              Importing {preview.length} transactions…
+            </span>
+            <span style={{ color: 'var(--primary)', fontWeight: 600 }}>{Math.round(progress)}%</span>
+          </div>
+          <div className="h-2.5 w-full overflow-hidden rounded-full" style={{ background: 'var(--surface-alt)' }}>
+            <div
+              className="h-full rounded-full transition-all duration-300"
+              style={{ width: `${progress}%`, background: 'var(--gradient-primary)' }}
+            />
+          </div>
+        </div>
+      )}
+
+      {/* Result banner */}
       {result && (
         <div className="flex items-center gap-3 rounded-xl px-4 py-3"
           style={{ background: 'rgba(0,184,148,0.10)', border: '1px solid rgba(0,184,148,0.25)' }}>
           <CheckCircle2 size={18} style={{ color: 'var(--primary)' }} />
-          <span className="text-sm" style={{ color: 'var(--foreground)' }}>
-            <strong>{result.imported}</strong> imported · <strong>{result.skipped}</strong> skipped
-          </span>
+          <div>
+            <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
+              Import successful
+            </div>
+            <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {result.imported} imported · {result.skipped} skipped
+            </div>
+          </div>
         </div>
       )}
 
       {/* Preview */}
-      {preview.length > 0 && (
+      {preview.length > 0 && !importing && (
         <div className="flex flex-col gap-3">
           <div className="flex items-center gap-2">
             <FileText size={15} style={{ color: 'var(--muted-foreground)' }} />
             <span className="text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-              {fileName} — {preview.length} rows to import
+              {fileName} — {preview.length} rows ready to import
             </span>
           </div>
 
@@ -256,7 +313,7 @@ function CSVImport() {
               <table className="w-full text-xs">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Date','Type','Item','Category','Amount'].map((h) => (
+                    {['Date','Type','Item','Category','Amount (UGX)'].map((h) => (
                       <th key={h} className="px-3 py-2 text-left font-semibold"
                         style={{ color: 'var(--muted-foreground)' }}>{h}</th>
                     ))}
@@ -265,19 +322,21 @@ function CSVImport() {
                 <tbody>
                   {preview.slice(0, 8).map((r, i) => (
                     <tr key={i} style={{ borderBottom: i < Math.min(preview.length,8)-1 ? '1px solid var(--border)' : undefined }}>
-                      <td className="px-3 py-2" style={{ color: 'var(--foreground)' }}>{r.date}</td>
+                      <td className="px-3 py-2 whitespace-nowrap" style={{ color: 'var(--foreground)' }}>{r.date}</td>
                       <td className="px-3 py-2">
                         <span className="rounded-full px-2 py-0.5 text-[10px] font-semibold"
-                          style={{ background: r.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
-                            color: r.type === 'income' ? 'var(--success)' : 'var(--danger)' }}>
+                          style={{
+                            background: r.type === 'income' ? 'rgba(16,185,129,0.15)' : 'rgba(239,68,68,0.15)',
+                            color: r.type === 'income' ? 'var(--success)' : 'var(--danger)',
+                          }}>
                           {r.type}
                         </span>
                       </td>
-                      <td className="px-3 py-2 max-w-[120px] truncate" style={{ color: 'var(--foreground)' }}>{r.item}</td>
-                      <td className="px-3 py-2" style={{ color: 'var(--foreground)' }}>{r.category}</td>
-                      <td className="px-3 py-2 font-semibold"
+                      <td className="px-3 py-2 max-w-[110px] truncate" style={{ color: 'var(--foreground)' }}>{r.item}</td>
+                      <td className="px-3 py-2 max-w-[90px] truncate" style={{ color: 'var(--foreground)' }}>{r.category}</td>
+                      <td className="px-3 py-2 font-semibold whitespace-nowrap"
                         style={{ color: r.type === 'income' ? 'var(--success)' : 'var(--danger)' }}>
-                        {r.type === 'income' ? '+' : '−'}{r.amount.toLocaleString()}
+                        {r.type === 'income' ? '+' : '−'}{(r.quantity ? r.amount * r.quantity : r.amount).toLocaleString()}
                       </td>
                     </tr>
                   ))}
@@ -286,7 +345,7 @@ function CSVImport() {
             </div>
             {preview.length > 8 && (
               <div className="px-3 py-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                +{preview.length - 8} more rows
+                +{preview.length - 8} more rows not shown
               </div>
             )}
           </div>
