@@ -55,7 +55,7 @@ export function AddTransactionSheet({
 
     setSaving(true)
     try {
-      await createTransaction({
+      const result = await createTransaction({
         accountId,
         categoryId: catId,
         type,
@@ -65,6 +65,9 @@ export function AddTransactionSheet({
       })
       const label = type === 'income' ? 'Income' : type === 'expense' ? 'Expense' : 'Investment'
       toast.success(`${label} saved — ${formatUGX(Number(amount))}`)
+      if (result.negativeBalance) {
+        toast.warning('Account balance is now negative. You may be tracking a debt or credit situation.')
+      }
       setAmount(''); setCatId(''); setNote('')
       onClose()
       router.refresh()
