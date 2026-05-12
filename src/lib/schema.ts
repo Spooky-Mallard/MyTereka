@@ -36,6 +36,7 @@ export const accounts = pgTable('accounts', {
   isFixed:      boolean('is_fixed').default(false).notNull(),
   lockedUntil:  date('locked_until'),
   createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:    timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
 export const categories = pgTable('categories', {
@@ -60,6 +61,7 @@ export const transactions = pgTable('transactions', {
   goalId:      uuid('goal_id').references(() => goals.id, { onDelete: 'set null' }),
   transferFee: integer('transfer_fee'),
   createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  updatedAt:   timestamp('updated_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
 export const budgets = pgTable('budgets', {

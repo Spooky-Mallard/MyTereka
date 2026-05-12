@@ -3,9 +3,12 @@
 import { db } from '@/lib/db'
 import { transactions, accounts, budgets, users, categories } from '@/lib/schema'
 import { auth } from '@/lib/auth'
-import { eq, and, desc, sql, gte, lte, inArray } from 'drizzle-orm'
+import { eq, and, desc, sql, gte, lte } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
 import { todayISO } from '@/lib/format'
+import { calcMoMoFee } from '@/lib/momo-fees'
+
+// ─────────────────────────────────────────────────────────────────────────────
 
 export async function updateStreak(userId: string) {
   const today     = todayISO()
@@ -45,20 +48,27 @@ export async function createTransaction(data: {
   if (!session?.user?.id) throw new Error('Unauthorized')
   const userId = session.user.id
 
-  /* First-transaction badge check before insert */
   const [existingCount] = await db
     .select({ count: sql<number>`count(*)` })
     .from(transactions)
     .where(eq(transactions.userId, userId))
   const isFirst = Number(existingCount?.count ?? 0) === 0
 
+  const [acct] = await db
+    .select({ balance: accounts.balance })
+    .from(accounts)
+    .where(and(eq(accounts.id, data.accountId), eq(accounts.userId, userId)))
+
+  const balanceDelta = data.type === 'income' ? data.amount : -data.amount
+  const projectedBalance = (acct?.balance ?? 0) + balanceDelta
+  const willGoNegative = projectedBalance < 0
+
   await db.transaction(async (tx) => {
     await tx.insert(transactions).values({ ...data, userId })
 
-    const balanceDelta = data.type === 'income' ? data.amount : -data.amount
     await tx
       .update(accounts)
-      .set({ balance: sql`balance + ${balanceDelta}` })
+      .set({ balance: sql`balance + ${balanceDelta}`, updatedAt: sql`now()` })
       .where(and(eq(accounts.id, data.accountId), eq(accounts.userId, userId)))
 
     if (data.type === 'expense') {
@@ -83,6 +93,8 @@ export async function createTransaction(data: {
   if (isFirst) {
     await checkAndAwardBadge(userId, 'first_transaction')
   }
+
+  return { negativeBalance: willGoNegative }
 }
 
 export type TransactionRow = {
@@ -159,14 +171,14 @@ export async function deleteTransaction(id: string) {
   await db.transaction(async (dbTx) => {
     await dbTx
       .update(accounts)
-      .set({ balance: sql`balance + ${balanceDelta}` })
+      .set({ balance: sql`balance + ${balanceDelta}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, tx.accountId))
 
     if (tx.type === 'expense') {
       const today = todayISO()
       await dbTx
         .update(budgets)
-        .set({ spentAmount: sql`spent_amount - ${tx.amount}` })
+        .set({ spentAmount: sql`GREATEST(0, spent_amount - ${tx.amount})` })
         .where(
           and(
             eq(budgets.categoryId, tx.categoryId),
@@ -197,13 +209,11 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
   if (!session?.user?.id) throw new Error('Unauthorized')
   const userId = session.user.id
 
-  // Load user categories once
   const userCats = await db.select().from(categories).where(eq(categories.userId, userId))
 
   let imported = 0
   let skipped  = 0
 
-  // Load user accounts — use first available
   const userAccounts = await db
     .select({ id: accounts.id, type: accounts.type })
     .from(accounts)
@@ -211,13 +221,11 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
 
   if (!userAccounts.length) throw new Error('No accounts found. Please create an account first.')
 
-  // Prefer cash or mobile_money account as default for imports
   const defaultAccount =
     userAccounts.find((a) => a.type === 'cash') ??
     userAccounts.find((a) => a.type === 'mobile_money') ??
     userAccounts[0]
 
-  // Load existing transactions for deduplication (date + note + amount)
   const existingTxns = await db
     .select({ date: transactions.date, note: transactions.note, amount: transactions.amount })
     .from(transactions)
@@ -236,7 +244,6 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
         continue
       }
 
-      // Find or create matching category
       const normalised = row.category.trim()
       let cat = userCats.find(
         (c) => c.name.toLowerCase() === normalised.toLowerCase() && c.type === row.type,
@@ -265,7 +272,7 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
         const delta = row.type === 'income' ? amount : -amount
         await tx
           .update(accounts)
-          .set({ balance: sql`balance + ${Math.round(delta)}` })
+          .set({ balance: sql`balance + ${Math.round(delta)}`, updatedAt: sql`now()` })
           .where(eq(accounts.id, defaultAccount.id))
       })
 
@@ -276,7 +283,6 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
     }
   }
 
-  // Award XP for the batch
   if (imported > 0) {
     await awardXP(userId, 'transaction_logged', imported * 5, `Imported ${imported} transactions`)
     await updateStreak(userId)
@@ -307,20 +313,37 @@ export async function updateTransaction(
     .where(and(eq(transactions.id, id), eq(transactions.userId, userId)))
   if (!old) throw new Error('Transaction not found')
 
+  const newType      = data.type      ?? old.type
+  const newAmount    = data.amount    ?? old.amount
+  const newAccountId = data.accountId ?? old.accountId
+
+  // Project final balance to detect negative result
+  const [targetAcct] = await db
+    .select({ balance: accounts.balance })
+    .from(accounts)
+    .where(eq(accounts.id, newAccountId))
+
+  const oldDeltaOnTarget = old.accountId === newAccountId
+    ? (old.type === 'income' ? -old.amount : old.amount)
+    : 0
+  const newDeltaOnTarget = newType === 'income' ? newAmount : -newAmount
+  const projectedBalance = (targetAcct?.balance ?? 0) + oldDeltaOnTarget + newDeltaOnTarget
+  const willGoNegative = projectedBalance < 0
+
   await db.transaction(async (tx) => {
     // Reverse old balance effect
     const oldDelta = old.type === 'income' ? -old.amount : old.amount
     await tx
       .update(accounts)
-      .set({ balance: sql`balance + ${oldDelta}` })
+      .set({ balance: sql`balance + ${oldDelta}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, old.accountId))
 
-    // Reverse old budget effect
+    // Reverse old budget effect — clamped at zero
     if (old.type === 'expense') {
       const today = todayISO()
       await tx
         .update(budgets)
-        .set({ spentAmount: sql`spent_amount - ${old.amount}` })
+        .set({ spentAmount: sql`GREATEST(0, spent_amount - ${old.amount})` })
         .where(
           and(
             eq(budgets.categoryId, old.categoryId),
@@ -331,16 +354,13 @@ export async function updateTransaction(
         )
     }
 
-    const newType      = data.type      ?? old.type
-    const newAmount    = data.amount    ?? old.amount
-    const newAccountId = data.accountId ?? old.accountId
-    const newCategoryId= data.categoryId?? old.categoryId
+    const newCategoryId = data.categoryId ?? old.categoryId
 
     // Apply new balance effect
     const newDelta = newType === 'income' ? newAmount : -newAmount
     await tx
       .update(accounts)
-      .set({ balance: sql`balance + ${newDelta}` })
+      .set({ balance: sql`balance + ${newDelta}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, newAccountId))
 
     // Apply new budget effect
@@ -366,35 +386,67 @@ export async function updateTransaction(
         categoryId: newCategoryId,
         type:       newType,
         amount:     newAmount,
-        note:       data.note  !== undefined ? data.note  : old.note,
-        date:       data.date  !== undefined ? data.date  : old.date,
-        goalId:     data.goalId !== undefined ? data.goalId : old.goalId,
+        note:       data.note    !== undefined ? data.note    : old.note,
+        date:       data.date    !== undefined ? data.date    : old.date,
+        goalId:     data.goalId  !== undefined ? data.goalId  : old.goalId,
+        updatedAt:  sql`now()`,
       })
       .where(eq(transactions.id, id))
   })
+
+  return { negativeBalance: willGoNegative }
 }
 
 export async function transferBetweenAccounts(data: {
   fromAccountId: string
   toAccountId:   string
   amount:        number
-  fee:           number
-  note?:         string
   date:          string
-}) {
+  note?:         string
+}): Promise<{ fee: number; total: number }> {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
   const userId = session.user.id
 
-  // Find or create a "Transfer" category for this user
-  const userCats = await db
+  // Verify both accounts belong to user
+  const [fromAcc, toAcc] = await Promise.all([
+    db.select().from(accounts).where(and(eq(accounts.id, data.fromAccountId), eq(accounts.userId, userId))).then((r) => r[0]),
+    db.select().from(accounts).where(and(eq(accounts.id, data.toAccountId),   eq(accounts.userId, userId))).then((r) => r[0]),
+  ])
+  if (!fromAcc) throw new Error('Source account not found')
+  if (!toAcc)   throw new Error('Destination account not found')
+
+  // Calculate fee server-side
+  const feeResult = calcMoMoFee(fromAcc.name, data.amount)
+  const fee = feeResult.type === 'fee' ? feeResult.fee : 0
+
+  if (feeResult.type === 'out_of_range') {
+    throw new Error(
+      `Amount is outside the valid range for ${feeResult.provider}. ` +
+      `Min: UGX ${feeResult.min.toLocaleString()}, Max: UGX ${feeResult.max.toLocaleString()}`
+    )
+  }
+
+  const totalDebit = data.amount + fee
+
+  if (fromAcc.balance < totalDebit) {
+    const shortfall = totalDebit - fromAcc.balance
+    throw new Error(
+      `Insufficient balance. You need UGX ${totalDebit.toLocaleString()} ` +
+      `(amount + fee) but have UGX ${fromAcc.balance.toLocaleString()}. ` +
+      `Short by UGX ${shortfall.toLocaleString()}.`
+    )
+  }
+
+  // Find or create Transfer category (type='transfer', hidden from regular pickers)
+  const [existingCat] = await db
     .select()
     .from(categories)
     .where(and(eq(categories.userId, userId), eq(categories.name, 'Transfer')))
 
   let transferCatId: string
-  if (userCats.length > 0) {
-    transferCatId = userCats[0].id
+  if (existingCat) {
+    transferCatId = existingCat.id
   } else {
     const [inserted] = await db
       .insert(categories)
@@ -403,36 +455,37 @@ export async function transferBetweenAccounts(data: {
     transferCatId = inserted.id
   }
 
-  const totalDebit = data.amount + data.fee
+  const noteText = fee > 0
+    ? `${data.note ? data.note + ' · ' : ''}Fee: UGX ${fee.toLocaleString()}`
+    : (data.note || null)
 
   await db.transaction(async (tx) => {
-    // Debit from source
     await tx
       .update(accounts)
-      .set({ balance: sql`balance - ${totalDebit}` })
-      .where(and(eq(accounts.id, data.fromAccountId), eq(accounts.userId, userId)))
+      .set({ balance: sql`balance - ${totalDebit}`, updatedAt: sql`now()` })
+      .where(eq(accounts.id, data.fromAccountId))
 
-    // Credit to destination
     await tx
       .update(accounts)
-      .set({ balance: sql`balance + ${data.amount}` })
-      .where(and(eq(accounts.id, data.toAccountId), eq(accounts.userId, userId)))
+      .set({ balance: sql`balance + ${data.amount}`, updatedAt: sql`now()` })
+      .where(eq(accounts.id, data.toAccountId))
 
-    // Record the outgoing transfer transaction
     await tx.insert(transactions).values({
       userId,
       accountId:   data.fromAccountId,
       categoryId:  transferCatId,
       type:        'transfer',
       amount:      data.amount,
-      note:        data.note || null,
+      note:        noteText,
       date:        data.date,
-      transferFee: data.fee > 0 ? data.fee : null,
+      transferFee: fee > 0 ? fee : null,
     })
   })
 
   await updateStreak(userId)
   await awardXP(userId, 'transaction_logged', 5, 'Transfer recorded')
+
+  return { fee, total: totalDebit }
 }
 
 export async function getAccountsForUser() {
@@ -453,7 +506,35 @@ export async function createAccount(data: {
 }) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
-  await db.insert(accounts).values({ ...data, userId: session.user.id })
+  const userId = session.user.id
+
+  // Enforce Cash uniqueness server-side
+  if (data.type === 'cash') {
+    const existing = await db
+      .select({ id: accounts.id })
+      .from(accounts)
+      .where(and(eq(accounts.userId, userId), eq(accounts.type, 'cash')))
+    if (existing.length > 0) throw new Error('You already have a Cash account. Only one is allowed.')
+  }
+
+  await db.insert(accounts).values({ ...data, userId })
+}
+
+export async function updateAccount(id: string, data: { name?: string; balance?: number }) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const userId = session.user.id
+
+  const [acct] = await db
+    .select()
+    .from(accounts)
+    .where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
+  if (!acct) throw new Error('Account not found')
+
+  await db
+    .update(accounts)
+    .set({ ...data, updatedAt: sql`now()` })
+    .where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
 }
 
 export async function deleteAccount(id: string) {
