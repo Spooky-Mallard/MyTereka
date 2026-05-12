@@ -387,31 +387,35 @@ type AccountRow = { id: string; name: string; type: string; balance: number; ico
 // ─── Transfer Modal with live fee calculator ──────────────────────────────────
 function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose: () => void }) {
   const router = useRouter()
-  const [fromId,     setFromId]     = useState(accounts[0]?.id ?? '')
-  const [toId,       setToId]       = useState(accounts[1]?.id ?? accounts[0]?.id ?? '')
-  const [amount,     setAmount]     = useState('')
-  const [manualFee,  setManualFee]  = useState('')
-  const [note,       setNote]       = useState('')
-  const [date,       setDate]       = useState(new Date().toISOString().split('T')[0])
-  const [saving,     setSaving]     = useState(false)
+  const [fromId,    setFromId]    = useState(accounts[0]?.id ?? '')
+  const [toId,      setToId]      = useState(accounts[1]?.id ?? accounts[0]?.id ?? '')
+  const [amount,    setAmount]    = useState('')
+  const [feeInput,  setFeeInput]  = useState('')
+  const [note,      setNote]      = useState('')
+  const [date,      setDate]      = useState(new Date().toISOString().split('T')[0])
+  const [saving,    setSaving]    = useState(false)
 
-  const fromAcc  = accounts.find((a) => a.id === fromId)
-  const toAcc    = accounts.find((a) => a.id === toId)
+  const fromAcc   = accounts.find((a) => a.id === fromId)
+  const toAcc     = accounts.find((a) => a.id === toId)
   const numAmount = Math.round(Number(amount) || 0)
 
-  // Auto-calc MoMo fee only for Mobile Money → Cash
+  // Auto-calc MoMo fee for Mobile Money → Cash, pre-populate fee field
   const isMoMoToCash = fromAcc?.type === 'mobile_money' && toAcc?.type === 'cash'
   const feeResult: FeeResult = isMoMoToCash && fromAcc && numAmount > 0
     ? calcMoMoFee(fromAcc.name, numAmount)
     : { type: 'none' }
-
   const autoFee    = feeResult.type === 'fee' ? feeResult.fee : 0
   const outOfRange = feeResult.type === 'out_of_range'
 
-  // For non-MoMo→Cash, user enters fee manually; for MoMo→Cash, auto fee is used
-  const effectiveFee  = isMoMoToCash ? autoFee : Math.round(Number(manualFee) || 0)
-  const totalDebit    = numAmount + effectiveFee
-  const canSubmit     = numAmount > 0 && fromId !== toId && !outOfRange && !saving
+  // Sync fee input with auto-calculated value whenever it changes (MoMo→Cash only)
+  useEffect(() => {
+    if (isMoMoToCash && autoFee > 0) setFeeInput(String(autoFee))
+    else if (isMoMoToCash && numAmount > 0 && autoFee === 0) setFeeInput('0')
+  }, [autoFee, isMoMoToCash, numAmount])
+
+  const effectiveFee = Math.round(Number(feeInput) || 0)
+  const totalDebit   = numAmount + effectiveFee
+  const canSubmit    = numAmount > 0 && fromId !== toId && !outOfRange && !saving
 
   async function handleTransfer() {
     if (!canSubmit) return
@@ -423,7 +427,7 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
         amount:        numAmount,
         note:          note || undefined,
         date,
-        manualFee:     isMoMoToCash ? undefined : effectiveFee,
+        manualFee:     effectiveFee,
       })
       if (result.fee > 0) {
         toast.success(
@@ -490,58 +494,33 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
           </div>
         </div>
 
-        {/* MoMo→Cash: auto fee banner */}
-        {isMoMoToCash && numAmount > 0 && (
-          <>
-            {outOfRange && feeResult.type === 'out_of_range' && (
-              <div className="rounded-xl px-4 py-3 text-sm" style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
-                Amount is outside the valid range for {feeResult.provider}.<br />
-                Min: {formatUGX(feeResult.min)} · Max: {formatUGX(feeResult.max)}
-              </div>
-            )}
-            {feeResult.type === 'fee' && (
-              <div className="rounded-xl px-4 py-3 flex flex-col gap-1"
-                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
-                <div className="flex items-center justify-between text-sm">
-                  <span style={{ color: 'var(--muted-foreground)' }}>{feeResult.provider} withdrawal fee</span>
-                  <span className="font-bold" style={{ color: 'var(--danger)' }}>{formatUGX(autoFee)}</span>
-                </div>
-                <div className="flex items-center justify-between text-sm font-semibold">
-                  <span style={{ color: 'var(--muted-foreground)' }}>Total deducted from source</span>
-                  <span style={{ color: 'var(--foreground)' }}>{formatUGX(totalDebit)}</span>
-                </div>
-                <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
-                  Recipient receives exactly {formatUGX(numAmount)}.
-                </div>
-              </div>
-            )}
-            {feeResult.type === 'none' && (
-              <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
-                No withdrawal fee for MTN/Airtel at this range.
-              </div>
-            )}
-          </>
-        )}
-
-        {/* Non-MoMo→Cash: manual fee input */}
-        {!isMoMoToCash && (
-          <div>
-            <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
-              Transaction Fee (UGX) <span style={{ fontWeight: 400 }}>— optional</span>
-            </label>
-            <div className="relative">
-              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
-              <input type="number" inputMode="numeric" placeholder="0" value={manualFee}
-                onChange={(e) => setManualFee(e.target.value)}
-                className="mytereka-input pl-16" />
-            </div>
-            {effectiveFee > 0 && numAmount > 0 && (
-              <div className="mt-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                Total deducted: {formatUGX(totalDebit)} · Recipient receives {formatUGX(numAmount)}
-              </div>
-            )}
+        {/* Out-of-range error for MoMo→Cash */}
+        {isMoMoToCash && outOfRange && feeResult.type === 'out_of_range' && (
+          <div className="rounded-xl px-4 py-3 text-sm" style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
+            Amount is outside the valid range for {feeResult.provider}.<br />
+            Min: {formatUGX(feeResult.min)} · Max: {formatUGX(feeResult.max)}
           </div>
         )}
+
+        {/* Fee field — always visible, auto-populated for MoMo→Cash, editable for all */}
+        <div>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+            Transaction Fee (UGX)
+            {isMoMoToCash && <span className="ml-1.5 text-xs font-normal" style={{ color: 'var(--primary)' }}>auto-calculated · editable</span>}
+            {!isMoMoToCash && <span className="ml-1.5 text-xs font-normal" style={{ color: 'var(--muted-foreground)' }}>— optional</span>}
+          </label>
+          <div className="relative">
+            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+            <input type="number" inputMode="numeric" placeholder="0"
+              value={feeInput} onChange={(e) => setFeeInput(e.target.value)}
+              className="mytereka-input pl-16" />
+          </div>
+          {effectiveFee > 0 && numAmount > 0 && (
+            <div className="mt-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              Total deducted from source: {formatUGX(totalDebit)} · Recipient receives {formatUGX(numAmount)}
+            </div>
+          )}
+        </div>
 
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Date</label>

@@ -428,23 +428,19 @@ export async function transferBetweenAccounts(data: {
   if (!fromAcc) throw new Error('Source account not found')
   if (!toAcc)   throw new Error('Destination account not found')
 
-  // Auto-calc fee only for MoMo → Cash transfers; otherwise use caller-supplied fee
-  const isMoMoToCash =
-    fromAcc.type === 'mobile_money' && toAcc.type === 'cash'
-
-  let fee: number
-  if (isMoMoToCash) {
-    const feeResult = calcMoMoFee(fromAcc.name, data.amount)
-    if (feeResult.type === 'out_of_range') {
+  // Validate MoMo→Cash amount range server-side (client already checks, but enforce here too)
+  if (fromAcc.type === 'mobile_money' && toAcc.type === 'cash') {
+    const rangeCheck = calcMoMoFee(fromAcc.name, data.amount)
+    if (rangeCheck.type === 'out_of_range') {
       throw new Error(
-        `Amount is outside the valid range for ${feeResult.provider}. ` +
-        `Min: UGX ${feeResult.min.toLocaleString()}, Max: UGX ${feeResult.max.toLocaleString()}`
+        `Amount is outside the valid range for ${rangeCheck.provider}. ` +
+        `Min: UGX ${rangeCheck.min.toLocaleString()}, Max: UGX ${rangeCheck.max.toLocaleString()}`
       )
     }
-    fee = feeResult.type === 'fee' ? feeResult.fee : 0
-  } else {
-    fee = Math.round(data.manualFee ?? 0)
   }
+
+  // Fee always comes from caller — client auto-populates for MoMo→Cash, manual for others
+  const fee = Math.round(data.manualFee ?? 0)
 
   const totalDebit = data.amount + fee
 
