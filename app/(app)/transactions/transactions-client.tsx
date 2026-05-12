@@ -50,6 +50,7 @@ function EditTransactionSheet({
   const [accountId,   setAccountId]   = useState(tx.accountId)
   const [date,        setDate]        = useState(tx.date)
   const [note,        setNote]        = useState(tx.note ?? '')
+  const [transferFee, setTransferFee] = useState(tx.transferFee != null ? String(tx.transferFee) : '')
   const [saving,      setSaving]      = useState(false)
   const [deleting,    setDeleting]    = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -77,11 +78,12 @@ function EditTransactionSheet({
     try {
       const result = await updateTransaction(tx.id, {
         type,
-        amount:     Math.round(Number(amount)),
-        categoryId: catId,
+        amount:      Math.round(Number(amount)),
+        categoryId:  catId,
         accountId,
         date,
-        note:       note || undefined,
+        note:        note || undefined,
+        transferFee: transferFee ? Math.round(Number(transferFee)) : null,
       })
       toast.success('Transaction updated')
       if (result.negativeBalance) {
@@ -162,7 +164,7 @@ function EditTransactionSheet({
                   <div className="relative">
                     <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
                     <input type="number" inputMode="numeric" value={amount} onChange={(e) => setAmount(e.target.value)}
-                      className="mytereka-input pl-16 text-xl font-bold"
+                      className="mytereka-input pl-20 text-xl font-bold"
                       style={{ color: type === 'income' ? 'var(--success)' : type === 'expense' ? 'var(--danger)' : 'var(--primary)' }} />
                   </div>
                 </div>
@@ -214,7 +216,20 @@ function EditTransactionSheet({
                   <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Date</label>
                   <div className="relative">
                     <CalendarDays size={16} className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2" style={{ color: 'var(--muted-foreground)' }} />
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mytereka-input pl-10" />
+                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} className="mytereka-input pl-12" />
+                  </div>
+                </div>
+
+                {/* Transaction fee */}
+                <div>
+                  <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                    Transaction Fee (UGX) <span style={{ color: 'var(--muted-foreground)', fontWeight: 400 }}>— optional</span>
+                  </label>
+                  <div className="relative">
+                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+                    <input type="number" inputMode="numeric" placeholder="0"
+                      value={transferFee} onChange={(e) => setTransferFee(e.target.value)}
+                      className="mytereka-input pl-16" />
                   </div>
                 </div>
 
