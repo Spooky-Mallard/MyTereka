@@ -457,48 +457,53 @@ export async function transferBetweenAccounts(data: {
     )
   }
 
-  // Find or create Transfer category (type='transfer', hidden from regular pickers)
-  const [existingCat] = await db
-    .select()
-    .from(categories)
-    .where(and(eq(categories.userId, userId), eq(categories.name, 'Transfer')))
+  // Find or create an expense category for transfer fees
+  let feeCatId: string | null = null
+  if (fee > 0) {
+    const [existingFeeCat] = await db
+      .select()
+      .from(categories)
+      .where(and(eq(categories.userId, userId), eq(categories.name, 'Transfer Fee')))
 
-  let transferCatId: string
-  if (existingCat) {
-    transferCatId = existingCat.id
-  } else {
-    const [inserted] = await db
-      .insert(categories)
-      .values({ userId, name: 'Transfer', type: 'transfer', icon: 'arrow-right-left', color: '#94A3B8', isDefault: false })
-      .returning()
-    transferCatId = inserted.id
+    if (existingFeeCat) {
+      feeCatId = existingFeeCat.id
+    } else {
+      const [inserted] = await db
+        .insert(categories)
+        .values({ userId, name: 'Transfer Fee', type: 'expense', icon: 'arrow-right-left', color: '#94A3B8', isDefault: false })
+        .returning()
+      feeCatId = inserted.id
+    }
   }
 
-  const noteText = fee > 0
-    ? `${data.note ? data.note + ' · ' : ''}Fee: UGX ${fee.toLocaleString()}`
-    : (data.note || null)
-
   await db.transaction(async (tx) => {
+    // Debit full amount (including fee) from source
     await tx
       .update(accounts)
       .set({ balance: sql`balance - ${totalDebit}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, data.fromAccountId))
 
+    // Credit only the transfer amount to destination (fee stays with provider)
     await tx
       .update(accounts)
       .set({ balance: sql`balance + ${data.amount}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, data.toAccountId))
 
-    await tx.insert(transactions).values({
-      userId,
-      accountId:   data.fromAccountId,
-      categoryId:  transferCatId,
-      type:        'transfer',
-      amount:      data.amount,
-      note:        noteText,
-      date:        data.date,
-      transferFee: fee > 0 ? fee : null,
-    })
+    // Only record the fee as an expense transaction — the money movement itself is silent
+    if (fee > 0 && feeCatId) {
+      await tx.insert(transactions).values({
+        userId,
+        accountId:   data.fromAccountId,
+        categoryId:  feeCatId,
+        type:        'expense',
+        amount:      fee,
+        note:        data.note
+          ? `${data.note} · transfer to ${toAcc.name}`
+          : `Transfer fee to ${toAcc.name}`,
+        date:        data.date,
+        transferFee: fee,
+      })
+    }
   })
 
   await updateStreak(userId)
