@@ -8,15 +8,17 @@ import {
   User, Lock, Bell, Globe, HelpCircle, MessageCircle,
   LogOut, Trash2, ChevronRight, Moon, Sun, Shield, Star, Flame,
   Upload, FileText, CheckCircle2, AlertCircle, Loader2,
-  Plus, X, Wallet, Banknote, Building2, Users, ArrowRightLeft, CalendarDays,
+  Plus, X, Wallet, Banknote, Building2, Users, ArrowRightLeft, CalendarDays, Smartphone, Pencil,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { importTransactions, createAccount, deleteAccount, getAccountsForUser, transferBetweenAccounts } from '@/lib/actions/transactions'
+import { importTransactions, createAccount, updateAccount, deleteAccount, getAccountsForUser, transferBetweenAccounts } from '@/lib/actions/transactions'
 import type { ImportRow } from '@/lib/actions/transactions'
+import { calcMoMoFee } from '@/lib/momo-fees'
+import type { FeeResult } from '@/lib/momo-fees'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
 import { formatUGX } from '@/lib/format'
 
@@ -372,39 +374,53 @@ function CSVImport() {
   )
 }
 
-const ACCOUNT_TYPE_ICONS: Record<string, React.ElementType> = {
-  cash:         Banknote,
-  mobile_money: Wallet,
-  bank:         Building2,
-  sacco:        Users,
+// ─── Account type spec ───────────────────────────────────────────────────────
+const ACCT_META: Record<string, { icon: React.ElementType; color: string; bg: string; label: string }> = {
+  cash:         { icon: Banknote,   color: '#F59E0B',  bg: 'rgba(245,158,11,0.12)',  label: 'Cash'          },
+  mobile_money: { icon: Smartphone, color: '#00B894',  bg: 'rgba(0,184,148,0.12)',   label: 'Mobile Money'  },
+  bank:         { icon: Building2,  color: '#3B82F6',  bg: 'rgba(59,130,246,0.12)',  label: 'Bank Account'  },
+  sacco:        { icon: Users,      color: '#8B5CF6',  bg: 'rgba(139,92,246,0.12)',  label: 'SACCO / Savings Group' },
 }
 
 type AccountRow = { id: string; name: string; type: string; balance: number; icon: string | null; color: string | null }
 
+// ─── Transfer Modal with live fee calculator ──────────────────────────────────
 function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose: () => void }) {
   const router = useRouter()
   const [fromId,  setFromId]  = useState(accounts[0]?.id ?? '')
   const [toId,    setToId]    = useState(accounts[1]?.id ?? accounts[0]?.id ?? '')
   const [amount,  setAmount]  = useState('')
-  const [fee,     setFee]     = useState('0')
   const [note,    setNote]    = useState('')
   const [date,    setDate]    = useState(new Date().toISOString().split('T')[0])
   const [saving,  setSaving]  = useState(false)
 
+  const fromAcc   = accounts.find((a) => a.id === fromId)
+  const numAmount = Math.round(Number(amount) || 0)
+  const feeResult: FeeResult = fromAcc && numAmount > 0
+    ? calcMoMoFee(fromAcc.name, numAmount)
+    : { type: 'none' }
+
+  const fee         = feeResult.type === 'fee' ? feeResult.fee : 0
+  const totalDebit  = numAmount + fee
+  const outOfRange  = feeResult.type === 'out_of_range'
+  const canSubmit   = numAmount > 0 && fromId !== toId && !outOfRange && !saving
+
   async function handleTransfer() {
-    if (!amount || Number(amount) <= 0) { toast.error('Enter a valid amount'); return }
-    if (fromId === toId) { toast.error('From and To accounts must differ'); return }
-    const numAmount = Math.round(Number(amount))
-    const numFee    = Math.round(Number(fee) || 0)
-    const fromAcc   = accounts.find((a) => a.id === fromId)
-    if (fromAcc && numAmount + numFee > fromAcc.balance) {
-      toast.error('Insufficient balance (including fee)')
-      return
-    }
+    if (!canSubmit) return
     setSaving(true)
     try {
-      await transferBetweenAccounts({ fromAccountId: fromId, toAccountId: toId, amount: numAmount, fee: numFee, note: note || undefined, date })
-      toast.success(`Transfer of ${formatUGX(numAmount)} recorded`)
+      const result = await transferBetweenAccounts({
+        fromAccountId: fromId, toAccountId: toId,
+        amount: numAmount, note: note || undefined, date,
+      })
+      if (result.fee > 0) {
+        toast.success(
+          `Transferred ${formatUGX(numAmount)} · Fee: ${formatUGX(result.fee)}`,
+          { description: `Total debited from source: ${formatUGX(result.total)}` }
+        )
+      } else {
+        toast.success(`Transferred ${formatUGX(numAmount)}`)
+      }
       onClose()
       router.refresh()
     } catch (e: unknown) {
@@ -418,7 +434,7 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
       style={{ background: 'rgba(0,0,0,0.6)' }}
       onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5 max-h-[90dvh] overflow-y-auto"
         style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
@@ -433,6 +449,11 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
             <select value={fromId} onChange={(e) => setFromId(e.target.value)} className="mytereka-input appearance-none text-sm">
               {accounts.map((a) => <option key={a.id} value={a.id}>{a.name}</option>)}
             </select>
+            {fromAcc && (
+              <div className="mt-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                Balance: {formatUGX(fromAcc.balance)}
+              </div>
+            )}
           </div>
           <div>
             <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>To</label>
@@ -441,6 +462,12 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
             </select>
           </div>
         </div>
+
+        {fromId === toId && (
+          <div className="rounded-xl px-3 py-2 text-xs" style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
+            From and To accounts must be different
+          </div>
+        )}
 
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Amount (UGX)</label>
@@ -451,16 +478,38 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
           </div>
         </div>
 
-        <div>
-          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
-            Transaction fee (UGX) — leave 0 if none
-          </label>
-          <div className="relative">
-            <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
-            <input type="number" inputMode="numeric" placeholder="0" value={fee}
-              onChange={(e) => setFee(e.target.value)} className="mytereka-input pl-16" />
-          </div>
-        </div>
+        {/* Live fee banner */}
+        {numAmount > 0 && (
+          <>
+            {outOfRange && feeResult.type === 'out_of_range' && (
+              <div className="rounded-xl px-4 py-3 text-sm" style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
+                Amount is outside the valid range for {feeResult.provider}.<br />
+                Min: {formatUGX(feeResult.min)} · Max: {formatUGX(feeResult.max)}
+              </div>
+            )}
+            {feeResult.type === 'fee' && (
+              <div className="rounded-xl px-4 py-3 flex flex-col gap-1"
+                style={{ background: 'rgba(239,68,68,0.08)', border: '1px solid rgba(239,68,68,0.2)' }}>
+                <div className="flex items-center justify-between text-sm">
+                  <span style={{ color: 'var(--muted-foreground)' }}>{feeResult.provider} withdrawal fee</span>
+                  <span className="font-bold" style={{ color: 'var(--danger)' }}>{formatUGX(feeResult.fee)}</span>
+                </div>
+                <div className="flex items-center justify-between text-sm font-semibold">
+                  <span style={{ color: 'var(--muted-foreground)' }}>Total deducted from source</span>
+                  <span style={{ color: 'var(--foreground)' }}>{formatUGX(totalDebit)}</span>
+                </div>
+                <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
+                  The recipient receives exactly {formatUGX(numAmount)}.
+                </div>
+              </div>
+            )}
+            {feeResult.type === 'none' && (
+              <div className="rounded-xl px-4 py-2.5 text-sm" style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
+                No withdrawal fee for this account type.
+              </div>
+            )}
+          </>
+        )}
 
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Date</label>
@@ -475,26 +524,37 @@ function TransferModal({ accounts, onClose }: { accounts: AccountRow[]; onClose:
           <input type="text" placeholder="e.g. MTN to Stanbic" value={note} onChange={(e) => setNote(e.target.value)} className="mytereka-input" />
         </div>
 
-        <button onClick={handleTransfer} disabled={saving}
-          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+        <button onClick={handleTransfer} disabled={!canSubmit}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
           style={{ background: 'var(--gradient-primary)' }}>
           {saving && <Loader2 size={16} className="animate-spin" />}
-          Transfer
+          {fee > 0 ? `Transfer ${formatUGX(numAmount)} + ${formatUGX(fee)} fee` : 'Transfer'}
         </button>
       </div>
     </div>
   )
 }
 
-function AddAccountModal({ onClose }: { onClose: () => void }) {
-  const router = useRouter()
+// ─── Add Account Modal ────────────────────────────────────────────────────────
+function AddAccountModal({
+  existingAccounts,
+  onClose,
+}: {
+  existingAccounts: AccountRow[]
+  onClose: () => void
+}) {
+  const router  = useRouter()
   const [name,    setName]    = useState('')
-  const [type,    setType]    = useState<'cash' | 'mobile_money' | 'bank' | 'sacco'>('cash')
+  const [type,    setType]    = useState<'cash' | 'mobile_money' | 'bank' | 'sacco'>('mobile_money')
   const [balance, setBalance] = useState('0')
   const [saving,  setSaving]  = useState(false)
 
+  const hasCash     = existingAccounts.some((a) => a.type === 'cash')
+  const cashBlocked = type === 'cash' && hasCash
+
   async function handleSave() {
-    if (!name.trim()) { toast.error('Enter an account name'); return }
+    if (!name.trim())  { toast.error('Enter an account name'); return }
+    if (cashBlocked)   { toast.error('You already have a Cash account'); return }
     setSaving(true)
     try {
       await createAccount({ name: name.trim(), type, balance: Math.round(Number(balance) || 0) })
@@ -509,10 +569,10 @@ function AddAccountModal({ onClose }: { onClose: () => void }) {
   }
 
   const accountTypes: Array<{ value: typeof type; label: string }> = [
-    { value: 'cash',         label: 'Cash' },
     { value: 'mobile_money', label: 'Mobile Money' },
-    { value: 'bank',         label: 'Bank' },
+    { value: 'bank',         label: 'Bank Account' },
     { value: 'sacco',        label: 'SACCO' },
+    { value: 'cash',         label: 'Cash' },
   ]
 
   return (
@@ -535,14 +595,16 @@ function AddAccountModal({ onClose }: { onClose: () => void }) {
           <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Type</label>
           <div className="grid grid-cols-2 gap-2">
             {accountTypes.map(({ value, label }) => {
-              const Icon = ACCOUNT_TYPE_ICONS[value]
+              const meta     = ACCT_META[value]
+              const Icon     = meta.icon
+              const selected = type === value
               return (
                 <button key={value} onClick={() => setType(value)}
                   className="flex items-center gap-2 rounded-xl p-3 text-sm font-medium transition-all"
                   style={{
-                    background: type === value ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
-                    border: type === value ? '1.5px solid var(--primary)' : '1.5px solid transparent',
-                    color: type === value ? 'var(--primary)' : 'var(--foreground)',
+                    background: selected ? `${meta.bg}` : 'var(--surface-alt)',
+                    border: selected ? `1.5px solid ${meta.color}` : '1.5px solid transparent',
+                    color: selected ? meta.color : 'var(--foreground)',
                   }}>
                   <Icon size={16} />
                   {label}
@@ -550,12 +612,16 @@ function AddAccountModal({ onClose }: { onClose: () => void }) {
               )
             })}
           </div>
+          {cashBlocked && (
+            <div className="mt-2 rounded-xl px-3 py-2 text-xs"
+              style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
+              You already have a Cash account. Only one is allowed.
+            </div>
+          )}
         </div>
 
         <div>
-          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
-            Current balance (UGX)
-          </label>
+          <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Opening balance (UGX)</label>
           <div className="relative">
             <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
             <input type="number" inputMode="numeric" placeholder="0" value={balance}
@@ -563,8 +629,8 @@ function AddAccountModal({ onClose }: { onClose: () => void }) {
           </div>
         </div>
 
-        <button onClick={handleSave} disabled={saving}
-          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+        <button onClick={handleSave} disabled={saving || cashBlocked}
+          className="w-full rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50 flex items-center justify-center gap-2"
           style={{ background: 'var(--gradient-primary)' }}>
           {saving && <Loader2 size={16} className="animate-spin" />}
           Add Account
@@ -574,39 +640,160 @@ function AddAccountModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-function AccountsManager() {
+// ─── Edit Account Modal ────────────────────────────────────────────────────────
+function EditAccountModal({
+  acct,
+  onClose,
+  onDeleted,
+}: {
+  acct:      AccountRow
+  onClose:   () => void
+  onDeleted: () => void
+}) {
   const router = useRouter()
-  const [accounts,    setAccounts]    = useState<AccountRow[]>([])
-  const [loading,     setLoading]     = useState(true)
-  const [showAdd,     setShowAdd]     = useState(false)
-  const [showTransfer,setShowTransfer]= useState(false)
-  const [deleting,    setDeleting]    = useState<string | null>(null)
+  const meta   = ACCT_META[acct.type] ?? ACCT_META.cash
+  const Icon   = meta.icon
 
-  useEffect(() => {
-    getAccountsForUser()
-      .then((accs) => setAccounts(accs as AccountRow[]))
-      .finally(() => setLoading(false))
-  }, [])
+  const [name,        setName]        = useState(acct.name)
+  const [balance,     setBalance]     = useState(String(acct.balance))
+  const [saving,      setSaving]      = useState(false)
+  const [confirmDel,  setConfirmDel]  = useState(false)
+  const [deleting,    setDeleting]    = useState(false)
 
-  async function handleDelete(id: string) {
-    setDeleting(id)
+  async function handleSave() {
+    if (!name.trim()) { toast.error('Enter an account name'); return }
+    setSaving(true)
     try {
-      await deleteAccount(id)
-      setAccounts((a) => a.filter((x) => x.id !== id))
-      toast.success('Account removed')
+      await updateAccount(acct.id, { name: name.trim(), balance: Math.round(Number(balance) || 0) })
+      toast.success('Account updated')
+      onClose()
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  async function handleDelete() {
+    setDeleting(true)
+    try {
+      await deleteAccount(acct.id)
+      toast.success('Account deleted')
+      setConfirmDel(false)
+      onDeleted()
       router.refresh()
     } catch (e: unknown) {
       toast.error(e instanceof Error ? e.message : 'Failed to delete')
     } finally {
-      setDeleting(null)
+      setDeleting(false)
     }
   }
+
+  return (
+    <>
+      <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+        style={{ background: 'rgba(0,0,0,0.6)' }}
+        onClick={(e) => e.target === e.currentTarget && onClose()}>
+        <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+              style={{ background: meta.bg, color: meta.color }}>
+              <Icon size={18} />
+            </div>
+            <div className="flex-1">
+              <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                Edit Account
+              </h2>
+              <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{meta.label}</div>
+            </div>
+            <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+          </div>
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Account name</label>
+            <input type="text" value={name} onChange={(e) => setName(e.target.value)} className="mytereka-input" />
+          </div>
+
+          <div>
+            <label className="mb-1 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Correct Balance (UGX)</label>
+            <div className="mb-1.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              This directly updates the tracked balance. Use this when the app balance doesn't match your actual balance.
+            </div>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold" style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+              <input type="number" inputMode="numeric" value={balance}
+                onChange={(e) => setBalance(e.target.value)} className="mytereka-input pl-16 font-bold" />
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setConfirmDel(true)}
+              className="flex items-center gap-2 rounded-full px-5 py-3.5 text-sm font-semibold transition hover:opacity-90"
+              style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)', border: '1px solid rgba(239,68,68,0.2)' }}>
+              <Trash2 size={14} />
+              Delete
+            </button>
+            <button onClick={handleSave} disabled={saving}
+              className="flex-1 rounded-full py-3.5 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+              style={{ background: 'var(--gradient-primary)' }}>
+              {saving && <Loader2 size={16} className="animate-spin" />}
+              Save
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Delete confirmation */}
+      <Dialog open={confirmDel} onOpenChange={setConfirmDel}>
+        <DialogContent style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+          <DialogHeader>
+            <DialogTitle style={{ color: 'var(--foreground)' }}>Delete "{acct.name}"?</DialogTitle>
+            <DialogDescription style={{ color: 'var(--muted-foreground)' }}>
+              {acct.balance !== 0
+                ? `This account has a balance of ${formatUGX(acct.balance)}. Consider transferring it first. `
+                : ''}
+              All transactions linked to this account will show "Deleted Account". This cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2">
+            <Button variant="outline" onClick={() => setConfirmDel(false)}
+              style={{ borderColor: 'var(--border)', color: 'var(--foreground)', background: 'var(--surface-alt)' }}>
+              Cancel
+            </Button>
+            <Button onClick={handleDelete} disabled={deleting}
+              style={{ background: 'var(--danger)', color: '#fff' }}>
+              {deleting && <Loader2 size={14} className="animate-spin mr-2" />}
+              Delete
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
+
+// ─── Accounts Manager ─────────────────────────────────────────────────────────
+function AccountsManager() {
+  const [accounts,     setAccounts]     = useState<AccountRow[]>([])
+  const [loading,      setLoading]      = useState(true)
+  const [showAdd,      setShowAdd]      = useState(false)
+  const [showTransfer, setShowTransfer] = useState(false)
+  const [editAcct,     setEditAcct]     = useState<AccountRow | null>(null)
+
+  const reload = () => getAccountsForUser().then((a) => setAccounts(a as AccountRow[]))
+
+  useEffect(() => {
+    reload().finally(() => setLoading(false))
+  }, [])
 
   const totalBalance = accounts.reduce((s, a) => s + a.balance, 0)
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Total */}
+      {/* Total + Transfer */}
       <div className="rounded-2xl p-4 flex items-center justify-between"
         style={{ background: 'var(--surface-alt)' }}>
         <div>
@@ -637,31 +824,30 @@ function AccountsManager() {
       ) : (
         <div className="flex flex-col gap-2">
           {accounts.map((acct) => {
-            const Icon = ACCOUNT_TYPE_ICONS[acct.type] ?? Wallet
+            const meta = ACCT_META[acct.type] ?? ACCT_META.cash
+            const Icon = meta.icon
             return (
-              <div key={acct.id} className="flex items-center gap-3 rounded-2xl px-4 py-3"
+              <button key={acct.id}
+                onClick={() => setEditAcct(acct)}
+                className="flex items-center gap-3 rounded-2xl px-4 py-3 w-full text-left transition hover:opacity-80 group"
                 style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
                 <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                  style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)' }}>
+                  style={{ background: meta.bg, color: meta.color }}>
                   <Icon size={18} />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{acct.name}</div>
-                  <div className="text-xs capitalize" style={{ color: 'var(--muted-foreground)' }}>
-                    {acct.type.replace('_', ' ')}
+                  <div className="text-sm font-semibold truncate" style={{ color: 'var(--foreground)' }}>{acct.name}</div>
+                  <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{meta.label}</div>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="text-sm font-bold"
+                    style={{ color: acct.balance < 0 ? 'var(--danger)' : 'var(--primary)' }}>
+                    {formatUGX(acct.balance)}
                   </div>
+                  <Pencil size={13} className="opacity-0 group-hover:opacity-50 transition-opacity"
+                    style={{ color: 'var(--muted-foreground)' }} />
                 </div>
-                <div className="text-right">
-                  <div className="text-sm font-bold" style={{ color: 'var(--primary)' }}>{formatUGX(acct.balance)}</div>
-                </div>
-                <button
-                  onClick={() => handleDelete(acct.id)}
-                  disabled={deleting === acct.id}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition-all"
-                  style={{ background: 'rgba(239,68,68,0.10)', color: 'var(--danger)' }}>
-                  {deleting === acct.id ? <Loader2 size={13} className="animate-spin" /> : <X size={13} />}
-                </button>
-              </div>
+              </button>
             )
           })}
         </div>
@@ -673,8 +859,9 @@ function AccountsManager() {
         <Plus size={15} strokeWidth={2.5} /> Add Account
       </button>
 
-      {showAdd && <AddAccountModal onClose={() => { setShowAdd(false); getAccountsForUser().then((a) => setAccounts(a as AccountRow[])) }} />}
-      {showTransfer && <TransferModal accounts={accounts} onClose={() => { setShowTransfer(false); getAccountsForUser().then((a) => setAccounts(a as AccountRow[])) }} />}
+      {showAdd      && <AddAccountModal existingAccounts={accounts} onClose={() => { setShowAdd(false); reload() }} />}
+      {showTransfer && <TransferModal accounts={accounts} onClose={() => { setShowTransfer(false); reload() }} />}
+      {editAcct     && <EditAccountModal acct={editAcct} onClose={() => { setEditAcct(null); reload() }} onDeleted={() => { setEditAcct(null); reload() }} />}
     </div>
   )
 }
