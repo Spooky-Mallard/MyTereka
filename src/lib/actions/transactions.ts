@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { transactions, accounts, budgets, users, categories } from '@/lib/schema'
+import { transactions, accounts, budgets, users, categories, goals } from '@/lib/schema'
 import { auth } from '@/lib/auth'
 import { eq, and, desc, sql, gte, lte } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
@@ -567,21 +567,40 @@ export async function deleteAccount(id: string) {
     .where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
   if (!acct) throw new Error('Account not found')
 
-  // Block delete if transactions reference this account
-  const [txCount] = await db
-    .select({ count: sql<number>`count(*)` })
-    .from(transactions)
-    .where(eq(transactions.accountId, id))
+  await db.transaction(async (tx) => {
+    // Null out any goal auto-debit references to this account
+    await tx
+      .update(goals)
+      .set({ autoDebitAccountId: null })
+      .where(eq(goals.autoDebitAccountId, id))
 
-  const count = Number(txCount?.count ?? 0)
-  if (count > 0) {
-    throw new Error(
-      `Cannot delete this account — it has ${count} transaction${count === 1 ? '' : 's'} linked to it. ` +
-      `Delete or reassign those transactions first.`
-    )
-  }
+    // Reverse budget spentAmount for any expense transactions on this account,
+    // then delete all transactions linked to this account
+    const linkedTxns = await tx
+      .select({ id: transactions.id, type: transactions.type, amount: transactions.amount, categoryId: transactions.categoryId })
+      .from(transactions)
+      .where(eq(transactions.accountId, id))
 
-  await db.delete(accounts).where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
+    for (const t of linkedTxns) {
+      if (t.type === 'expense') {
+        const today = todayISO()
+        await tx
+          .update(budgets)
+          .set({ spentAmount: sql`GREATEST(0, spent_amount - ${t.amount})` })
+          .where(
+            and(
+              eq(budgets.categoryId, t.categoryId),
+              eq(budgets.userId, userId),
+              lte(budgets.periodStartDate, today),
+              gte(budgets.periodEndDate, today),
+            ),
+          )
+      }
+    }
+
+    await tx.delete(transactions).where(eq(transactions.accountId, id))
+    await tx.delete(accounts).where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
+  })
 }
 
 export async function getCategoriesForUser() {

@@ -785,9 +785,9 @@ function EditAccountModal({
             <DialogTitle style={{ color: 'var(--foreground)' }}>Delete "{acct.name}"?</DialogTitle>
             <DialogDescription style={{ color: 'var(--muted-foreground)' }}>
               {acct.balance !== 0
-                ? `This account has a balance of ${formatUGX(acct.balance)}. Consider transferring it first. `
+                ? `This account has a balance of ${formatUGX(acct.balance)}. `
                 : ''}
-              All transactions linked to this account will show "Deleted Account". This cannot be undone.
+              All transactions linked to this account will be permanently deleted and their effect on budgets reversed. This cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="gap-2">
