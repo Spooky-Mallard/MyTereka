@@ -19,13 +19,14 @@ export function AddTransactionSheet({
   onClose: () => void
 }) {
   const router = useRouter()
-  const [type,     setType]     = useState<'expense' | 'income' | 'investment'>('expense')
-  const [amount,   setAmount]   = useState('')
-  const [catId,    setCatId]    = useState('')
-  const [accountId,setAccountId] = useState('')
-  const [date,     setDate]     = useState(new Date().toISOString().split('T')[0])
-  const [note,     setNote]     = useState('')
-  const [saving,   setSaving]   = useState(false)
+  const [type,        setType]       = useState<'expense' | 'income' | 'investment'>('expense')
+  const [amount,      setAmount]     = useState('')
+  const [catId,       setCatId]      = useState('')
+  const [accountId,   setAccountId]  = useState('')
+  const [date,        setDate]       = useState(new Date().toISOString().split('T')[0])
+  const [note,        setNote]       = useState('')
+  const [transferFee, setTransferFee] = useState('')
+  const [saving,      setSaving]     = useState(false)
 
   const [accounts,   setAccounts]   = useState<AccountOption[]>([])
   const [categories, setCategories] = useState<CategoryOption[]>([])
@@ -57,18 +58,19 @@ export function AddTransactionSheet({
     try {
       const result = await createTransaction({
         accountId,
-        categoryId: catId,
+        categoryId:  catId,
         type,
-        amount: Math.round(Number(amount)),
-        note:   note || undefined,
+        amount:      Math.round(Number(amount)),
+        note:        note || undefined,
         date,
+        transferFee: transferFee ? Math.round(Number(transferFee)) : undefined,
       })
       const label = type === 'income' ? 'Income' : type === 'expense' ? 'Expense' : 'Investment'
       toast.success(`${label} saved — ${formatUGX(Number(amount))}`)
       if (result.negativeBalance) {
         toast.warning('Account balance is now negative. You may be tracking a debt or credit situation.')
       }
-      setAmount(''); setCatId(''); setNote('')
+      setAmount(''); setCatId(''); setNote(''); setTransferFee('')
       onClose()
       router.refresh()
     } catch (e: unknown) {
@@ -127,7 +129,7 @@ export function AddTransactionSheet({
                 </span>
                 <input type="number" inputMode="numeric" placeholder="0"
                   value={amount} onChange={(e) => setAmount(e.target.value)}
-                  className="mytereka-input pl-16 text-xl font-bold"
+                  className="mytereka-input pl-20 text-xl font-bold"
                   style={{ color: type === 'income' ? 'var(--success)' : type === 'expense' ? 'var(--danger)' : 'var(--primary)' }} />
               </div>
             </div>
@@ -198,7 +200,21 @@ export function AddTransactionSheet({
                   className="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
                   style={{ color: 'var(--muted-foreground)' }} />
                 <input type="date" value={date} onChange={(e) => setDate(e.target.value)}
-                  className="mytereka-input pl-10" />
+                  className="mytereka-input pl-12" />
+              </div>
+            </div>
+
+            {/* Transaction fee */}
+            <div>
+              <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                Transaction Fee (UGX) <span style={{ color: 'var(--muted-foreground)', fontWeight: 400 }}>— optional</span>
+              </label>
+              <div className="relative">
+                <span className="absolute left-4 top-1/2 -translate-y-1/2 text-sm font-bold"
+                  style={{ color: 'var(--muted-foreground)' }}>UGX</span>
+                <input type="number" inputMode="numeric" placeholder="0"
+                  value={transferFee} onChange={(e) => setTransferFee(e.target.value)}
+                  className="mytereka-input pl-16" />
               </div>
             </div>
 
