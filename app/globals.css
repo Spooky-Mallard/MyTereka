@@ -354,7 +354,7 @@
   border: 1.5px solid var(--border);
   border-radius: var(--radius-sm);
   background: var(--surface-alt);
-  padding: 0 16px;
+  padding: 0 50px;
   font-size: 14px;
   color: var(--foreground);
   transition: border-color 0.15s;
