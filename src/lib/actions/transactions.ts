@@ -36,13 +36,14 @@ export async function updateStreak(userId: string) {
 }
 
 export async function createTransaction(data: {
-  accountId:  string
-  categoryId: string
-  type:       'income' | 'expense' | 'transfer' | 'investment'
-  amount:     number
-  note?:      string
-  date:       string
-  goalId?:    string
+  accountId:   string
+  categoryId:  string
+  type:        'income' | 'expense' | 'transfer' | 'investment'
+  amount:      number
+  note?:       string
+  date:        string
+  goalId?:     string
+  transferFee?: number
 }) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
@@ -64,7 +65,11 @@ export async function createTransaction(data: {
   const willGoNegative = projectedBalance < 0
 
   await db.transaction(async (tx) => {
-    await tx.insert(transactions).values({ ...data, userId })
+    await tx.insert(transactions).values({
+      ...data,
+      userId,
+      transferFee: data.transferFee && data.transferFee > 0 ? data.transferFee : null,
+    })
 
     await tx
       .update(accounts)
@@ -109,6 +114,7 @@ export type TransactionRow = {
   categoryColor:string | null
   accountId:    string
   accountName:  string
+  transferFee:  number | null
 }
 
 export async function getTransactions(filters?: {
@@ -135,6 +141,7 @@ export async function getTransactions(filters?: {
       categoryColor: categories.color,
       accountId:     transactions.accountId,
       accountName:   accounts.name,
+      transferFee:   transactions.transferFee,
     })
     .from(transactions)
     .innerJoin(categories, eq(transactions.categoryId, categories.id))
@@ -294,13 +301,14 @@ export async function importTransactions(rows: ImportRow[]): Promise<{ imported:
 export async function updateTransaction(
   id: string,
   data: {
-    accountId?:  string
-    categoryId?: string
-    type?:       'income' | 'expense' | 'transfer' | 'investment'
-    amount?:     number
-    note?:       string
-    date?:       string
-    goalId?:     string | null
+    accountId?:   string
+    categoryId?:  string
+    type?:        'income' | 'expense' | 'transfer' | 'investment'
+    amount?:      number
+    note?:        string
+    date?:        string
+    goalId?:      string | null
+    transferFee?: number | null
   },
 ) {
   const session = await auth()
@@ -382,14 +390,17 @@ export async function updateTransaction(
     await tx
       .update(transactions)
       .set({
-        accountId:  newAccountId,
-        categoryId: newCategoryId,
-        type:       newType,
-        amount:     newAmount,
-        note:       data.note    !== undefined ? data.note    : old.note,
-        date:       data.date    !== undefined ? data.date    : old.date,
-        goalId:     data.goalId  !== undefined ? data.goalId  : old.goalId,
-        updatedAt:  sql`now()`,
+        accountId:   newAccountId,
+        categoryId:  newCategoryId,
+        type:        newType,
+        amount:      newAmount,
+        note:        data.note        !== undefined ? data.note        : old.note,
+        date:        data.date        !== undefined ? data.date        : old.date,
+        goalId:      data.goalId      !== undefined ? data.goalId      : old.goalId,
+        transferFee: data.transferFee !== undefined
+          ? (data.transferFee && data.transferFee > 0 ? data.transferFee : null)
+          : old.transferFee,
+        updatedAt:   sql`now()`,
       })
       .where(eq(transactions.id, id))
   })
@@ -403,6 +414,7 @@ export async function transferBetweenAccounts(data: {
   amount:        number
   date:          string
   note?:         string
+  manualFee?:    number
 }): Promise<{ fee: number; total: number }> {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
@@ -416,15 +428,22 @@ export async function transferBetweenAccounts(data: {
   if (!fromAcc) throw new Error('Source account not found')
   if (!toAcc)   throw new Error('Destination account not found')
 
-  // Calculate fee server-side
-  const feeResult = calcMoMoFee(fromAcc.name, data.amount)
-  const fee = feeResult.type === 'fee' ? feeResult.fee : 0
+  // Auto-calc fee only for MoMo → Cash transfers; otherwise use caller-supplied fee
+  const isMoMoToCash =
+    fromAcc.type === 'mobile_money' && toAcc.type === 'cash'
 
-  if (feeResult.type === 'out_of_range') {
-    throw new Error(
-      `Amount is outside the valid range for ${feeResult.provider}. ` +
-      `Min: UGX ${feeResult.min.toLocaleString()}, Max: UGX ${feeResult.max.toLocaleString()}`
-    )
+  let fee: number
+  if (isMoMoToCash) {
+    const feeResult = calcMoMoFee(fromAcc.name, data.amount)
+    if (feeResult.type === 'out_of_range') {
+      throw new Error(
+        `Amount is outside the valid range for ${feeResult.provider}. ` +
+        `Min: UGX ${feeResult.min.toLocaleString()}, Max: UGX ${feeResult.max.toLocaleString()}`
+      )
+    }
+    fee = feeResult.type === 'fee' ? feeResult.fee : 0
+  } else {
+    fee = Math.round(data.manualFee ?? 0)
   }
 
   const totalDebit = data.amount + fee
@@ -547,6 +566,20 @@ export async function deleteAccount(id: string) {
     .from(accounts)
     .where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
   if (!acct) throw new Error('Account not found')
+
+  // Block delete if transactions reference this account
+  const [txCount] = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(transactions)
+    .where(eq(transactions.accountId, id))
+
+  const count = Number(txCount?.count ?? 0)
+  if (count > 0) {
+    throw new Error(
+      `Cannot delete this account — it has ${count} transaction${count === 1 ? '' : 's'} linked to it. ` +
+      `Delete or reassign those transactions first.`
+    )
+  }
 
   await db.delete(accounts).where(and(eq(accounts.id, id), eq(accounts.userId, userId)))
 }
