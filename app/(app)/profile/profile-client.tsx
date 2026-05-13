@@ -21,6 +21,7 @@ import { calcMoMoFee } from '@/lib/momo-fees'
 import type { FeeResult } from '@/lib/momo-fees'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
 import { formatUGX } from '@/lib/format'
+import { FriendsTab } from '@/components/friends-tab'
 
 /* All defined badges so unearned ones still show (greyed) */
 const ALL_BADGES = [
@@ -877,7 +878,7 @@ function AccountsManager() {
   )
 }
 
-type ProfileTab = 'settings' | 'badges' | 'import' | 'accounts'
+type ProfileTab = 'settings' | 'badges' | 'import' | 'accounts' | 'friends'
 
 export function ProfileClient({
   profile,
@@ -958,6 +959,7 @@ export function ProfileClient({
       <div className="flex rounded-2xl p-1 flex-wrap gap-1" style={{ background: 'var(--surface-alt)' }}>
         {([
           { key: 'settings',  label: '⚙️ Settings' },
+          { key: 'friends',   label: '👥 Friends' },
           { key: 'accounts',  label: '💳 Accounts' },
           { key: 'badges',    label: '🏅 Badges' },
           { key: 'import',    label: '📥 Import' },
@@ -1060,6 +1062,9 @@ export function ProfileClient({
           })}
         </div>
       )}
+
+      {/* Friends tab */}
+      {activeTab === 'friends' && <FriendsTab />}
 
       {/* Accounts tab */}
       {activeTab === 'accounts' && (
