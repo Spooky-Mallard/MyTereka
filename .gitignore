@@ -34,3 +34,4 @@ dist-ssr
 CLAUDE.md
 documentation
 .next
+tsconfig.tsbuildinfo
