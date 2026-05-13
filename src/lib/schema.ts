@@ -8,10 +8,21 @@ export const transactionTypeEnum = pgEnum('transaction_type',   ['income', 'expe
 export const periodEnum          = pgEnum('period',             ['weekly', 'monthly'])
 export const autoDebitEnum       = pgEnum('auto_debit_schedule',['daily', 'weekly', 'monthly'])
 export const levelEnum           = pgEnum('level',              ['Beginner', 'Saver', 'Consistent', 'Master', 'Grand Master'])
+export const friendshipStatusEnum = pgEnum('friendship_status', ['pending', 'accepted', 'declined', 'blocked'])
+export const notificationTypeEnum = pgEnum('notification_type', [
+  'friend_request',
+  'friend_accepted',
+  'nudge',
+  'shared_goal_invite',
+  'shared_goal_contribution',
+  'shared_goal_completed',
+  'shared_goal_removed',
+])
 
 export const users = pgTable('users', {
   id:             uuid('id').defaultRandom().primaryKey(),
   name:           varchar('name',           { length: 100 }).notNull(),
+  username:       varchar('username',       { length: 20 }).unique(),
   email:          varchar('email',          { length: 255 }).notNull().unique(),
   passwordHash:   text('password_hash').notNull(),
   mobileNumber:   varchar('mobile_number',  { length: 20 }),
@@ -124,4 +135,24 @@ export const xpEvents = pgTable('xp_events', {
   xpAwarded:   integer('xp_awarded').notNull(),
   description: text('description'),
   createdAt:   timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const friendships = pgTable('friendships', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  requesterId:  uuid('requester_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  addresseeId:  uuid('addressee_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  status:       friendshipStatusEnum('status').default('pending').notNull(),
+  createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  respondedAt:  timestamp('responded_at', { withTimezone: true }),
+})
+
+export const notifications = pgTable('notifications', {
+  id:        uuid('id').defaultRandom().primaryKey(),
+  userId:    uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  type:      notificationTypeEnum('type').notNull(),
+  actorId:   uuid('actor_id').references(() => users.id, { onDelete: 'cascade' }),
+  entityId:  uuid('entity_id'),
+  body:      text('body'),
+  readAt:    timestamp('read_at', { withTimezone: true }),
+  createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })

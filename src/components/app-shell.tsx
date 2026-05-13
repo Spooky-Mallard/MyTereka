@@ -3,12 +3,14 @@
 import { useState, useRef, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Bell, House, BarChart2, Plus, Target, User, LogOut, ChevronDown } from 'lucide-react'
+import { Bell, House, BarChart2, Plus, Target, User, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
 import { Toaster } from '@/components/ui/sonner'
 import { AddTransactionSheet } from '@/components/add-transaction-sheet'
+import { getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead } from '@/lib/actions/notifications'
+import type { NotificationRow } from '@/lib/types/notifications'
 
 const mobileNavItems = [
   { title: 'Home',      url: '/',          icon: House },
@@ -121,9 +123,38 @@ function UserMenu() {
   )
 }
 
+function notificationIcon(type: NotificationRow['type']) {
+  switch (type) {
+    case 'friend_request':            return UserPlus
+    case 'friend_accepted':           return UserCheck
+    case 'nudge':                     return Sparkles
+    case 'shared_goal_invite':        return UsersIcon
+    case 'shared_goal_contribution':  return Trophy
+    case 'shared_goal_completed':     return Trophy
+    case 'shared_goal_removed':       return UsersIcon
+    default:                          return Bell
+  }
+}
+
+function formatRelative(d: Date) {
+  const diff = Date.now() - new Date(d).getTime()
+  const m = Math.floor(diff / 60000)
+  if (m < 1) return 'just now'
+  if (m < 60) return `${m}m ago`
+  const h = Math.floor(m / 60)
+  if (h < 24) return `${h}h ago`
+  const days = Math.floor(h / 24)
+  if (days < 7) return `${days}d ago`
+  return new Date(d).toLocaleDateString('en-UG')
+}
+
 function NotificationBell() {
   const [open, setOpen] = useState(false)
+  const [items, setItems] = useState<NotificationRow[]>([])
+  const [unread, setUnread] = useState(0)
   const ref = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const { status } = useSession()
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -133,8 +164,54 @@ function NotificationBell() {
     return () => document.removeEventListener('mousedown', handleClick)
   }, [])
 
-  /* Placeholder — wire to real notifications later */
-  const notifications: { id: string; text: string; time: string }[] = []
+  useEffect(() => {
+    if (status !== 'authenticated') return
+    let active = true
+    async function load() {
+      try {
+        const c = await getUnreadCount()
+        if (active) setUnread(c)
+      } catch { /* ignore */ }
+    }
+    load()
+    const id = setInterval(load, 30000)
+    return () => { active = false; clearInterval(id) }
+  }, [status])
+
+  useEffect(() => {
+    if (!open) return
+    let active = true
+    async function load() {
+      try {
+        const rows = await getNotifications(20)
+        if (active) setItems(rows)
+      } catch { /* ignore */ }
+    }
+    load()
+  }, [open])
+
+  async function markAll() {
+    await markAllNotificationsRead()
+    setUnread(0)
+    setItems((prev) => prev.map((n) => ({ ...n, readAt: n.readAt ?? new Date() })))
+  }
+
+  async function clickItem(n: NotificationRow) {
+    if (!n.readAt) {
+      await markNotificationRead(n.id)
+      setUnread((u) => Math.max(0, u - 1))
+      setItems((prev) => prev.map((x) => x.id === n.id ? { ...x, readAt: new Date() } : x))
+    }
+    setOpen(false)
+    if (n.type === 'friend_request' || n.type === 'friend_accepted') {
+      if (n.actor?.username) router.push(`/profile/${n.actor.username}`)
+      else router.push('/profile')
+    } else if (n.type.startsWith('shared_goal') && n.entityId) {
+      router.push(`/goals/shared/${n.entityId}`)
+    } else if (n.type === 'nudge') {
+      router.push('/')
+    }
+  }
 
   return (
     <div ref={ref} className="relative">
@@ -145,31 +222,34 @@ function NotificationBell() {
         aria-label="Notifications"
       >
         <Bell size={18} />
-        {notifications.length > 0 && (
+        {unread > 0 && (
           <span
-            className="absolute right-1.5 top-1.5 h-2 w-2 rounded-full"
+            className="absolute -right-0.5 -top-0.5 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[10px] font-bold text-white"
             style={{ background: 'var(--danger)' }}
-          />
+          >
+            {unread > 9 ? '9+' : unread}
+          </span>
         )}
       </button>
 
       {open && (
         <div
-          className="absolute right-0 top-full mt-2 w-72 overflow-hidden rounded-2xl z-50"
+          className="absolute right-0 top-full mt-2 w-80 overflow-hidden rounded-2xl z-50"
           style={{ background: 'var(--card)', boxShadow: 'var(--shadow-md)', border: '1px solid var(--border)' }}
         >
           <div className="flex items-center justify-between px-4 py-3"
             style={{ borderBottom: '1px solid var(--border)' }}>
             <span className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>Notifications</span>
-            {notifications.length > 0 && (
-              <span className="rounded-full px-2 py-0.5 text-xs font-bold"
-                style={{ background: 'var(--primary)22', color: 'var(--primary)' }}>
-                {notifications.length}
-              </span>
+            {unread > 0 && (
+              <button onClick={markAll}
+                className="text-xs font-semibold transition hover:opacity-80"
+                style={{ color: 'var(--primary)' }}>
+                Mark all read
+              </button>
             )}
           </div>
 
-          {notifications.length === 0 ? (
+          {items.length === 0 ? (
             <div className="flex flex-col items-center gap-2 py-8 text-center">
               <Bell size={28} style={{ color: 'var(--muted-foreground)', opacity: 0.4 }} />
               <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
@@ -177,14 +257,40 @@ function NotificationBell() {
               </div>
             </div>
           ) : (
-            <div className="flex flex-col">
-              {notifications.map((n) => (
-                <div key={n.id} className="px-4 py-3 text-sm"
-                  style={{ borderBottom: '1px solid var(--border)', color: 'var(--foreground)' }}>
-                  <div>{n.text}</div>
-                  <div className="mt-0.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>{n.time}</div>
-                </div>
-              ))}
+            <div className="flex max-h-[60vh] flex-col overflow-y-auto">
+              {items.map((n) => {
+                const Icon = notificationIcon(n.type)
+                const isUnread = !n.readAt
+                return (
+                  <button key={n.id} onClick={() => clickItem(n)}
+                    className="flex items-start gap-3 px-4 py-3 text-left text-sm transition hover:opacity-90"
+                    style={{
+                      borderBottom: '1px solid var(--border)',
+                      background: isUnread ? 'var(--surface-alt)' : 'transparent',
+                    }}>
+                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full"
+                      style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)' }}>
+                      <Icon size={14} />
+                    </span>
+                    <div className="flex-1 min-w-0">
+                      <div className="text-sm" style={{ color: 'var(--foreground)' }}>
+                        {n.body ?? n.type.replace(/_/g, ' ')}
+                      </div>
+                      <div className="mt-0.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                        {formatRelative(n.createdAt)}
+                      </div>
+                    </div>
+                    {isUnread && (
+                      <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full" style={{ background: 'var(--primary)' }} />
+                    )}
+                  </button>
+                )
+              })}
+              <Link href="/notifications" onClick={() => setOpen(false)}
+                className="px-4 py-3 text-center text-xs font-semibold transition hover:opacity-80"
+                style={{ color: 'var(--primary)' }}>
+                View all
+              </Link>
             </div>
           )}
         </div>

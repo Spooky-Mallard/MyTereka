@@ -38,9 +38,11 @@ export default function RegisterPage() {
     if (result?.error) {
       setLoading(false)
       const msg = result.error
-      if (msg.includes('Mobile'))  setFieldErrors({ mobile: msg })
-      else if (msg.includes('Password')) setFieldErrors({ password: msg })
-      else if (msg.includes('email'))    setFieldErrors({ email: msg })
+      if (msg.includes('Mobile'))           setFieldErrors({ mobile: msg })
+      else if (msg.includes('Password'))    setFieldErrors({ password: msg })
+      else if (msg.includes('email'))       setFieldErrors({ email: msg })
+      else if (msg.includes('Username') || msg.includes('username'))
+                                            setFieldErrors({ username: msg })
       else toast.error(msg)
       return
     }
@@ -96,6 +98,18 @@ export default function RegisterPage() {
             <input name="name" type="text" placeholder="Atong Precious Olanya"
               required autoComplete="name"
               className="mytereka-input" />
+          </Field>
+
+          <Field label="Username" error={fieldErrors.username}>
+            <input name="username" type="text" placeholder="atong_p"
+              required autoComplete="username"
+              pattern="[a-z0-9_]{3,20}"
+              className={`mytereka-input${fieldErrors.username ? ' error' : ''}`} />
+            {!fieldErrors.username && (
+              <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                3-20 chars, lowercase letters, numbers, underscore. Friends find you by this.
+              </p>
+            )}
           </Field>
 
           <Field label="Email" error={fieldErrors.email}>

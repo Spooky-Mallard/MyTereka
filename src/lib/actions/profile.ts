@@ -8,6 +8,7 @@ import { eq, desc } from 'drizzle-orm'
 export type ProfileData = {
   id:             string
   name:           string
+  username:       string | null
   email:          string
   avatarUrl:      string | null
   xpPoints:       number
@@ -32,6 +33,7 @@ export async function getProfile(): Promise<ProfileData> {
     .select({
       id:             users.id,
       name:           users.name,
+      username:       users.username,
       email:          users.email,
       avatarUrl:      users.avatarUrl,
       xpPoints:       users.xpPoints,
