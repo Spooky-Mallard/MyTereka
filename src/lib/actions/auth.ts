@@ -39,24 +39,33 @@ const DEFAULT_ACCOUNTS = [
   { name: 'Cash',             type: 'cash'         as const, balance: 0 },
 ]
 
+const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/
+
 export async function registerUser(formData: FormData) {
   const name     = (formData.get('name')     as string)?.trim()
   const email    = (formData.get('email')    as string)?.trim().toLowerCase()
   const password = (formData.get('password') as string)
   const mobile   = (formData.get('mobile')   as string)?.trim()
+  const username = (formData.get('username') as string)?.trim().toLowerCase()
 
-  if (!name || !email || !password) return { error: 'All fields are required' }
+  if (!name || !email || !password || !username) return { error: 'All fields are required' }
   if (password.length < 8)          return { error: 'Password must be at least 8 characters' }
   if (mobile && !/^256[0-9]{9}$/.test(mobile))
     return { error: 'Mobile number must be in format 256XXXXXXXXX (Uganda)' }
+  if (!USERNAME_REGEX.test(username))
+    return { error: 'Username must be 3-20 characters, lowercase letters, numbers, or underscore' }
 
   const existing = await db.select({ id: users.id }).from(users).where(eq(users.email, email))
   if (existing.length > 0) return { error: 'An account with this email already exists' }
+
+  const usernameTaken = await db.select({ id: users.id }).from(users).where(eq(users.username, username))
+  if (usernameTaken.length > 0) return { error: 'Username is already taken' }
 
   const passwordHash = await bcrypt.hash(password, 12)
 
   const [user] = await db.insert(users).values({
     name,
+    username,
     email,
     passwordHash,
     mobileNumber: mobile || null,
