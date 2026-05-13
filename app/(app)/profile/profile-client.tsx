@@ -22,6 +22,7 @@ import type { FeeResult } from '@/lib/momo-fees'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
 import { formatUGX } from '@/lib/format'
 import { FriendsTab } from '@/components/friends-tab'
+import { UsernameEditModal } from '@/components/username-edit-modal'
 
 /* All defined badges so unearned ones still show (greyed) */
 const ALL_BADGES = [
@@ -893,6 +894,7 @@ export function ProfileClient({
   const [streakAlerts,  setStreakAlerts]  = useState(true)
   const [logoutOpen,    setLogoutOpen]    = useState(false)
   const [activeTab,     setActiveTab]     = useState<ProfileTab>('settings')
+  const [usernameOpen,  setUsernameOpen]  = useState(false)
   const router = useRouter()
 
   const initials    = profile.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
@@ -925,7 +927,18 @@ export function ProfileClient({
           </div>
           <div className="flex-1 min-w-0">
             <div className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{profile.name}</div>
-            <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>{profile.email}</div>
+            <button
+              onClick={() => setUsernameOpen(true)}
+              className="group flex items-center gap-1 text-sm transition hover:opacity-80"
+              style={{ color: profile.username ? 'var(--primary)' : 'var(--warning)' }}
+              aria-label="Edit username"
+            >
+              <span className="font-medium">
+                {profile.username ? `@${profile.username}` : 'Set username'}
+              </span>
+              <Pencil size={11} className="opacity-70 group-hover:opacity-100" />
+            </button>
+            <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>{profile.email}</div>
             <div className="mt-1 flex items-center gap-2">
               <span className="level-badge">{profile.level}</span>
               <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--warning)' }}>
@@ -1118,6 +1131,13 @@ export function ProfileClient({
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {usernameOpen && (
+        <UsernameEditModal
+          initialUsername={profile.username}
+          onClose={() => setUsernameOpen(false)}
+        />
+      )}
     </div>
   )
 }
