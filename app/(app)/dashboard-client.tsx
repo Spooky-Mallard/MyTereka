@@ -5,6 +5,7 @@ import { useState } from 'react'
 import { Eye, EyeOff, ChevronRight, Flame, Star, TrendingUp, TrendingDown } from 'lucide-react'
 import { formatUGX } from '@/lib/format'
 import { categoryMeta } from '@/lib/mock-data'
+import { UsernameSetupBanner } from '@/components/username-setup-banner'
 
 const LEVEL_XP: Record<string, number> = {
   'Beginner': 100, 'Saver': 300, 'Consistent': 700, 'Master': 1500, 'Grand Master': 1500,
@@ -51,7 +52,7 @@ function StreakDots({ streak }: { streak: number }) {
 }
 
 type Props = {
-  user: { name: string; level: string; xp: number; streak: number; lastActive: string | null }
+  user: { name: string; username: string | null; level: string; xp: number; streak: number; lastActive: string | null }
   totalBalance: number
   recentTxns: Array<{
     id: string; type: string; amount: number; note: string | null
@@ -83,6 +84,7 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col gap-6">
+      <UsernameSetupBanner initialUsername={user.username} />
       <div className="flex flex-wrap items-end justify-between gap-2">
         <div>
           <h1 className="text-2xl font-bold tracking-tight md:text-3xl"

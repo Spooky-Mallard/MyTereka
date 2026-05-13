@@ -72,6 +72,7 @@ export default async function DashboardPage() {
     <DashboardClient
       user={{
         name:       user?.name        ?? '',
+        username:   user?.username    ?? null,
         level:      user?.level       ?? 'Beginner',
         xp:         user?.xpPoints    ?? 0,
         streak:     user?.streakCount ?? 0,
