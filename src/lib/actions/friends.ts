@@ -3,7 +3,7 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { friendships, notifications, users } from '@/lib/schema'
-import { and, eq, or, ne, ilike, sql } from 'drizzle-orm'
+import { and, eq, or, ne, ilike, inArray } from 'drizzle-orm'
 import type { PublicUser, FriendCard, IncomingRequest, FriendProfile } from '@/lib/types/friends'
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/
@@ -151,7 +151,8 @@ export async function getFriends(): Promise<FriendCard[]> {
   const rows = await db
     .select({
       friendshipId: friendships.id,
-      otherId: sql<string>`CASE WHEN ${friendships.requesterId} = ${me} THEN ${friendships.addresseeId} ELSE ${friendships.requesterId} END`,
+      requesterId:  friendships.requesterId,
+      addresseeId:  friendships.addresseeId,
     })
     .from(friendships)
     .where(
@@ -163,7 +164,11 @@ export async function getFriends(): Promise<FriendCard[]> {
 
   if (rows.length === 0) return []
 
-  const friendIds = rows.map((r) => r.otherId)
+  const pairs = rows.map((r) => ({
+    friendshipId: r.friendshipId,
+    otherId: r.requesterId === me ? r.addresseeId : r.requesterId,
+  }))
+  const friendIds = pairs.map((p) => p.otherId)
   const profiles = await db
     .select({
       id:          users.id,
@@ -175,14 +180,14 @@ export async function getFriends(): Promise<FriendCard[]> {
       streakCount: users.streakCount,
     })
     .from(users)
-    .where(sql`${users.id} = ANY (${friendIds})`)
+    .where(inArray(users.id, friendIds))
 
   const byId = new Map(profiles.map((p) => [p.id, p]))
-  return rows
-    .map((r) => {
-      const p = byId.get(r.otherId)
+  return pairs
+    .map((pair) => {
+      const p = byId.get(pair.otherId)
       if (!p) return null
-      return { ...p, friendshipId: r.friendshipId } as FriendCard
+      return { ...p, friendshipId: pair.friendshipId } as FriendCard
     })
     .filter((x): x is FriendCard => x !== null)
 }
