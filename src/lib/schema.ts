@@ -18,6 +18,8 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'shared_goal_completed',
   'shared_goal_removed',
 ])
+export const sharedGoalLeavePolicyEnum = pgEnum('shared_goal_leave_policy', ['refundable', 'forfeit'])
+export const sharedGoalMemberStatusEnum = pgEnum('shared_goal_member_status', ['invited', 'active', 'left', 'removed', 'declined'])
 
 export const users = pgTable('users', {
   id:             uuid('id').defaultRandom().primaryKey(),
@@ -144,6 +146,40 @@ export const friendships = pgTable('friendships', {
   status:       friendshipStatusEnum('status').default('pending').notNull(),
   createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
   respondedAt:  timestamp('responded_at', { withTimezone: true }),
+})
+
+export const sharedGoals = pgTable('shared_goals', {
+  id:            uuid('id').defaultRandom().primaryKey(),
+  creatorId:     uuid('creator_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  name:          varchar('name', { length: 100 }).notNull(),
+  icon:          varchar('icon', { length: 50 }),
+  targetAmount:  integer('target_amount').notNull(),
+  currentAmount: integer('current_amount').default(0).notNull(),
+  targetDate:    date('target_date'),
+  leavePolicy:   sharedGoalLeavePolicyEnum('leave_policy').default('forfeit').notNull(),
+  isCompleted:   boolean('is_completed').default(false).notNull(),
+  createdAt:     timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const sharedGoalMembers = pgTable('shared_goal_members', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  sharedGoalId: uuid('shared_goal_id').references(() => sharedGoals.id, { onDelete: 'cascade' }).notNull(),
+  userId:       uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  status:       sharedGoalMemberStatusEnum('status').default('invited').notNull(),
+  isCreator:    boolean('is_creator').default(false).notNull(),
+  joinedAt:     timestamp('joined_at', { withTimezone: true }).defaultNow().notNull(),
+  leftAt:       timestamp('left_at',   { withTimezone: true }),
+})
+
+export const sharedGoalContributions = pgTable('shared_goal_contributions', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  sharedGoalId: uuid('shared_goal_id').references(() => sharedGoals.id, { onDelete: 'cascade' }).notNull(),
+  userId:       uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  accountId:    uuid('account_id').references(() => accounts.id).notNull(),
+  amount:       integer('amount').notNull(),
+  note:         text('note'),
+  isRefund:     boolean('is_refund').default(false).notNull(),
+  createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
 export const notifications = pgTable('notifications', {
