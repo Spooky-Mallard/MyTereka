@@ -1,14 +1,21 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
-import { Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2, CalendarDays } from 'lucide-react'
+import Link from 'next/link'
+import {
+  Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2,
+  CalendarDays, Users, UserPlus,
+} from 'lucide-react'
 import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
 import { createGoal, contributeToGoal } from '@/lib/actions/goals'
+import { respondToSharedGoalInvite } from '@/lib/actions/shared-goals'
 import { getAccountsForUser } from '@/lib/actions/transactions'
+import { NewSharedGoalSheet } from '@/components/new-shared-goal-sheet'
 import type { goals } from '@/lib/schema'
 import type { InferSelectModel } from 'drizzle-orm'
+import type { SharedGoalCard, SharedGoalInvite } from '@/lib/types/shared-goals'
 
 type GoalRow = InferSelectModel<typeof goals>
 type AccountRow = { id: string; name: string; balance: number; type: string }
@@ -102,7 +109,6 @@ function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void
           <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
         </div>
 
-        {/* Remaining */}
         <div className="rounded-xl p-3 text-center" style={{ background: 'var(--surface-alt)' }}>
           <div className="text-xs mb-1" style={{ color: 'var(--muted-foreground)' }}>Remaining</div>
           <div className="text-lg font-bold" style={{ color: 'var(--primary)' }}>
@@ -110,7 +116,6 @@ function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void
           </div>
         </div>
 
-        {/* Amount */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
             Amount (UGX)
@@ -125,7 +130,6 @@ function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void
           </div>
         </div>
 
-        {/* Account */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
             Source account
@@ -147,7 +151,6 @@ function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void
           )}
         </div>
 
-        {/* Note */}
         <div>
           <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
             Note (optional)
@@ -177,7 +180,6 @@ function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: Goa
   return (
     <div className="rounded-2xl p-5 flex flex-col gap-4"
       style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-      {/* Header row */}
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
           style={{ background: goal.isCompleted ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
@@ -209,7 +211,6 @@ function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: Goa
         </div>
       </div>
 
-      {/* Progress bar */}
       <div>
         <div className="progress-track" style={{ height: 8 }}>
           <div className="progress-fill" style={{ width: `${pct}%`, background: barColor, borderRadius: 'var(--radius-full)' }} />
@@ -225,7 +226,6 @@ function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: Goa
         )}
       </div>
 
-      {/* Add Contribution button */}
       {!goal.isCompleted && (
         <button
           onClick={() => onContribute(goal)}
@@ -235,6 +235,109 @@ function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: Goa
           Add Contribution
         </button>
       )}
+    </div>
+  )
+}
+
+function SharedGoalCardItem({ goal }: { goal: SharedGoalCard }) {
+  const pct  = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
+  const Icon = goal.icon ? iconMap[goal.icon] ?? Target : Target
+  const barColor = goal.isCompleted ? 'var(--success)' : pct >= 75 ? 'var(--primary-light)' : 'var(--primary)'
+
+  return (
+    <Link href={`/goals/shared/${goal.id}`} className="block">
+      <div className="rounded-2xl p-5 flex flex-col gap-4 transition hover:opacity-90"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="flex items-start gap-3">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
+            style={{ background: goal.isCompleted ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
+                     color: goal.isCompleted ? 'var(--primary)' : 'var(--muted-foreground)' }}>
+            {goal.isCompleted ? <Trophy size={20} /> : <Icon size={20} />}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{goal.name}</span>
+              <span className="rounded-full px-2 py-0.5 text-xs font-semibold flex items-center gap-1"
+                style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)' }}>
+                <Users size={11} /> {goal.memberCount}
+              </span>
+              {goal.isCompleted && (
+                <span className="rounded-full px-2 py-0.5 text-xs font-semibold"
+                  style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
+                  Done
+                </span>
+              )}
+            </div>
+            <div className="mt-0.5 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+              {goal.isCreator ? 'You created' : `by ${goal.creatorName}`}
+              {goal.targetDate && ' · '}
+              {goal.targetDate && new Date(goal.targetDate).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })}
+            </div>
+          </div>
+
+          <div className="shrink-0 text-right">
+            <div className="text-xl font-bold" style={{ color: 'var(--primary)' }}>{pct}%</div>
+          </div>
+        </div>
+
+        <div>
+          <div className="progress-track" style={{ height: 8 }}>
+            <div className="progress-fill" style={{ width: `${pct}%`, background: barColor, borderRadius: 'var(--radius-full)' }} />
+          </div>
+          <div className="mt-2 flex justify-between text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            <span>Pooled: <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{formatUGX(goal.currentAmount)}</span></span>
+            <span>Target: <span className="font-semibold" style={{ color: 'var(--foreground)' }}>{formatUGX(goal.targetAmount)}</span></span>
+          </div>
+        </div>
+      </div>
+    </Link>
+  )
+}
+
+function InviteCard({ invite, onResponded }: { invite: SharedGoalInvite; onResponded: () => void }) {
+  const router = useRouter()
+  const [pending, start] = useTransition()
+  const Icon = invite.icon ? iconMap[invite.icon] ?? Target : Target
+
+  function respond(action: 'accept' | 'decline') {
+    start(async () => {
+      try {
+        await respondToSharedGoalInvite(invite.sharedGoalId, action)
+        toast.success(action === 'accept' ? `Joined "${invite.name}"` : 'Invite declined')
+        onResponded()
+        router.refresh()
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Failed')
+      }
+    })
+  }
+
+  return (
+    <div className="rounded-2xl p-4 flex items-start gap-3"
+      style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--primary)' }}>
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
+        style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
+        <Icon size={18} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{invite.name}</div>
+        <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          {invite.creatorName} invited you · Target {formatUGX(invite.targetAmount)} · {invite.leavePolicy}
+        </div>
+        <div className="mt-2 flex gap-2">
+          <button disabled={pending} onClick={() => respond('accept')}
+            className="rounded-full px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'var(--gradient-primary)' }}>
+            Accept
+          </button>
+          <button disabled={pending} onClick={() => respond('decline')}
+            className="rounded-full px-3 py-1.5 text-xs font-semibold transition hover:opacity-90 disabled:opacity-60"
+            style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
+            Decline
+          </button>
+        </div>
+      </div>
     </div>
   )
 }
@@ -405,15 +508,31 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
   )
 }
 
-type Tab = 'goals' | 'map'
+type Section = 'personal' | 'shared'
+type PersonalView = 'goals' | 'map'
 
-export function GoalsClient({ data }: { data: GoalRow[] }) {
-  const [tab,          setTab]          = useState<Tab>('goals')
-  const [showNew,      setShowNew]      = useState(false)
+export function GoalsClient({
+  data,
+  sharedGoals,
+  sharedInvites,
+}: {
+  data: GoalRow[]
+  sharedGoals: SharedGoalCard[]
+  sharedInvites: SharedGoalInvite[]
+}) {
+  const [section, setSection] = useState<Section>('personal')
+  const [personalView, setPersonalView] = useState<PersonalView>('goals')
+  const [showNew, setShowNew] = useState(false)
+  const [showNewShared, setShowNewShared] = useState(false)
   const [contributeGoal, setContributeGoal] = useState<GoalRow | null>(null)
+  const [invitesLocal, setInvitesLocal] = useState(sharedInvites)
 
   const active    = data.filter((g) => !g.isCompleted)
   const completed = data.filter((g) => g.isCompleted)
+
+  function dismissInvite(id: string) {
+    setInvitesLocal((prev) => prev.filter((i) => i.sharedGoalId !== id))
+  }
 
   return (
     <div className="mx-auto flex max-w-5xl flex-col gap-6">
@@ -424,74 +543,140 @@ export function GoalsClient({ data }: { data: GoalRow[] }) {
             Goals
           </h1>
           <p className="mt-0.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            {active.length} active · {completed.length} completed
+            {section === 'personal'
+              ? `${active.length} active · ${completed.length} completed`
+              : `${sharedGoals.length} shared${invitesLocal.length > 0 ? ` · ${invitesLocal.length} invite${invitesLocal.length === 1 ? '' : 's'}` : ''}`}
           </p>
         </div>
         <button
-          onClick={() => setShowNew(true)}
+          onClick={() => section === 'personal' ? setShowNew(true) : setShowNewShared(true)}
           className="flex h-11 items-center gap-2 rounded-full px-5 text-sm font-semibold text-white transition hover:opacity-90 active:scale-95"
           style={{ background: 'var(--primary)', boxShadow: '0 4px 12px rgba(0,184,148,0.35)' }}>
-          <Plus size={16} strokeWidth={2.5} /> New goal
+          <Plus size={16} strokeWidth={2.5} /> {section === 'personal' ? 'New goal' : 'New shared'}
         </button>
       </div>
 
-      {/* Tab switcher */}
       <div className="flex rounded-full p-1 w-fit" style={{ background: 'var(--surface-alt)' }}>
-        {(['goals', 'map'] as Tab[]).map((t) => (
-          <button key={t} onClick={() => setTab(t)}
-            className="rounded-full px-5 py-1.5 text-sm font-medium capitalize transition"
-            style={tab === t
+        {(['personal', 'shared'] as Section[]).map((s) => (
+          <button key={s} onClick={() => setSection(s)}
+            className="rounded-full px-5 py-1.5 text-sm font-medium capitalize transition flex items-center gap-1.5"
+            style={section === s
               ? { background: 'var(--primary)', color: '#fff' }
               : { color: 'var(--muted-foreground)' }}>
-            {t === 'goals' ? 'My Goals' : 'Goal Map'}
+            {s === 'shared' && <Users size={13} />}
+            {s}
+            {s === 'shared' && invitesLocal.length > 0 && (
+              <span className="ml-1 rounded-full px-1.5 text-[10px] font-bold"
+                style={{ background: section === s ? '#fff' : 'var(--primary)', color: section === s ? 'var(--primary)' : '#fff' }}>
+                {invitesLocal.length}
+              </span>
+            )}
           </button>
         ))}
       </div>
 
-      {data.length === 0 ? (
-        <div className="flex flex-col items-center gap-4 rounded-2xl py-16 text-center"
-          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <div className="text-5xl">🎯</div>
-          <div>
-            <div className="font-semibold" style={{ color: 'var(--foreground)' }}>No goals yet</div>
-            <div className="mt-1 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-              Set a savings goal to start your journey
-            </div>
+      {section === 'personal' ? (
+        <>
+          <div className="flex rounded-full p-1 w-fit" style={{ background: 'var(--surface-alt)' }}>
+            {(['goals', 'map'] as PersonalView[]).map((t) => (
+              <button key={t} onClick={() => setPersonalView(t)}
+                className="rounded-full px-5 py-1.5 text-sm font-medium capitalize transition"
+                style={personalView === t
+                  ? { background: 'var(--primary)', color: '#fff' }
+                  : { color: 'var(--muted-foreground)' }}>
+                {t === 'goals' ? 'My Goals' : 'Goal Map'}
+              </button>
+            ))}
           </div>
-          <button onClick={() => setShowNew(true)}
-            className="flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition hover:opacity-90"
-            style={{ background: 'var(--primary)' }}>
-            <Plus size={16} /> Create Goal
-          </button>
-        </div>
-      ) : tab === 'goals' ? (
-        <div className="flex flex-col gap-4">
-          {active.length > 0 && (
-            <div className="flex flex-col gap-3">
-              {active.map((g) => (
-                <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
-              ))}
+
+          {data.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl py-16 text-center"
+              style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+              <div className="text-5xl">🎯</div>
+              <div>
+                <div className="font-semibold" style={{ color: 'var(--foreground)' }}>No goals yet</div>
+                <div className="mt-1 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                  Set a savings goal to start your journey
+                </div>
+              </div>
+              <button onClick={() => setShowNew(true)}
+                className="flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition hover:opacity-90"
+                style={{ background: 'var(--primary)' }}>
+                <Plus size={16} /> Create Goal
+              </button>
+            </div>
+          ) : personalView === 'goals' ? (
+            <div className="flex flex-col gap-4">
+              {active.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  {active.map((g) => (
+                    <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
+                  ))}
+                </div>
+              )}
+              {completed.length > 0 && (
+                <div className="flex flex-col gap-3">
+                  <div className="px-1 text-xs font-semibold uppercase tracking-widest"
+                    style={{ color: 'var(--muted-foreground)' }}>
+                    Completed
+                  </div>
+                  {completed.map((g) => (
+                    <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+              <GoalMap goals={data} />
             </div>
           )}
-          {completed.length > 0 && (
+        </>
+      ) : (
+        <div className="flex flex-col gap-4">
+          {invitesLocal.length > 0 && (
             <div className="flex flex-col gap-3">
               <div className="px-1 text-xs font-semibold uppercase tracking-widest"
                 style={{ color: 'var(--muted-foreground)' }}>
-                Completed
+                Invites
               </div>
-              {completed.map((g) => (
-                <GoalCard key={g.id} goal={g} onContribute={setContributeGoal} />
+              {invitesLocal.map((inv) => (
+                <InviteCard key={inv.sharedGoalId} invite={inv}
+                  onResponded={() => dismissInvite(inv.sharedGoalId)} />
               ))}
             </div>
           )}
-        </div>
-      ) : (
-        <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <GoalMap goals={data} />
+
+          {sharedGoals.length === 0 && invitesLocal.length === 0 ? (
+            <div className="flex flex-col items-center gap-4 rounded-2xl py-16 text-center"
+              style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+              <div className="text-5xl">🤝</div>
+              <div>
+                <div className="font-semibold" style={{ color: 'var(--foreground)' }}>No shared goals yet</div>
+                <div className="mt-1 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+                  Save together — invite friends and pool funds toward a target
+                </div>
+              </div>
+              <button onClick={() => setShowNewShared(true)}
+                className="flex h-11 items-center gap-2 rounded-full px-6 text-sm font-semibold text-white transition hover:opacity-90"
+                style={{ background: 'var(--primary)' }}>
+                <UserPlus size={16} /> Create Shared Goal
+              </button>
+            </div>
+          ) : (
+            sharedGoals.length > 0 && (
+              <div className="flex flex-col gap-3">
+                {sharedGoals.map((g) => (
+                  <SharedGoalCardItem key={g.id} goal={g} />
+                ))}
+              </div>
+            )
+          )}
         </div>
       )}
 
       {showNew && <NewGoalModal onClose={() => setShowNew(false)} />}
+      {showNewShared && <NewSharedGoalSheet onClose={() => setShowNewShared(false)} />}
       {contributeGoal && (
         <ContributeModal goal={contributeGoal} onClose={() => setContributeGoal(null)} />
       )}
