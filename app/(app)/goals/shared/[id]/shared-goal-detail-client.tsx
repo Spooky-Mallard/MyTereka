@@ -7,6 +7,7 @@ import { toast } from 'sonner'
 import {
   ArrowLeft, Plus, Loader2, X, Users, Trophy, LogOut, UserMinus, Crown,
   Target, Laptop, Plane, Car, Home, BookOpen, Heart, Star, CalendarDays,
+  UserPlus, Check,
 } from 'lucide-react'
 import { formatUGX } from '@/lib/format'
 import { getAccountsForUser } from '@/lib/actions/transactions'
@@ -14,6 +15,9 @@ import {
   contributeToSharedGoal,
   leaveSharedGoal,
   removeMember,
+  inviteToSharedGoal,
+  getInvitableFriends,
+  type InvitableFriend,
 } from '@/lib/actions/shared-goals'
 import { SharedGoalLeaderboard } from '@/components/shared-goal-leaderboard'
 import type { SharedGoalDetail, SharedGoalMember, LeaderboardRow } from '@/lib/types/shared-goals'
@@ -192,6 +196,112 @@ function ConfirmDialog({
   )
 }
 
+function InviteModal({
+  sharedGoalId,
+  onClose,
+}: {
+  sharedGoalId: string
+  onClose: () => void
+}) {
+  const router = useRouter()
+  const [friends, setFriends] = useState<InvitableFriend[] | null>(null)
+  const [selected, setSelected] = useState<Set<string>>(new Set())
+  const [pending, start] = useTransition()
+
+  useEffect(() => {
+    getInvitableFriends(sharedGoalId).then(setFriends)
+  }, [sharedGoalId])
+
+  function toggle(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  function send() {
+    if (selected.size === 0) { toast.error('Select at least one friend'); return }
+    start(async () => {
+      try {
+        const res = await inviteToSharedGoal(sharedGoalId, Array.from(selected))
+        toast.success(`Invited ${res.invited} friend${res.invited === 1 ? '' : 's'}`)
+        onClose()
+        router.refresh()
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Failed')
+      }
+    })
+  }
+
+  return (
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+      style={{ background: 'rgba(0,0,0,0.6)' }}
+      onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+              Invite friends
+            </h2>
+            <p className="mt-0.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
+              Select accepted friends to invite
+            </p>
+          </div>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}><X size={20} /></button>
+        </div>
+
+        {friends === null ? (
+          <div className="flex flex-col gap-2">
+            {[0, 1, 2].map((i) => <div key={i} className="skeleton h-12 rounded-xl" />)}
+          </div>
+        ) : friends.length === 0 ? (
+          <div className="rounded-xl p-6 text-center text-sm"
+            style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
+            No eligible friends — they may already be members or you have no accepted friends.
+          </div>
+        ) : (
+          <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
+            {friends.map((f) => {
+              const on = selected.has(f.id)
+              return (
+                <button key={f.id} onClick={() => toggle(f.id)}
+                  className="flex items-center gap-3 rounded-xl p-3 text-left transition"
+                  style={{
+                    background: on ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
+                    border: `1.5px solid ${on ? 'var(--primary)' : 'transparent'}`,
+                  }}>
+                  <Avatar name={f.name} src={f.avatarUrl} />
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{f.name}</div>
+                    {f.username && (
+                      <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>@{f.username}</div>
+                    )}
+                  </div>
+                  {on && (
+                    <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
+                      style={{ background: 'var(--primary)' }}>
+                      <Check size={12} className="text-white" />
+                    </div>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        )}
+
+        <button onClick={send} disabled={pending || selected.size === 0}
+          className="flex w-full items-center justify-center gap-2 rounded-full py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-50"
+          style={{ background: 'var(--gradient-primary)' }}>
+          {pending && <Loader2 size={16} className="animate-spin" />}
+          Send invite{selected.size > 1 ? 's' : ''} {selected.size > 0 && `(${selected.size})`}
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export function SharedGoalDetailClient({
   detail,
   leaderboard,
@@ -203,6 +313,7 @@ export function SharedGoalDetailClient({
 }) {
   const router = useRouter()
   const [showContribute, setShowContribute] = useState(false)
+  const [showInvite, setShowInvite] = useState(false)
   const [leaving, setLeaving] = useState(false)
   const [removing, setRemoving] = useState<SharedGoalMember | null>(null)
   const [pending, start] = useTransition()
@@ -321,9 +432,16 @@ export function SharedGoalDetailClient({
         style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
         <div className="mb-3 flex items-center gap-2">
           <Users size={16} style={{ color: 'var(--muted-foreground)' }} />
-          <h2 className="text-sm font-bold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>
+          <h2 className="text-sm font-bold uppercase tracking-widest flex-1" style={{ color: 'var(--muted-foreground)' }}>
             Members · {activeMembers.length}
           </h2>
+          {detail.isCreator && !detail.isCompleted && (
+            <button onClick={() => setShowInvite(true)}
+              className="flex items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold text-white transition hover:opacity-90"
+              style={{ background: 'var(--gradient-primary)' }}>
+              <UserPlus size={12} /> Invite
+            </button>
+          )}
         </div>
         <div className="flex flex-col gap-2">
           {activeMembers.map((m) => (
@@ -425,6 +543,12 @@ export function SharedGoalDetailClient({
         </button>
       )}
 
+      {showInvite && (
+        <InviteModal
+          sharedGoalId={detail.id}
+          onClose={() => setShowInvite(false)}
+        />
+      )}
       {showContribute && (
         <ContributeSharedModal
           sharedGoalId={detail.id}

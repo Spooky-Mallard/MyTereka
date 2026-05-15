@@ -113,6 +113,63 @@ export async function createSharedGoal(data: {
   return { success: true, sharedGoalId }
 }
 
+export async function inviteToSharedGoal(sharedGoalId: string, friendIds: string[]) {
+  const me = await requireUserId()
+  if (friendIds.length === 0) throw new Error('No friends selected')
+
+  const [goal] = await db.select().from(sharedGoals).where(eq(sharedGoals.id, sharedGoalId))
+  if (!goal) throw new Error('Shared goal not found')
+  if (goal.creatorId !== me) throw new Error('Only the creator can invite members')
+
+  await assertAcceptedFriends(me, friendIds)
+
+  // find which of these are already members (any status except declined)
+  const existing = await db
+    .select({ userId: sharedGoalMembers.userId, status: sharedGoalMembers.status })
+    .from(sharedGoalMembers)
+    .where(and(eq(sharedGoalMembers.sharedGoalId, sharedGoalId), inArray(sharedGoalMembers.userId, friendIds)))
+
+  const existingMap = new Map(existing.map((r) => [r.userId, r.status]))
+  const toInvite = friendIds.filter((id) => {
+    const s = existingMap.get(id)
+    // allow re-invite if declined or never a member; block active/invited/left/removed
+    return !s || s === 'declined'
+  })
+
+  if (toInvite.length === 0) throw new Error('All selected friends are already members or have pending invites')
+
+  const [me_row] = await db.select({ name: users.name }).from(users).where(eq(users.id, me))
+
+  await db.transaction(async (tx) => {
+    for (const userId of toInvite) {
+      const s = existingMap.get(userId)
+      if (s === 'declined') {
+        // re-use existing row: flip back to invited
+        await tx
+          .update(sharedGoalMembers)
+          .set({ status: 'invited', leftAt: null })
+          .where(and(eq(sharedGoalMembers.sharedGoalId, sharedGoalId), eq(sharedGoalMembers.userId, userId)))
+      } else {
+        await tx.insert(sharedGoalMembers).values({
+          sharedGoalId,
+          userId,
+          status: 'invited',
+          isCreator: false,
+        })
+      }
+      await tx.insert(notifications).values({
+        userId,
+        type:     'shared_goal_invite',
+        actorId:  me,
+        entityId: sharedGoalId,
+        body:     `${me_row?.name ?? 'Someone'} invited you to a shared goal: ${goal.name}`,
+      })
+    }
+  })
+
+  return { success: true, invited: toInvite.length }
+}
+
 export async function respondToSharedGoalInvite(
   sharedGoalId: string,
   action: 'accept' | 'decline',
@@ -613,4 +670,46 @@ export async function getSharedGoalInvites(): Promise<SharedGoalInvite[]> {
     .where(and(eq(sharedGoalMembers.userId, me), eq(sharedGoalMembers.status, 'invited')))
     .orderBy(desc(sharedGoalMembers.joinedAt))
   return rows
+}
+
+export type InvitableFriend = { id: string; name: string; username: string | null; avatarUrl: string | null }
+
+export async function getInvitableFriends(sharedGoalId: string): Promise<InvitableFriend[]> {
+  const me = await requireUserId()
+
+  // get accepted friends
+  const friendships_rows = await db
+    .select({ requesterId: friendships.requesterId, addresseeId: friendships.addresseeId })
+    .from(friendships)
+    .where(
+      and(
+        eq(friendships.status, 'accepted'),
+        or(eq(friendships.requesterId, me), eq(friendships.addresseeId, me)),
+      ),
+    )
+
+  if (friendships_rows.length === 0) return []
+
+  const friendIds = friendships_rows.map((r) => (r.requesterId === me ? r.addresseeId : r.requesterId))
+
+  // get already-active/invited members to exclude
+  const blocked = await db
+    .select({ userId: sharedGoalMembers.userId })
+    .from(sharedGoalMembers)
+    .where(
+      and(
+        eq(sharedGoalMembers.sharedGoalId, sharedGoalId),
+        inArray(sharedGoalMembers.status, ['active', 'invited']),
+      ),
+    )
+
+  const blockedSet = new Set(blocked.map((r) => r.userId))
+  const eligible = friendIds.filter((id) => !blockedSet.has(id))
+  if (eligible.length === 0) return []
+
+  return db
+    .select({ id: users.id, name: users.name, username: users.username, avatarUrl: users.avatarUrl })
+    .from(users)
+    .where(inArray(users.id, eligible))
+    .orderBy(users.name)
 }
