@@ -1,48 +1,60 @@
 'use client'
 
-import { useRef, useEffect, useState } from 'react'
-import {
-  Flag, Sprout, Zap, Flame, Star, Trophy,
-} from 'lucide-react'
+import { useRef, useEffect, useState, useCallback } from 'react'
+import { Flag, Sprout, Zap, Flame, Star, Trophy } from 'lucide-react'
 
-// ─── constants ──────────────────────────────────────────────────────────────
+// ─── constants ───────────────────────────────────────────────────────────────
 
 export const MILESTONE_NODES = [
-  { key: 'start', pct: 0,   label: 'Start',        Icon: Flag,    xp: 0,   badge: null          },
-  { key: '10',    pct: 10,  label: 'Early Mover',  Icon: Sprout,  xp: 20,  badge: 'milestone_10' },
-  { key: '25',    pct: 25,  label: 'Quarter Way',  Icon: Zap,     xp: 30,  badge: 'milestone_25' },
-  { key: '50',    pct: 50,  label: 'Halfway',      Icon: Flame,   xp: 50,  badge: 'milestone_50' },
-  { key: '75',    pct: 75,  label: 'Almost There', Icon: Star,    xp: 75,  badge: 'milestone_75' },
-  { key: '100',   pct: 100, label: 'Goal Complete',Icon: Trophy,  xp: 100, badge: 'goal_completed' },
+  { key: 'start', pct: 0,   label: 'Start',        Icon: Flag,   xp: 0,   badge: null           },
+  { key: '10',    pct: 10,  label: 'Early Mover',  Icon: Sprout, xp: 20,  badge: 'milestone_10'  },
+  { key: '25',    pct: 25,  label: 'Quarter Way',  Icon: Zap,    xp: 30,  badge: 'milestone_25'  },
+  { key: '50',    pct: 50,  label: 'Halfway',      Icon: Flame,  xp: 50,  badge: 'milestone_50'  },
+  { key: '75',    pct: 75,  label: 'Almost There', Icon: Star,   xp: 75,  badge: 'milestone_75'  },
+  { key: '100',   pct: 100, label: 'Goal Complete',Icon: Trophy, xp: 100, badge: 'goal_completed' },
 ] as const
 
 export const COIN_PCTS = [5, 17.5, 37.5, 62.5, 87.5] as const
 
-const NODE_SPACING_Y = 150
-const NODE_R = 24
-const MILESTONE_R = 32
-const COIN_R = 14
-const PADDING_X = 60
-const PADDING_TOP = 50
-const PADDING_BOTTOM = 70
+const NODE_SPACING_Y  = 150
+const NODE_R          = 24
+const MILESTONE_R     = 32
+const COIN_R          = 14
+const PADDING_X       = 60
+const PADDING_TOP     = 50
+const PADDING_BOTTOM  = 70
+const ANIM_DURATION   = 1200 // ms
 
-// ─── helpers ────────────────────────────────────────────────────────────────
+// ─── hooks ───────────────────────────────────────────────────────────────────
+
+function usePrefersReducedMotion() {
+  const [reduced, setReduced] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    setReduced(mq.matches)
+    const handler = (e: MediaQueryListEvent) => setReduced(e.matches)
+    mq.addEventListener('change', handler)
+    return () => mq.removeEventListener('change', handler)
+  }, [])
+  return reduced
+}
+
+// ─── helpers ─────────────────────────────────────────────────────────────────
+
+function easeInOut(t: number) {
+  return t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2
+}
 
 function nodeCoords(w: number) {
-  const totalNodes = MILESTONE_NODES.length
-  const svgHeight = (totalNodes - 1) * NODE_SPACING_Y + PADDING_TOP + PADDING_BOTTOM
-
-  // node[0] = start = bottom, node[5] = goal = top
-  // In SVG: y increases downward. Bottom = high y, top = low y.
+  const total = MILESTONE_NODES.length
+  const svgHeight = (total - 1) * NODE_SPACING_Y + PADDING_TOP + PADDING_BOTTOM
   const nodes = MILESTONE_NODES.map((m, i) => {
     const x = i % 2 === 0
       ? PADDING_X + (w - 2 * PADDING_X) * 0.25
       : PADDING_X + (w - 2 * PADDING_X) * 0.75
-    // index 0 at bottom (high y), index 5 at top (low y)
-    const y = PADDING_TOP + (totalNodes - 1 - i) * NODE_SPACING_Y
+    const y = PADDING_TOP + (total - 1 - i) * NODE_SPACING_Y
     return { ...m, x, y }
   })
-
   return { nodes, svgHeight }
 }
 
@@ -56,13 +68,7 @@ function buildPathD(nodes: { x: number; y: number }[]) {
   return d
 }
 
-// Linearly interpolate point on path between two pct values
-function pctToPathPct(pct: number) {
-  // path goes from node[0] (pct=0) at path start to node[5] (pct=100) at path end
-  return pct / 100
-}
-
-// ─── component ──────────────────────────────────────────────────────────────
+// ─── component ───────────────────────────────────────────────────────────────
 
 export function GoalMapCanvas({
   currentPct,
@@ -70,28 +76,37 @@ export function GoalMapCanvas({
   collectedCoins,
   isCompleted,
 }: {
-  currentPct:      number
+  currentPct:       number
   earnedMilestones: string[]
-  collectedCoins:  number[]
-  isCompleted:     boolean
+  collectedCoins:   number[]
+  isCompleted:      boolean
 }) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const trackPathRef = useRef<SVGPathElement>(null)
-  const avatarRef    = useRef<SVGCircleElement>(null)
-  const [width, setWidth] = useState(320)
+  const containerRef   = useRef<HTMLDivElement>(null)
+  const fillPathRef    = useRef<SVGPathElement>(null)
+  const avatarGroupRef = useRef<SVGGElement>(null)
+  const avatarRef      = useRef<SVGCircleElement>(null)
+
+  const [width, setWidth]           = useState(320)
   const [totalLength, setTotalLength] = useState(0)
-  const [avatarPos, setAvatarPos] = useState<{ x: number; y: number } | null>(null)
 
-  const earnedSet    = new Set(earnedMilestones)
-  const collectedSet = new Set(collectedCoins)
+  // animated pct — what the avatar currently displays
+  const [displayPct, setDisplayPct]   = useState(currentPct)
+  const [displayPos, setDisplayPos]   = useState<{ x: number; y: number } | null>(null)
 
-  // measure container
+  // refs for RAF
+  const rafRef      = useRef<number | undefined>(undefined)
+  const startRef    = useRef<number | undefined>(undefined)
+  const fromPctRef  = useRef(currentPct)
+  const toPctRef    = useRef(currentPct)
+
+  const reduced = usePrefersReducedMotion()
+
+  // ── resize observer ──────────────────────────────────────────────────────
   useEffect(() => {
     const el = containerRef.current
     if (!el) return
     const ro = new ResizeObserver((entries) => {
-      const w = entries[0]?.contentRect.width ?? 320
-      setWidth(Math.min(w, 480))
+      setWidth(Math.min(entries[0]?.contentRect.width ?? 320, 480))
     })
     ro.observe(el)
     setWidth(Math.min(el.offsetWidth, 480))
@@ -101,46 +116,105 @@ export function GoalMapCanvas({
   const { nodes, svgHeight } = nodeCoords(width)
   const pathD = buildPathD(nodes)
 
-  // cache path length + compute initial avatar pos after mount
+  // ── cache total length after path renders ────────────────────────────────
   useEffect(() => {
-    const path = trackPathRef.current
+    const path = fillPathRef.current
     if (!path) return
     const len = path.getTotalLength()
     setTotalLength(len)
-    const t = pctToPathPct(currentPct)
-    const pt = path.getPointAtLength(len * t)
-    setAvatarPos({ x: pt.x, y: pt.y })
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [width, pathD])
 
-  // update avatar position when pct changes (no animation yet — Phase 4)
-  useEffect(() => {
-    const path = trackPathRef.current
-    if (!path || totalLength === 0) return
-    const t = pctToPathPct(currentPct)
-    const pt = path.getPointAtLength(totalLength * t)
-    setAvatarPos({ x: pt.x, y: pt.y })
-  }, [currentPct, totalLength])
-
-  // scroll avatar into view on load
-  useEffect(() => {
-    avatarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
-  }, [avatarPos])
-
-  // coin positions — computed from path
-  function getCoinPos(coinPct: number): { x: number; y: number } | null {
-    const path = trackPathRef.current
+  // ── helper: pct → SVG point ──────────────────────────────────────────────
+  const pctToPoint = useCallback((pct: number) => {
+    const path = fillPathRef.current
     if (!path || totalLength === 0) return null
-    const t = pctToPathPct(coinPct)
-    const pt = path.getPointAtLength(totalLength * t)
-    return { x: pt.x, y: pt.y }
-  }
+    return path.getPointAtLength(totalLength * (pct / 100))
+  }, [totalLength])
 
-  const dashOffset = totalLength > 0 ? totalLength * (1 - currentPct / 100) : 0
+  // ── initial avatar placement (no animation) ──────────────────────────────
+  useEffect(() => {
+    if (totalLength === 0) return
+    const pt = pctToPoint(currentPct)
+    if (pt) setDisplayPos({ x: pt.x, y: pt.y })
+    setDisplayPct(currentPct)
+    fromPctRef.current = currentPct
+    toPctRef.current   = currentPct
+  // only on totalLength change (width change) — not on every currentPct change
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalLength])
+
+  // ── animated movement when currentPct changes ────────────────────────────
+  useEffect(() => {
+    if (totalLength === 0) return
+    const from = fromPctRef.current
+    const to   = currentPct
+    if (from === to) return
+
+    toPctRef.current = to
+
+    // cancel any in-progress animation
+    if (rafRef.current) cancelAnimationFrame(rafRef.current)
+    startRef.current = undefined
+
+    if (reduced) {
+      // snap instantly
+      const pt = pctToPoint(to)
+      if (pt) setDisplayPos({ x: pt.x, y: pt.y })
+      setDisplayPct(to)
+      fromPctRef.current = to
+      return
+    }
+
+    const tick = (now: number) => {
+      if (!startRef.current) startRef.current = now
+      const elapsed = now - startRef.current
+      const t = Math.min(elapsed / ANIM_DURATION, 1)
+      const eased = easeInOut(t)
+
+      const animPct = from + (to - from) * eased
+      // exact curve-following: interpolate getPointAtLength over sub-range
+      const fromLen = totalLength * (from / 100)
+      const toLen   = totalLength * (to   / 100)
+      const pt = fillPathRef.current?.getPointAtLength(fromLen + (toLen - fromLen) * eased)
+      if (pt) setDisplayPos({ x: pt.x, y: pt.y })
+      setDisplayPct(Math.round(animPct))
+
+      if (t < 1) {
+        rafRef.current = requestAnimationFrame(tick)
+      } else {
+        fromPctRef.current = to
+        // scroll avatar into view after animation completes
+        avatarRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      }
+    }
+
+    rafRef.current = requestAnimationFrame(tick)
+    return () => { if (rafRef.current) cancelAnimationFrame(rafRef.current) }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentPct, totalLength, reduced])
+
+  // ── scroll avatar into view on initial load ──────────────────────────────
+  useEffect(() => {
+    if (!displayPos) return
+    avatarRef.current?.scrollIntoView({ behavior: reduced ? 'auto' : 'smooth', block: 'center' })
+  // only on first render after pos is set
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [!!displayPos])
+
+  const earnedSet    = new Set(earnedMilestones)
+  const collectedSet = new Set(collectedCoins)
+
+  const dashOffset = totalLength > 0 ? totalLength * (1 - currentPct / 100) : undefined
+
+  // coin positions (computed after totalLength known)
+  const coinPositions = COIN_PCTS.map((coinPct) => pctToPoint(coinPct))
 
   return (
-    <div ref={containerRef} className="w-full overflow-y-auto rounded-2xl"
-      style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', maxHeight: '70vh' }}>
+    <div
+      ref={containerRef}
+      className="w-full overflow-y-auto rounded-2xl"
+      style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', maxHeight: '70vh' }}
+    >
       <svg
         width={width}
         height={svgHeight}
@@ -156,31 +230,32 @@ export function GoalMapCanvas({
           strokeLinejoin="round"
         />
 
-        {/* ── completed fill ── */}
+        {/* ── completed fill (dashoffset CSS transition) ── */}
         <path
-          ref={trackPathRef}
+          ref={fillPathRef}
           d={pathD}
           fill="none"
-          stroke={isCompleted ? 'var(--primary)' : 'var(--primary)'}
+          stroke="var(--primary)"
           strokeWidth={8}
           strokeLinecap="round"
           strokeLinejoin="round"
           strokeDasharray={totalLength || undefined}
-          strokeDashoffset={dashOffset || undefined}
-          style={{ transition: 'stroke-dashoffset 0.8s ease' }}
+          strokeDashoffset={dashOffset}
+          style={{
+            transition: reduced ? 'none' : 'stroke-dashoffset 1.2s ease-in-out',
+          }}
         />
 
         {/* ── milestone nodes ── */}
         {nodes.map((node) => {
-          const isStart    = node.key === 'start'
-          const isEnd      = node.key === '100'
-          const earned     = earnedSet.has(node.key) || isStart || (isCompleted && isEnd)
-          const r          = isStart || isEnd ? MILESTONE_R : NODE_R + 4
-          const NodeIcon   = node.Icon
+          const isStart  = node.key === 'start'
+          const isEnd    = node.key === '100'
+          const earned   = earnedSet.has(node.key) || isStart || (isCompleted && isEnd)
+          const r        = isStart || isEnd ? MILESTONE_R : NODE_R + 4
+          const NodeIcon = node.Icon
 
           return (
             <g key={node.key}>
-              {/* glow ring for milestone (not start) */}
               {!isStart && (
                 <circle
                   cx={node.x} cy={node.y}
@@ -188,47 +263,32 @@ export function GoalMapCanvas({
                   fill="none"
                   stroke={earned ? 'var(--warning)' : 'var(--border)'}
                   strokeWidth={2}
-                  opacity={earned ? 0.5 : 0.25}
+                  opacity={earned ? 0.5 : 0.2}
                 />
               )}
-
-              {/* main circle */}
               <circle
-                cx={node.x} cy={node.y}
-                r={r}
+                cx={node.x} cy={node.y} r={r}
                 fill={earned ? 'var(--primary)' : 'var(--surface-alt)'}
                 stroke={earned ? 'var(--primary-light)' : 'var(--border)'}
                 strokeWidth={2.5}
               />
-
-              {/* icon */}
               <foreignObject
                 x={node.x - 12} y={node.y - 12}
                 width={24} height={24}
                 style={{ overflow: 'visible', pointerEvents: 'none' }}
               >
-                <NodeIcon
-                  size={22}
-                  color={earned ? '#ffffff' : 'var(--muted-foreground)'}
-                  strokeWidth={1.8}
-                />
+                <NodeIcon size={22} color={earned ? '#ffffff' : 'var(--muted-foreground)'} strokeWidth={1.8} />
               </foreignObject>
-
-              {/* label */}
               <text
-                x={node.x}
-                y={node.y + r + 18}
+                x={node.x} y={node.y + r + 18}
                 textAnchor="middle"
                 style={{ fill: 'var(--foreground)', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}
               >
                 {node.label}
               </text>
-
-              {/* XP label below milestone label */}
               {node.xp > 0 && (
                 <text
-                  x={node.x}
-                  y={node.y + r + 31}
+                  x={node.x} y={node.y + r + 31}
                   textAnchor="middle"
                   style={{ fill: 'var(--warning)', fontSize: 10, fontWeight: 500 }}
                 >
@@ -240,23 +300,24 @@ export function GoalMapCanvas({
         })}
 
         {/* ── XP coins ── */}
-        {COIN_PCTS.map((coinPct, idx) => {
+        {COIN_PCTS.map((_, idx) => {
           const collected = collectedSet.has(idx)
-          const pos = getCoinPos(coinPct)
+          const pos = coinPositions[idx]
           if (!pos) return null
           return (
             <g
               key={idx}
               style={{
                 opacity: collected ? 0 : 1,
-                animation: collected ? 'none' : `float-avatar 2s ease-in-out ${idx * 0.3}s infinite`,
+                animation: collected || reduced
+                  ? 'none'
+                  : `float-avatar 2s ease-in-out ${idx * 0.3}s infinite`,
                 transformOrigin: `${pos.x}px ${pos.y}px`,
                 transformBox: 'fill-box',
               }}
             >
               <circle
-                cx={pos.x} cy={pos.y}
-                r={COIN_R}
+                cx={pos.x} cy={pos.y} r={COIN_R}
                 fill="rgba(245,158,11,0.20)"
                 stroke="var(--warning)"
                 strokeWidth={2}
@@ -273,34 +334,30 @@ export function GoalMapCanvas({
         })}
 
         {/* ── avatar ── */}
-        {avatarPos && (
-          <g>
-            {/* shadow */}
+        {displayPos && (
+          <g ref={avatarGroupRef}>
             <circle
-              cx={avatarPos.x} cy={avatarPos.y + 3}
+              cx={displayPos.x} cy={displayPos.y + 3}
               r={NODE_R - 2}
               fill="rgba(0,0,0,0.25)"
             />
-            {/* white border */}
             <circle
-              cx={avatarPos.x} cy={avatarPos.y}
+              cx={displayPos.x} cy={displayPos.y}
               r={NODE_R}
               fill="white"
             />
-            {/* teal fill */}
             <circle
               ref={avatarRef}
-              cx={avatarPos.x} cy={avatarPos.y}
+              cx={displayPos.x} cy={displayPos.y}
               r={NODE_R - 3}
               fill="var(--primary)"
             />
-            {/* avatar label — percent text */}
             <text
-              x={avatarPos.x} y={avatarPos.y + 5}
+              x={displayPos.x} y={displayPos.y + 5}
               textAnchor="middle"
               style={{ fill: '#ffffff', fontSize: 10, fontWeight: 700 }}
             >
-              {currentPct}%
+              {displayPct}%
             </text>
           </g>
         )}
