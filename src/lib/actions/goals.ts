@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { goals, goalContributions, accounts } from '@/lib/schema'
+import { goals, goalContributions, accounts, badges } from '@/lib/schema'
 import { eq, and, sql } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
 
@@ -70,6 +70,23 @@ export async function contributeToGoal(
   }
 
   return { completed: false, goalName: goal.name }
+}
+
+const GOAL_MAP_BADGES = [
+  { triggerEvent: 'milestone_10',  name: 'Early Mover',   description: 'Saved the first 10% of a savings goal', icon: '🌱' },
+  { triggerEvent: 'milestone_25',  name: 'Quarter Way',   description: 'Reached 25% of a savings goal',         icon: '⚡' },
+  { triggerEvent: 'milestone_50',  name: 'Halfway Hero',  description: 'Hit the halfway mark on a savings goal', icon: '🔥' },
+  { triggerEvent: 'milestone_75',  name: 'Almost There',  description: 'Reached 75% of a savings goal',          icon: '⭐' },
+  { triggerEvent: 'goal_completed',name: 'Goal Getter',   description: 'Completed a savings goal',               icon: '🏆' },
+]
+
+export async function seedGoalBadges() {
+  const existing = await db.select({ triggerEvent: badges.triggerEvent }).from(badges)
+  const existingEvents = new Set(existing.map((b) => b.triggerEvent))
+  const toInsert = GOAL_MAP_BADGES.filter((b) => !existingEvents.has(b.triggerEvent))
+  if (toInsert.length === 0) return { inserted: 0 }
+  await db.insert(badges).values(toInsert.map((b) => ({ ...b, xpReward: 0 })))
+  return { inserted: toInsert.length }
 }
 
 export async function getGoals() {

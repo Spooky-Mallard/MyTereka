@@ -114,6 +114,24 @@ export const goalContributions = pgTable('goal_contributions', {
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+export const goalMilestones = pgTable('goal_milestones', {
+  id:           uuid('id').defaultRandom().primaryKey(),
+  goalId:       uuid('goal_id').references(() => goals.id, { onDelete: 'cascade' }).notNull(),
+  userId:       uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  milestoneKey: varchar('milestone_key', { length: 20 }).notNull(),
+  xpAwarded:    integer('xp_awarded').notNull(),
+  badgeKey:     varchar('badge_key', { length: 100 }),
+  reachedAt:    timestamp('reached_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const goalCoins = pgTable('goal_coins', {
+  id:          uuid('id').defaultRandom().primaryKey(),
+  goalId:      uuid('goal_id').references(() => goals.id, { onDelete: 'cascade' }).notNull(),
+  userId:      uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  coinIndex:   integer('coin_index').notNull(),
+  collectedAt: timestamp('collected_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 export const badges = pgTable('badges', {
   id:           uuid('id').defaultRandom().primaryKey(),
   name:         varchar('name',          { length: 100 }).notNull(),
