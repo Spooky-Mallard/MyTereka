@@ -58,6 +58,20 @@ export type SharedGoalDetail = {
   contributions: SharedGoalContributionRow[]
 }
 
+export type LeaderboardRow = {
+  rank: number
+  userId: string
+  name: string
+  username: string | null
+  avatarUrl: string | null
+  level: 'Beginner' | 'Saver' | 'Consistent' | 'Master' | 'Grand Master'
+  xpPoints: number
+  status: SharedGoalMemberStatus
+  isCreator: boolean
+  totalContributed: number
+  contributionCount: number
+}
+
 export type SharedGoalInvite = {
   sharedGoalId: string
   name: string

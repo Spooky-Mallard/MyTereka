@@ -19,6 +19,7 @@ import type {
   SharedGoalInvite,
   SharedGoalMember,
   SharedGoalContributionRow,
+  LeaderboardRow,
 } from '@/lib/types/shared-goals'
 
 async function requireUserId() {
@@ -532,6 +533,64 @@ export async function getSharedGoalDetail(sharedGoalId: string): Promise<SharedG
     members,
     contributions,
   }
+}
+
+export async function getSharedGoalLeaderboard(sharedGoalId: string): Promise<LeaderboardRow[]> {
+  const me = await requireUserId()
+
+  const [myMembership] = await db
+    .select({ id: sharedGoalMembers.id })
+    .from(sharedGoalMembers)
+    .where(and(eq(sharedGoalMembers.sharedGoalId, sharedGoalId), eq(sharedGoalMembers.userId, me)))
+  if (!myMembership) throw new Error('Unauthorized')
+
+  const memberRows = await db
+    .select({
+      userId:    sharedGoalMembers.userId,
+      status:    sharedGoalMembers.status,
+      isCreator: sharedGoalMembers.isCreator,
+      name:      users.name,
+      username:  users.username,
+      avatarUrl: users.avatarUrl,
+      level:     users.level,
+      xpPoints:  users.xpPoints,
+    })
+    .from(sharedGoalMembers)
+    .innerJoin(users, eq(users.id, sharedGoalMembers.userId))
+    .where(
+      and(
+        eq(sharedGoalMembers.sharedGoalId, sharedGoalId),
+        inArray(sharedGoalMembers.status, ['active', 'left', 'removed']),
+      ),
+    )
+
+  const contribAgg = await db
+    .select({
+      userId:            sharedGoalContributions.userId,
+      totalContributed:  sql<number>`COALESCE(SUM(CASE WHEN ${sharedGoalContributions.isRefund} THEN -${sharedGoalContributions.amount} ELSE ${sharedGoalContributions.amount} END), 0)::int`,
+      contributionCount: sql<number>`SUM(CASE WHEN ${sharedGoalContributions.isRefund} THEN 0 ELSE 1 END)::int`,
+    })
+    .from(sharedGoalContributions)
+    .where(eq(sharedGoalContributions.sharedGoalId, sharedGoalId))
+    .groupBy(sharedGoalContributions.userId)
+  const contribMap = new Map(contribAgg.map((c) => [c.userId, c]))
+
+  const enriched = memberRows.map((m) => {
+    const agg = contribMap.get(m.userId)
+    return {
+      ...m,
+      totalContributed:  agg?.totalContributed ?? 0,
+      contributionCount: agg?.contributionCount ?? 0,
+    }
+  })
+
+  enriched.sort((a, b) => {
+    if (b.totalContributed !== a.totalContributed) return b.totalContributed - a.totalContributed
+    if (b.contributionCount !== a.contributionCount) return b.contributionCount - a.contributionCount
+    return a.name.localeCompare(b.name)
+  })
+
+  return enriched.map((row, i) => ({ rank: i + 1, ...row }))
 }
 
 export async function getSharedGoalInvites(): Promise<SharedGoalInvite[]> {
