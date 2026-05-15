@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
   Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2,
-  CalendarDays, Users, UserPlus,
+  CalendarDays, Users, UserPlus, Map,
 } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
@@ -226,15 +226,23 @@ function GoalCard({ goal, onContribute }: { goal: GoalRow; onContribute: (g: Goa
         )}
       </div>
 
-      {!goal.isCompleted && (
-        <button
-          onClick={() => onContribute(goal)}
-          className="flex items-center justify-center gap-2 w-full rounded-full py-2.5 text-sm font-semibold transition hover:opacity-90 active:scale-95"
-          style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)', border: '1px solid rgba(0,184,148,0.3)' }}>
-          <Plus size={15} strokeWidth={2.5} />
-          Add Contribution
-        </button>
-      )}
+      <div className="flex gap-2">
+        {!goal.isCompleted && (
+          <button
+            onClick={() => onContribute(goal)}
+            className="flex flex-1 items-center justify-center gap-2 rounded-full py-2.5 text-sm font-semibold transition hover:opacity-90 active:scale-95"
+            style={{ background: 'rgba(0,184,148,0.12)', color: 'var(--primary)', border: '1px solid rgba(0,184,148,0.3)' }}>
+            <Plus size={15} strokeWidth={2.5} />
+            Add Contribution
+          </button>
+        )}
+        <Link
+          href={`/goals/${goal.id}/map`}
+          className="flex items-center justify-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-semibold transition hover:opacity-90"
+          style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
+          <Map size={14} /> Map
+        </Link>
+      </div>
     </div>
   )
 }
