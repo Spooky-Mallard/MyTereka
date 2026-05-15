@@ -15,7 +15,8 @@ import {
   leaveSharedGoal,
   removeMember,
 } from '@/lib/actions/shared-goals'
-import type { SharedGoalDetail, SharedGoalMember } from '@/lib/types/shared-goals'
+import { SharedGoalLeaderboard } from '@/components/shared-goal-leaderboard'
+import type { SharedGoalDetail, SharedGoalMember, LeaderboardRow } from '@/lib/types/shared-goals'
 
 type AccountRow = { id: string; name: string; balance: number; type: string }
 
@@ -193,9 +194,11 @@ function ConfirmDialog({
 
 export function SharedGoalDetailClient({
   detail,
+  leaderboard,
   meId,
 }: {
   detail: SharedGoalDetail
+  leaderboard: LeaderboardRow[]
   meId: string
 }) {
   const router = useRouter()
@@ -372,6 +375,8 @@ export function SharedGoalDetailClient({
           </div>
         )}
       </div>
+
+      <SharedGoalLeaderboard rows={leaderboard} meId={meId} />
 
       <div className="rounded-2xl p-5"
         style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
