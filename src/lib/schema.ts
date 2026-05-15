@@ -182,6 +182,13 @@ export const sharedGoalContributions = pgTable('shared_goal_contributions', {
   createdAt:    timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
 })
 
+export const nudges = pgTable('nudges', {
+  id:         uuid('id').defaultRandom().primaryKey(),
+  fromUserId: uuid('from_user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  toUserId:   uuid('to_user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  createdAt:  timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
 export const notifications = pgTable('notifications', {
   id:        uuid('id').defaultRandom().primaryKey(),
   userId:    uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),

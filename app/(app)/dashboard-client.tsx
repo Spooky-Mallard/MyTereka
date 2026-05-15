@@ -1,11 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useState } from 'react'
-import { Eye, EyeOff, ChevronRight, Flame, Star, TrendingUp, TrendingDown } from 'lucide-react'
+import { useState, useTransition } from 'react'
+import { Eye, EyeOff, ChevronRight, Flame, Star, TrendingUp, TrendingDown, Sparkles, X } from 'lucide-react'
 import { formatUGX } from '@/lib/format'
 import { categoryMeta } from '@/lib/mock-data'
 import { UsernameSetupBanner } from '@/components/username-setup-banner'
+import { markNotificationRead } from '@/lib/actions/notifications'
+import type { NudgeCard } from '@/lib/actions/nudges'
 
 const LEVEL_XP: Record<string, number> = {
   'Beginner': 100, 'Saver': 300, 'Consistent': 700, 'Master': 1500, 'Grand Master': 1500,
@@ -67,10 +69,22 @@ type Props = {
     id: string; name: string; icon: string | null
     targetAmount: number; currentAmount: number; targetDate: string | null
   }>
+  nudges: NudgeCard[]
 }
 
-export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals }: Props) {
+export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals, nudges: initialNudges }: Props) {
   const [hideBalance, setHideBalance] = useState(true)
+  const [dismissedNudges, setDismissedNudges] = useState<Set<string>>(new Set())
+  const [, startDismiss] = useTransition()
+
+  function dismissNudge(nudge: NudgeCard) {
+    setDismissedNudges((prev) => new Set([...prev, nudge.id]))
+    startDismiss(async () => {
+      try { await markNotificationRead(nudge.notificationId) } catch { /* ignore */ }
+    })
+  }
+
+  const visibleNudges = initialNudges.filter((n) => !dismissedNudges.has(n.id))
 
   const totalIncome  = recentTxns.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const totalExpense = recentTxns.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
@@ -99,6 +113,36 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
           {new Date().toLocaleDateString('en-UG', { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
       </div>
+
+      {visibleNudges.length > 0 && (
+        <div className="flex flex-col gap-2">
+          {visibleNudges.map((n) => (
+            <div key={n.id}
+              className="flex items-center gap-3 rounded-2xl px-4 py-3"
+              style={{ background: 'rgba(0,184,148,0.10)', border: '1px solid rgba(0,184,148,0.25)' }}>
+              <Sparkles size={16} style={{ color: 'var(--primary)', flexShrink: 0 }} />
+              <span className="flex-1 text-sm" style={{ color: 'var(--foreground)' }}>
+                <span className="font-semibold">{n.actorName}</span>
+                {n.actorUsername && (
+                  <Link href={`/profile/${n.actorUsername}`} className="ml-1 text-xs hover:underline"
+                    style={{ color: 'var(--primary)' }}>
+                    @{n.actorUsername}
+                  </Link>
+                )}
+                {' '}is cheering you on — keep your streak alive!
+              </span>
+              <button
+                onClick={() => dismissNudge(n)}
+                className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition hover:opacity-70"
+                style={{ color: 'var(--muted-foreground)' }}
+                aria-label="Dismiss"
+              >
+                <X size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
 
       <div className="grid gap-4 lg:grid-cols-3">
         {/* Balance card */}

@@ -2,11 +2,12 @@
 
 import { useEffect, useState, useTransition } from 'react'
 import Link from 'next/link'
-import { UserPlus, Check, X, Flame, Star, Users as UsersIcon } from 'lucide-react'
+import { UserPlus, Check, X, Flame, Star, Users as UsersIcon, Sparkles } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   getFriends, getIncomingRequests, respondToFriendRequest, removeFriend,
 } from '@/lib/actions/friends'
+import { sendNudge } from '@/lib/actions/nudges'
 import type { FriendCard, IncomingRequest } from '@/lib/types/friends'
 import { FriendSearchSheet } from './friend-search-sheet'
 
@@ -45,6 +46,17 @@ export function FriendsTab() {
         await respondToFriendRequest(id, action)
         toast.success(action === 'accept' ? 'Friend added' : 'Request declined')
         await reload()
+      } catch (e) {
+        toast.error(e instanceof Error ? e.message : 'Failed')
+      }
+    })
+  }
+
+  function nudge(friendId: string, name: string) {
+    startTransition(async () => {
+      try {
+        await sendNudge(friendId)
+        toast.success(`Nudged ${name}! ✨`)
       } catch (e) {
         toast.error(e instanceof Error ? e.message : 'Failed')
       }
@@ -173,6 +185,15 @@ export function FriendsTab() {
                     </div>
                   </div>
                 </Link>
+                <button
+                  disabled={pending}
+                  onClick={() => nudge(f.id, f.name)}
+                  className="flex h-8 w-8 items-center justify-center rounded-full transition hover:opacity-80 disabled:opacity-50"
+                  style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}
+                  title="Nudge"
+                >
+                  <Sparkles size={14} />
+                </button>
                 <button
                   disabled={pending}
                   onClick={() => unfriend(f.id, f.name)}

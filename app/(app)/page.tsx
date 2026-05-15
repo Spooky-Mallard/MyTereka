@@ -1,10 +1,11 @@
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
 import { users, accounts, transactions, budgets, goals, categories } from '@/lib/schema'
-import { eq, and, desc, sql, lte, gte, sum } from 'drizzle-orm'
+import { eq, and, desc, lte, gte } from 'drizzle-orm'
 import { redirect } from 'next/navigation'
-import { formatUGX, todayISO } from '@/lib/format'
+import { todayISO } from '@/lib/format'
 import { DashboardClient } from './dashboard-client'
+import { getRecentNudges } from '@/lib/actions/nudges'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -18,6 +19,7 @@ export default async function DashboardPage() {
     recentTxns,
     userBudgets,
     userGoals,
+    recentNudges,
   ] = await Promise.all([
     db.query.users.findFirst({ where: eq(users.id, userId) }),
     db.select().from(accounts).where(eq(accounts.userId, userId)),
@@ -64,6 +66,7 @@ export default async function DashboardPage() {
       .from(goals)
       .where(and(eq(goals.userId, userId), eq(goals.isCompleted, false)))
       .limit(3),
+    getRecentNudges(),
   ])
 
   const totalBalance = userAccounts.reduce((s, a) => s + a.balance, 0)
@@ -82,6 +85,7 @@ export default async function DashboardPage() {
       recentTxns={recentTxns}
       budgets={userBudgets}
       goals={userGoals}
+      nudges={recentNudges}
     />
   )
 }

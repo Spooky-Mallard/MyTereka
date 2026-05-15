@@ -3,8 +3,9 @@
 import { useRouter } from 'next/navigation'
 import { useTransition } from 'react'
 import { toast } from 'sonner'
-import { UserPlus, Check, X, Clock } from 'lucide-react'
+import { UserPlus, Check, X, Clock, Sparkles } from 'lucide-react'
 import { sendFriendRequest, removeFriend, getFriendshipWith, respondToFriendRequest } from '@/lib/actions/friends'
+import { sendNudge } from '@/lib/actions/nudges'
 
 export function FriendProfileActions({
   userId, isFriend, pendingDirection,
@@ -39,6 +40,15 @@ export function FriendProfileActions({
     })
   }
 
+  function nudge() {
+    start(async () => {
+      try {
+        await sendNudge(userId)
+        toast.success('Nudge sent! ✨')
+      } catch (e) { toast.error(e instanceof Error ? e.message : 'Failed') }
+    })
+  }
+
   function respond(action: 'accept' | 'decline') {
     start(async () => {
       try {
@@ -53,11 +63,18 @@ export function FriendProfileActions({
 
   if (isFriend) {
     return (
-      <button onClick={remove} disabled={pending}
-        className="rounded-full px-5 py-2 text-sm font-semibold transition hover:opacity-80 disabled:opacity-50"
-        style={{ background: 'var(--surface-alt)', color: 'var(--danger)' }}>
-        Remove friend
-      </button>
+      <div className="flex items-center justify-center gap-3">
+        <button onClick={nudge} disabled={pending}
+          className="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
+          style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
+          <Sparkles size={14} /> Nudge
+        </button>
+        <button onClick={remove} disabled={pending}
+          className="rounded-full px-5 py-2 text-sm font-semibold transition hover:opacity-80 disabled:opacity-50"
+          style={{ background: 'var(--surface-alt)', color: 'var(--danger)' }}>
+          Remove friend
+        </button>
+      </div>
     )
   }
   if (pendingDirection === 'outgoing') {
