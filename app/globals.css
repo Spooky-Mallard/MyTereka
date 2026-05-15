@@ -121,6 +121,10 @@
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.4);
   --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.5);
   --shadow-card: 0 2px 8px rgba(0, 184, 148, 0.12);
+
+  --podium-gold:   #F2C94C;
+  --podium-silver: #C9D2DA;
+  --podium-bronze: #CD7F32;
 }
 
 /* ═══════════════════════════════════════════
