@@ -672,12 +672,17 @@ export async function getSharedGoalInvites(): Promise<SharedGoalInvite[]> {
   return rows
 }
 
-export type InvitableFriend = { id: string; name: string; username: string | null; avatarUrl: string | null }
+export type InvitableFriend = {
+  id: string
+  name: string
+  username: string | null
+  avatarUrl: string | null
+  memberStatus: 'none' | 'invited' | 'active'
+}
 
 export async function getInvitableFriends(sharedGoalId: string): Promise<InvitableFriend[]> {
   const me = await requireUserId()
 
-  // get accepted friends
   const friendships_rows = await db
     .select({ requesterId: friendships.requesterId, addresseeId: friendships.addresseeId })
     .from(friendships)
@@ -692,9 +697,9 @@ export async function getInvitableFriends(sharedGoalId: string): Promise<Invitab
 
   const friendIds = friendships_rows.map((r) => (r.requesterId === me ? r.addresseeId : r.requesterId))
 
-  // get already-active/invited members to exclude
-  const blocked = await db
-    .select({ userId: sharedGoalMembers.userId })
+  // get current member statuses for this goal
+  const members = await db
+    .select({ userId: sharedGoalMembers.userId, status: sharedGoalMembers.status })
     .from(sharedGoalMembers)
     .where(
       and(
@@ -703,13 +708,16 @@ export async function getInvitableFriends(sharedGoalId: string): Promise<Invitab
       ),
     )
 
-  const blockedSet = new Set(blocked.map((r) => r.userId))
-  const eligible = friendIds.filter((id) => !blockedSet.has(id))
-  if (eligible.length === 0) return []
+  const memberStatusMap = new Map(members.map((m) => [m.userId, m.status as 'active' | 'invited']))
 
-  return db
+  const profiles = await db
     .select({ id: users.id, name: users.name, username: users.username, avatarUrl: users.avatarUrl })
     .from(users)
-    .where(inArray(users.id, eligible))
+    .where(inArray(users.id, friendIds))
     .orderBy(users.name)
+
+  return profiles.map((p) => ({
+    ...p,
+    memberStatus: memberStatusMap.get(p.id) ?? 'none',
+  }))
 }

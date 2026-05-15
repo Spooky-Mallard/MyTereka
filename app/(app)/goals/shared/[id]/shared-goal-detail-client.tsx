@@ -259,27 +259,36 @@ function InviteModal({
         ) : friends.length === 0 ? (
           <div className="rounded-xl p-6 text-center text-sm"
             style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
-            No eligible friends — they may already be members or you have no accepted friends.
+            No accepted friends yet. Add friends from your Profile to invite them here.
           </div>
         ) : (
           <div className="flex flex-col gap-2 max-h-72 overflow-y-auto">
             {friends.map((f) => {
-              const on = selected.has(f.id)
+              const isActive  = f.memberStatus === 'active'
+              const isPending = f.memberStatus === 'invited'
+              const disabled  = isActive || isPending
+              const on        = selected.has(f.id)
               return (
-                <button key={f.id} onClick={() => toggle(f.id)}
+                <button key={f.id}
+                  onClick={() => !disabled && toggle(f.id)}
+                  disabled={disabled}
                   className="flex items-center gap-3 rounded-xl p-3 text-left transition"
                   style={{
-                    background: on ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
-                    border: `1.5px solid ${on ? 'var(--primary)' : 'transparent'}`,
+                    background: disabled ? 'var(--surface-alt)' : on ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
+                    border: `1.5px solid ${on && !disabled ? 'var(--primary)' : 'transparent'}`,
+                    opacity: disabled ? 0.55 : 1,
+                    cursor: disabled ? 'default' : 'pointer',
                   }}>
                   <Avatar name={f.name} src={f.avatarUrl} />
                   <div className="flex-1 min-w-0">
                     <div className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{f.name}</div>
-                    {f.username && (
-                      <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>@{f.username}</div>
-                    )}
+                    <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                      {f.username ? `@${f.username}` : ''}
+                      {isPending && <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold" style={{ background: 'rgba(245,158,11,0.18)', color: 'var(--warning)' }}>Pending</span>}
+                      {isActive  && <span className="ml-1 rounded-full px-1.5 py-0.5 text-[10px] font-semibold" style={{ background: 'rgba(0,184,148,0.18)', color: 'var(--primary)' }}>Member</span>}
+                    </div>
                   </div>
-                  {on && (
+                  {on && !disabled && (
                     <div className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full"
                       style={{ background: 'var(--primary)' }}>
                       <Check size={12} className="text-white" />
