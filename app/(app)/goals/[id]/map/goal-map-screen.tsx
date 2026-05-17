@@ -139,6 +139,25 @@ export function GoalMapScreen({
   const [goal, setGoal] = useState(initialGoal)
   const [showContribute, setShowContribute] = useState(false)
   const [activeMilestoneKey, setActiveMilestoneKey] = useState<string | null>(null)
+  const [confettiFired, setConfettiFired] = useState(false)
+
+  async function fireConfetti() {
+    if (typeof window === 'undefined' || confettiFired) return
+    setConfettiFired(true)
+    const confetti = (await import('canvas-confetti')).default
+    confetti({
+      particleCount: 120,
+      spread: 80,
+      colors: ['#00B894', '#1DD1A1', '#F59E0B', '#ffffff'],
+      origin: { y: 0.5 },
+    })
+  }
+
+  function handleMilestoneModalDismiss() {
+    const key = activeMilestoneKey
+    setActiveMilestoneKey(null)
+    if (key === '100') fireConfetti()
+  }
 
   function handleContributionResult(res: { newlyReachedMilestones: string[]; coinsCollected: number[]; completed: boolean }) {
     // Refresh server data then update local state
@@ -162,6 +181,12 @@ export function GoalMapScreen({
 
   const pct = currentPct
   const isCompleted = goal.isCompleted || pct >= 100
+
+  // Fire confetti once on initial load if already completed
+  useEffect(() => {
+    if (isCompleted) fireConfetti()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return (
     <div className="mx-auto flex max-w-lg flex-col gap-4">
@@ -205,9 +230,14 @@ export function GoalMapScreen({
             </button>
           )}
           {isCompleted && (
-            <div className="rounded-full px-4 py-2 text-sm font-semibold"
-              style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
-              Completed 🎉
+            <div className="flex flex-col items-end gap-0.5">
+              <div className="rounded-full px-4 py-2 text-sm font-bold"
+                style={{ background: 'var(--gradient-primary)', color: '#ffffff' }}>
+                Goal Complete 🎉
+              </div>
+              <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                {formatUGX(goal.targetAmount)} saved
+              </span>
             </div>
           )}
         </div>
@@ -241,7 +271,7 @@ export function GoalMapScreen({
         return (
           <MilestoneModal
             milestone={node}
-            onDismiss={() => setActiveMilestoneKey(null)}
+            onDismiss={handleMilestoneModalDismiss}
           />
         )
       })()}
