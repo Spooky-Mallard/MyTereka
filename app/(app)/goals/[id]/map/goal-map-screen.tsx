@@ -8,7 +8,8 @@ import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
 import { contributeToGoal, getGoalMapData } from '@/lib/actions/goals'
 import { getAccountsForUser } from '@/lib/actions/transactions'
-import { GoalMapCanvas } from '@/components/goal-map-canvas'
+import { GoalMapCanvas, MILESTONE_NODES } from '@/components/goal-map-canvas'
+import { MilestoneModal } from '@/components/milestone-modal'
 import type { GoalMapData } from '@/lib/actions/goals'
 import { useEffect } from 'react'
 
@@ -137,6 +138,7 @@ export function GoalMapScreen({
   const [collectedCoins, setCollectedCoins] = useState(initialCoins)
   const [goal, setGoal] = useState(initialGoal)
   const [showContribute, setShowContribute] = useState(false)
+  const [activeMilestoneKey, setActiveMilestoneKey] = useState<string | null>(null)
 
   function handleContributionResult(res: { newlyReachedMilestones: string[]; coinsCollected: number[]; completed: boolean }) {
     // Refresh server data then update local state
@@ -222,6 +224,7 @@ export function GoalMapScreen({
         earnedMilestones={earnedMilestones}
         collectedCoins={collectedCoins}
         isCompleted={isCompleted}
+        onMilestoneFirstEarned={(key) => setActiveMilestoneKey(key)}
       />
 
       {showContribute && (
@@ -231,6 +234,17 @@ export function GoalMapScreen({
           onSuccess={handleContributionResult}
         />
       )}
+
+      {activeMilestoneKey && (() => {
+        const node = MILESTONE_NODES.find((m) => m.key === activeMilestoneKey)
+        if (!node) return null
+        return (
+          <MilestoneModal
+            milestone={node}
+            onDismiss={() => setActiveMilestoneKey(null)}
+          />
+        )
+      })()}
     </div>
   )
 }

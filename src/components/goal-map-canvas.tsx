@@ -3,6 +3,7 @@
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { Flag, Sprout, Zap, Flame, Star, Trophy } from 'lucide-react'
 import { GoalMapCoin } from './goal-map-coin'
+import { GoalMapMilestoneNode } from './goal-map-milestone'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
@@ -77,12 +78,14 @@ export function GoalMapCanvas({
   collectedCoins,
   isCompleted,
   onCoinCollect,
+  onMilestoneFirstEarned,
 }: {
-  currentPct:       number
-  earnedMilestones: string[]
-  collectedCoins:   number[]
-  isCompleted:      boolean
-  onCoinCollect?:   (coinIndex: number) => void
+  currentPct:              number
+  earnedMilestones:        string[]
+  collectedCoins:          number[]
+  isCompleted:             boolean
+  onCoinCollect?:          (coinIndex: number) => void
+  onMilestoneFirstEarned?: (key: string) => void
 }) {
   const containerRef   = useRef<HTMLDivElement>(null)
   const fillPathRef    = useRef<SVGPathElement>(null)
@@ -250,57 +253,16 @@ export function GoalMapCanvas({
         />
 
         {/* ── milestone nodes ── */}
-        {nodes.map((node) => {
-          const isStart  = node.key === 'start'
-          const isEnd    = node.key === '100'
-          const earned   = earnedSet.has(node.key) || isStart || (isCompleted && isEnd)
-          const r        = isStart || isEnd ? MILESTONE_R : NODE_R + 4
-          const NodeIcon = node.Icon
-
-          return (
-            <g key={node.key}>
-              {!isStart && (
-                <circle
-                  cx={node.x} cy={node.y}
-                  r={r + 8}
-                  fill="none"
-                  stroke={earned ? 'var(--warning)' : 'var(--border)'}
-                  strokeWidth={2}
-                  opacity={earned ? 0.5 : 0.2}
-                />
-              )}
-              <circle
-                cx={node.x} cy={node.y} r={r}
-                fill={earned ? 'var(--primary)' : 'var(--surface-alt)'}
-                stroke={earned ? 'var(--primary-light)' : 'var(--border)'}
-                strokeWidth={2.5}
-              />
-              <foreignObject
-                x={node.x - 12} y={node.y - 12}
-                width={24} height={24}
-                style={{ overflow: 'visible', pointerEvents: 'none' }}
-              >
-                <NodeIcon size={22} color={earned ? '#ffffff' : 'var(--muted-foreground)'} strokeWidth={1.8} />
-              </foreignObject>
-              <text
-                x={node.x} y={node.y + r + 18}
-                textAnchor="middle"
-                style={{ fill: 'var(--foreground)', fontSize: 11, fontWeight: 600, fontFamily: 'inherit' }}
-              >
-                {node.label}
-              </text>
-              {node.xp > 0 && (
-                <text
-                  x={node.x} y={node.y + r + 31}
-                  textAnchor="middle"
-                  style={{ fill: 'var(--warning)', fontSize: 10, fontWeight: 500 }}
-                >
-                  +{node.xp} XP
-                </text>
-              )}
-            </g>
-          )
-        })}
+        {nodes.map((node) => (
+          <GoalMapMilestoneNode
+            key={node.key}
+            node={node}
+            earned={earnedSet.has(node.key)}
+            isCompleted={isCompleted}
+            reduced={reduced}
+            onFirstEarn={(n) => onMilestoneFirstEarned?.(n.key)}
+          />
+        ))}
 
         {/* ── XP coins ── */}
         {COIN_PCTS.map((_, idx) => {
