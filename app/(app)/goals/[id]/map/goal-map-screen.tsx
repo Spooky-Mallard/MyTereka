@@ -188,7 +188,7 @@ export function GoalMapScreen({
         <div className="flex items-center gap-4 mb-3">
           <div className="flex-1">
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>{pct}%</span>
+              <span id="goal-map-xp-counter" className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>{pct}%</span>
               <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>complete</span>
             </div>
             <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>

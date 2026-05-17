@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from 'react'
 import { Flag, Sprout, Zap, Flame, Star, Trophy } from 'lucide-react'
+import { GoalMapCoin } from './goal-map-coin'
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
@@ -75,11 +76,13 @@ export function GoalMapCanvas({
   earnedMilestones,
   collectedCoins,
   isCompleted,
+  onCoinCollect,
 }: {
   currentPct:       number
   earnedMilestones: string[]
   collectedCoins:   number[]
   isCompleted:      boolean
+  onCoinCollect?:   (coinIndex: number) => void
 }) {
   const containerRef   = useRef<HTMLDivElement>(null)
   const fillPathRef    = useRef<SVGPathElement>(null)
@@ -301,35 +304,18 @@ export function GoalMapCanvas({
 
         {/* ── XP coins ── */}
         {COIN_PCTS.map((_, idx) => {
-          const collected = collectedSet.has(idx)
           const pos = coinPositions[idx]
           if (!pos) return null
           return (
-            <g
+            <GoalMapCoin
               key={idx}
-              style={{
-                opacity: collected ? 0 : 1,
-                animation: collected || reduced
-                  ? 'none'
-                  : `float-avatar 2s ease-in-out ${idx * 0.3}s infinite`,
-                transformOrigin: `${pos.x}px ${pos.y}px`,
-                transformBox: 'fill-box',
-              }}
-            >
-              <circle
-                cx={pos.x} cy={pos.y} r={COIN_R}
-                fill="rgba(245,158,11,0.20)"
-                stroke="var(--warning)"
-                strokeWidth={2}
-              />
-              <text
-                x={pos.x} y={pos.y + 4}
-                textAnchor="middle"
-                style={{ fill: 'var(--warning)', fontSize: 9, fontWeight: 700 }}
-              >
-                +10
-              </text>
-            </g>
+              coinIndex={idx}
+              x={pos.x}
+              y={pos.y}
+              collected={collectedSet.has(idx)}
+              reduced={reduced}
+              onCollect={onCoinCollect}
+            />
           )
         })}
 
