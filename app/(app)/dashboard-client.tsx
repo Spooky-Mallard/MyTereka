@@ -70,9 +70,10 @@ type Props = {
     targetAmount: number; currentAmount: number; targetDate: string | null
   }>
   nudges: NudgeCard[]
+  dailyTip: { body: string; category: string | null } | null
 }
 
-export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals, nudges: initialNudges }: Props) {
+export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals, nudges: initialNudges, dailyTip }: Props) {
   const [hideBalance, setHideBalance] = useState(true)
   const [dismissedNudges, setDismissedNudges] = useState<Set<string>>(new Set())
   const [, startDismiss] = useTransition()
@@ -113,6 +114,18 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
           {new Date().toLocaleDateString('en-UG', { weekday: 'long', month: 'long', day: 'numeric' })}
         </div>
       </div>
+
+      {dailyTip && (
+        <div className="card-base flex gap-3 items-start">
+          <div className="mt-0.5 shrink-0 text-lg">💡</div>
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--primary)' }}>
+              Tip of the Day
+            </p>
+            <p className="text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>{dailyTip.body}</p>
+          </div>
+        </div>
+      )}
 
       {visibleNudges.length > 0 && (
         <div className="flex flex-col gap-2">

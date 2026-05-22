@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { todayISO } from '@/lib/format'
 import { DashboardClient } from './dashboard-client'
 import { getRecentNudges } from '@/lib/actions/nudges'
+import { getDailyTip } from '@/lib/actions/profile'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -20,6 +21,7 @@ export default async function DashboardPage() {
     userBudgets,
     userGoals,
     recentNudges,
+    dailyTip,
   ] = await Promise.all([
     db.query.users.findFirst({ where: eq(users.id, userId) }),
     db.select().from(accounts).where(eq(accounts.userId, userId)),
@@ -67,6 +69,7 @@ export default async function DashboardPage() {
       .where(and(eq(goals.userId, userId), eq(goals.isCompleted, false)))
       .limit(3),
     getRecentNudges(),
+    getDailyTip(),
   ])
 
   const totalBalance = userAccounts.reduce((s, a) => s + a.balance, 0)
@@ -86,6 +89,7 @@ export default async function DashboardPage() {
       budgets={userBudgets}
       goals={userGoals}
       nudges={recentNudges}
+      dailyTip={dailyTip}
     />
   )
 }

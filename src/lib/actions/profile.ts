@@ -2,7 +2,7 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { users, userBadges, badges, transactions, streakHistory } from '@/lib/schema'
+import { users, userBadges, badges, transactions, streakHistory, financialTips, userTipSeeds } from '@/lib/schema'
 import { eq, desc, gte, and, sql } from 'drizzle-orm'
 
 export type ProfileData = {
@@ -139,4 +139,43 @@ export async function getStreakPageData(): Promise<{
     activeDates:     txDates,
     history:         historyRows,
   }
+}
+
+export async function seedFinancialTips(): Promise<{ inserted: number }> {
+  const { FINANCIAL_TIPS } = await import('@/lib/seed-tips')
+  const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(financialTips)
+  if (Number(count) > 0) return { inserted: 0 }
+  const rows = await db.insert(financialTips).values(FINANCIAL_TIPS).returning({ id: financialTips.id })
+  return { inserted: rows.length }
+}
+
+export type DailyTip = { body: string; category: string | null }
+
+export async function getDailyTip(): Promise<DailyTip | null> {
+  const session = await auth()
+  if (!session?.user?.id) return null
+  const userId = session.user.id
+
+  const [seedRow] = await db
+    .select({ seed: userTipSeeds.seed })
+    .from(userTipSeeds)
+    .where(eq(userTipSeeds.userId, userId))
+
+  if (!seedRow) return null
+
+  const [{ total }] = await db
+    .select({ total: sql<number>`count(*)` })
+    .from(financialTips)
+
+  if (!total || Number(total) === 0) return null
+
+  const dayIndex = Math.floor((Date.now() + 3 * 60 * 60 * 1000) / 86400000)
+  const tipId = ((seedRow.seed + dayIndex) % Number(total)) + 1
+
+  const [tip] = await db
+    .select({ body: financialTips.body, category: financialTips.category })
+    .from(financialTips)
+    .where(eq(financialTips.id, tipId))
+
+  return tip ?? null
 }
