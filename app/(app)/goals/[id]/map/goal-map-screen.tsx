@@ -8,7 +8,7 @@ import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
 import { contributeToGoal, getGoalMapData } from '@/lib/actions/goals'
 import { getAccountsForUser } from '@/lib/actions/transactions'
-import { GoalMapCanvas, MILESTONE_NODES } from '@/components/goal-map-canvas'
+import { GoalMapTileCanvas, MILESTONE_NODES } from '@/components/goal-map-tile-canvas'
 import { MilestoneModal } from '@/components/milestone-modal'
 import type { GoalMapData } from '@/lib/actions/goals'
 import { useEffect } from 'react'
@@ -249,12 +249,9 @@ export function GoalMapScreen({
       </div>
 
       {/* Map canvas */}
-      <GoalMapCanvas
+      <GoalMapTileCanvas
         currentPct={currentPct}
         earnedMilestones={earnedMilestones}
-        collectedCoins={collectedCoins}
-        isCompleted={isCompleted}
-        onMilestoneFirstEarned={(key) => setActiveMilestoneKey(key)}
       />
 
       {showContribute && (

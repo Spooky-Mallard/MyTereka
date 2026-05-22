@@ -721,3 +721,74 @@ export async function getInvitableFriends(sharedGoalId: string): Promise<Invitab
     memberStatus: memberStatusMap.get(p.id) ?? 'none',
   }))
 }
+
+export type SharedGoalMapData = {
+  goal: {
+    id:            string
+    name:          string
+    icon:          string | null
+    targetAmount:  number
+    currentAmount: number
+    isCompleted:   boolean
+  }
+  members: {
+    userId:           string
+    name:             string
+    avatarUrl:        string | null
+    totalContributed: number
+  }[]
+  currentPct:       number
+  earnedMilestones: string[]
+}
+
+export async function getSharedGoalMapData(sharedGoalId: string): Promise<SharedGoalMapData | null> {
+  const userId = await requireUserId()
+
+  const [goal] = await db
+    .select({
+      id:            sharedGoals.id,
+      name:          sharedGoals.name,
+      icon:          sharedGoals.icon,
+      targetAmount:  sharedGoals.targetAmount,
+      currentAmount: sharedGoals.currentAmount,
+      isCompleted:   sharedGoals.isCompleted,
+    })
+    .from(sharedGoals)
+    .innerJoin(sharedGoalMembers, eq(sharedGoalMembers.sharedGoalId, sharedGoals.id))
+    .where(and(
+      eq(sharedGoals.id, sharedGoalId),
+      eq(sharedGoalMembers.userId, userId),
+      eq(sharedGoalMembers.status, 'active'),
+    ))
+
+  if (!goal) return null
+
+  const contributions = await db
+    .select({
+      userId:   sharedGoalContributions.userId,
+      name:     users.name,
+      avatarUrl: users.avatarUrl,
+      amount:   sharedGoalContributions.amount,
+      isRefund: sharedGoalContributions.isRefund,
+    })
+    .from(sharedGoalContributions)
+    .innerJoin(users, eq(sharedGoalContributions.userId, users.id))
+    .where(eq(sharedGoalContributions.sharedGoalId, sharedGoalId))
+
+  const memberMap = new Map<string, { userId: string; name: string; avatarUrl: string | null; totalContributed: number }>()
+  for (const c of contributions) {
+    const prev = memberMap.get(c.userId) ?? { userId: c.userId, name: c.name, avatarUrl: c.avatarUrl, totalContributed: 0 }
+    prev.totalContributed += c.isRefund ? -c.amount : c.amount
+    memberMap.set(c.userId, prev)
+  }
+  const members = [...memberMap.values()].sort((a, b) => b.totalContributed - a.totalContributed)
+
+  const currentPct = goal.targetAmount > 0
+    ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100))
+    : 0
+
+  const MILESTONE_PCTS = [10, 25, 50, 75, 100]
+  const earnedMilestones = ['start', ...MILESTONE_PCTS.filter((p) => currentPct >= p).map((p) => String(p))]
+
+  return { goal, members, currentPct, earnedMilestones }
+}

@@ -2,7 +2,7 @@
 
 import { useEffect, useRef } from 'react'
 import { X } from 'lucide-react'
-import type { MILESTONE_NODES } from './goal-map-canvas'
+import type { MILESTONE_NODES } from './goal-map-tile-canvas'
 
 type MilestoneNode = (typeof MILESTONE_NODES)[number]
 

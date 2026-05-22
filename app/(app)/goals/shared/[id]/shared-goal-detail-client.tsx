@@ -383,6 +383,14 @@ export function SharedGoalDetailClient({
         </div>
       </div>
 
+      <Link
+        href={`/goals/shared/${detail.id}/map`}
+        className="flex items-center gap-2 px-4 py-2.5 rounded-xl text-sm font-semibold self-start"
+        style={{ background: 'var(--primary)', color: '#fff' }}
+      >
+        🗺️ View Map
+      </Link>
+
       <div className="rounded-2xl p-6 flex flex-col gap-5"
         style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
         <div className="flex items-start gap-4">
