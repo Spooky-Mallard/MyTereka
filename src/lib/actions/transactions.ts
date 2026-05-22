@@ -134,7 +134,26 @@ export async function createTransaction(data: {
     await checkAndAwardBadge(userId, 'first_transaction')
   }
 
-  return { negativeBalance: willGoNegative }
+  const [{ txCount }] = await db
+    .select({ txCount: sql<number>`count(*)` })
+    .from(transactions)
+    .where(eq(transactions.userId, userId))
+
+  const [userRating] = await db
+    .select({ ratingAskedAt: users.ratingAskedAt })
+    .from(users)
+    .where(eq(users.id, userId))
+
+  const promptRating = Number(txCount) === 3 && userRating?.ratingAskedAt === null
+
+  if (promptRating) {
+    await db
+      .update(users)
+      .set({ ratingAskedAt: sql`now()` })
+      .where(eq(users.id, userId))
+  }
+
+  return { negativeBalance: willGoNegative, promptRating }
 }
 
 export type TransactionRow = {

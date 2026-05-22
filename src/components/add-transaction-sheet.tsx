@@ -10,6 +10,7 @@ import { createTransaction } from '@/lib/actions/transactions'
 import { getUserAccounts, getUserCategories } from '@/lib/actions/profile'
 import type { AccountOption, CategoryOption } from '@/lib/actions/profile'
 import { CalendarDays, ChevronDown, Loader2 } from 'lucide-react'
+import { RatingModal } from '@/components/rating-modal'
 
 export function AddTransactionSheet({
   open,
@@ -27,6 +28,7 @@ export function AddTransactionSheet({
   const [note,        setNote]       = useState('')
   const [transferFee, setTransferFee] = useState('')
   const [saving,      setSaving]     = useState(false)
+  const [showRating, setShowRating] = useState(false)
 
   const [accounts,   setAccounts]   = useState<AccountOption[]>([])
   const [categories, setCategories] = useState<CategoryOption[]>([])
@@ -70,6 +72,9 @@ export function AddTransactionSheet({
       if (result.negativeBalance) {
         toast.warning('Account balance is now negative. You may be tracking a debt or credit situation.')
       }
+      if (result.promptRating) {
+        setShowRating(true)
+      }
       setAmount(''); setCatId(''); setNote(''); setTransferFee('')
       onClose()
       router.refresh()
@@ -81,6 +86,7 @@ export function AddTransactionSheet({
   }
 
   return (
+    <>
     <Sheet open={open} onOpenChange={(v) => !v && onClose()}>
       <SheetContent
         side="bottom"
@@ -239,5 +245,7 @@ export function AddTransactionSheet({
         )}
       </SheetContent>
     </Sheet>
+      <RatingModal open={showRating} onClose={() => setShowRating(false)} />
+    </>
   )
 }
