@@ -95,7 +95,7 @@ export default function RegisterPage() {
 
         <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
           <Field label="Full name">
-            <input name="name" type="text" placeholder="Atong Precious Olanya"
+            <input name="name" type="text" placeholder="John Doe"
               required autoComplete="name"
               className="mytereka-input" />
           </Field>
