@@ -179,3 +179,13 @@ export async function getDailyTip(): Promise<DailyTip | null> {
 
   return tip ?? null
 }
+
+export async function submitAppRating(rating: number): Promise<void> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  if (rating < 1 || rating > 5) throw new Error('Invalid rating')
+  await db
+    .update(users)
+    .set({ appRating: rating })
+    .where(eq(users.id, session.user.id))
+}
