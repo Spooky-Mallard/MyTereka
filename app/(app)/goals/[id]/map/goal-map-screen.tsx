@@ -252,6 +252,9 @@ export function GoalMapScreen({
       <GoalMapTileCanvas
         currentPct={currentPct}
         earnedMilestones={earnedMilestones}
+        goalName={goal.name}
+        targetAmount={goal.targetAmount}
+        currentAmount={goal.currentAmount}
       />
 
       {showContribute && (
