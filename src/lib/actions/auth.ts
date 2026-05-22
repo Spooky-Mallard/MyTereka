@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { users, categories, accounts, badges } from '@/lib/schema'
+import { users, categories, accounts, badges, userTipSeeds } from '@/lib/schema'
 import bcrypt from 'bcryptjs'
 import { eq, sql } from 'drizzle-orm'
 
@@ -104,6 +104,9 @@ export async function registerUser(formData: FormData) {
   if (Number(count) === 0) {
     await db.insert(badges).values(BASE_BADGES)
   }
+
+  const tipSeed = Math.floor(Math.random() * 9000) + 1000
+  await db.insert(userTipSeeds).values({ userId: user.id, seed: tipSeed })
 
   return { success: true }
 }
