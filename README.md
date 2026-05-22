@@ -4,6 +4,77 @@ A personal finance app built for Ugandan users — track income, expenses, savin
 
 ---
 
+## Design vibe & visual direction
+
+**Core feeling:** Playful, energetic, and celebratory — like Duolingo but for money. The app should feel like it rewards you for showing up, not like a spreadsheet that judges you. Every interaction should feel snappy and alive.
+
+**Reference:** Duolingo's mobile app — bold milestone moments, satisfying animations when something good happens (streak, goal complete, badge), and a clear visual hierarchy that makes progress feel real and exciting.
+
+### Personality
+
+- **Encouraging, never punishing.** Over-budget? That's shown clearly but without shame. Streak broken? Reset message is warm, not harsh.
+- **Celebration is a feature.** Confetti on goal completion. Milestone modals that feel like unlocking an achievement. XP pop animations. These are not polish — they are the product.
+- **Ugandan identity.** This is not a generic fintech app. It references MTN MoMo, SACCOs, bodaboda, school fees, kwanjula. The tone is warm and locally grounded.
+
+### Visual language
+
+**Color use:**
+- Teal (`#00B894`) is the brand's primary energy — used for active states, CTAs, progress fills, and the logo. It should feel alive and optimistic.
+- Amber (`#F59E0B`) is the streak and excitement color — used for the flame, the current milestone tile, and anything that says "you're on a roll."
+- Green (`#10B981`) means money coming in — income, positive values, goal completion.
+- Red (`#EF4444`) means money going out — expenses, over-budget states. Never alarming, just clear.
+- Dark navy background (`#0D2137`) keeps everything grounded and premium. The colors pop against it.
+
+**Typography:**
+- Headings use Poppins — rounded, friendly, confident. Not corporate.
+- Body uses the system font stack — clean and fast to render on lower-end Android devices common in Uganda.
+- Numbers are always bold and large. The UGX amount on the balance card, the streak count, the goal percentage — these are the heroes of every screen.
+
+**Shapes and surfaces:**
+- Heavy use of rounded corners (`border-radius: 16–24px`). Nothing harsh or boxy.
+- Cards have a soft teal glow (`box-shadow: 0 2px 8px rgba(0,184,148,0.12)`) — they feel elevated off the dark background.
+- The gradient (`linear-gradient(135deg, #00B894, #1DD1A1)`) is used on the primary balance card and CTAs — reserved for the most important element on screen.
+
+**Motion and animation:**
+- Animations signal meaning, not decoration. The streak dot fills gold when active. The milestone tile pulses amber when it's the current position. The avatar bounces on the goal map.
+- Transitions are fast (300–500ms) and use `ease-in-out`. Nothing sluggish.
+- Confetti fires on goal completion — full `canvas-confetti` burst in teal, gold, and white.
+- XP counter animates when XP is awarded. Milestone modal slides up like a native sheet.
+
+### Mobile-first principles
+
+The app is primarily used on phones, most likely mid-range Android (Samsung A-series, Tecno, Infinix) in Uganda. Design decisions should reflect this:
+
+- **Thumb zones are sacred.** Primary actions (Add Transaction FAB, Contribute button) live at the bottom of the screen within thumb reach.
+- **Bottom sheets instead of modals.** The Add Transaction sheet, contribute modal, and rating prompt all slide up from the bottom — not center-screen dialogs.
+- **Large tap targets.** Minimum 44px touch targets. Category grid uses icon tiles with enough padding to tap accurately on small screens.
+- **No hover-only states.** Every interactive element must work with touch. Hover effects are enhancement only.
+- **Bottom navigation bar** replaces the sidebar on mobile — 5 tabs with clear active state (teal icon + label weight change). The center tab is the Add Transaction FAB — elevated teal circle.
+- **Loading states use skeletons**, not spinners. The skeleton shimmer matches the dark background — no white flashes.
+
+### Screen-specific character
+
+| Screen | What it should feel like |
+|--------|--------------------------|
+| Dashboard | Morning briefing. Big balance, streak visible at a glance, recent transactions scannable in seconds. The tip card is a calm moment of learning. |
+| Add Transaction | Fast and frictionless. Tap type → tap category tile → type amount → done. Feels like a native keyboard flow. |
+| Goal map | A journey. Isometric tiles recede into the distance. The current tile glows amber. Completing a milestone should feel like leveling up in a game. |
+| Streak calendar | Pride and accountability. Gold dots are satisfying to see. A long streak history should feel like an achievement wall. |
+| Budgets | Clear status at a glance. Color-coded bars (green/amber/red) communicate health instantly without reading numbers. |
+| Profile / Badges | Trophy case energy. Earned badges are bright and prominent. Unearned badges are visible but desaturated — motivation, not shame. |
+| Analytics | Clean and informative. Charts are the hero. Period tabs let users slice time quickly. Not a wall of numbers. |
+
+### What to avoid
+
+- No harsh edges, pure-white surfaces, or light-mode assumptions
+- No dollar signs, decimals, or non-UGX currency anywhere
+- No empty states without a clear CTA and encouraging copy ("No goals yet — create your first one")
+- No animations that run forever without user action (except the streak flame subtle pulse and tile current-position pulse)
+- No dense data tables — use cards, chips, and visual hierarchy instead
+- No generic placeholder copy — everything should feel like it was written for a Ugandan user
+
+---
+
 ## What it does
 
 | Feature | Description |
