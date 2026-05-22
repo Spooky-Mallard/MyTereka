@@ -5,8 +5,8 @@ import { usePathname } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import {
-  House, ArrowLeftRight, BarChart2, PiggyBank,
-  Target, User, LogOut, Plus,
+  House, ArrowLeftRight, BarChart2, Wallet,
+  Target, User, LogOut, Plus, Flame, Trophy, Users,
 } from 'lucide-react'
 import {
   Sidebar, SidebarContent, SidebarFooter, SidebarGroup,
@@ -14,22 +14,56 @@ import {
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from '@/components/ui/sidebar'
 
-const navItems = [
+const moneyNav = [
   { title: 'Home',         url: '/',             icon: House },
   { title: 'Transactions', url: '/transactions', icon: ArrowLeftRight },
   { title: 'Analytics',    url: '/analytics',    icon: BarChart2 },
-  { title: 'Budgets',      url: '/budgets',      icon: PiggyBank },
+  { title: 'Budgets',      url: '/budgets',      icon: Wallet },
+]
+
+const questNav = [
   { title: 'Goals',        url: '/goals',        icon: Target },
+  { title: 'Streak',       url: '/streak',       icon: Flame },
 ]
 
 export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
-  const pathname   = usePathname()
+  const pathname = usePathname()
   const { data: session } = useSession()
-  const isActive   = (path: string) =>
+  const isActive = (path: string) =>
     path === '/' ? pathname === '/' : pathname.startsWith(path)
 
   const name     = session?.user?.name ?? 'User'
   const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+
+  function NavItem({ item }: { item: { title: string; url: string; icon: React.ElementType } }) {
+    const active = isActive(item.url)
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          asChild
+          isActive={active}
+          tooltip={item.title}
+          className="h-10 rounded-xl font-medium transition-all"
+          style={
+            active
+              ? { background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }
+              : { color: 'var(--sidebar-foreground)' }
+          }
+        >
+          <Link href={item.url} className="flex items-center gap-3 px-3">
+            <item.icon
+              size={18}
+              strokeWidth={active ? 2.5 : 2}
+              style={{ color: active ? 'var(--primary)' : 'var(--muted-foreground)' }}
+            />
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: active ? 700 : 500 }}>
+              {item.title}
+            </span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
 
   return (
     <Sidebar collapsible="icon" style={{ background: 'var(--sidebar)' }}>
@@ -58,55 +92,44 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
 
       {/* Navigation */}
       <SidebarContent className="px-2">
+        {/* Add transaction CTA */}
+        <div className="px-1 pb-3 group-data-[collapsible=icon]:hidden">
+          <button
+            onClick={onAdd}
+            className="flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white transition hover:opacity-90"
+            style={{ background: 'var(--gradient-primary)', boxShadow: 'var(--shadow-fab)' }}
+          >
+            <Plus size={15} strokeWidth={2.6} />
+            Add transaction
+          </button>
+        </div>
+
+        {/* Money group */}
         <SidebarGroup>
           <SidebarGroupLabel
-            className="mb-1 px-2 text-xs font-semibold uppercase tracking-widest"
+            className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest"
             style={{ color: 'var(--muted-foreground)' }}
           >
-            Menu
+            Money
           </SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu className="gap-0.5">
-              {navItems.map((item) => {
-                const active = isActive(item.url)
-                return (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton
-                      asChild
-                      isActive={active}
-                      tooltip={item.title}
-                      className="h-10 rounded-xl font-medium transition-all"
-                      style={
-                        active
-                          ? { background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }
-                          : { color: 'var(--sidebar-foreground)' }
-                      }
-                    >
-                      <Link href={item.url} className="flex items-center gap-3 px-3">
-                        <item.icon
-                          size={18}
-                          strokeWidth={active ? 2.5 : 2}
-                          style={{ color: active ? 'var(--primary)' : 'var(--muted-foreground)' }}
-                        />
-                        <span>{item.title}</span>
-                      </Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                )
-              })}
+              {moneyNav.map((item) => <NavItem key={item.title} item={item} />)}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
 
-              {/* Add transaction */}
-              <SidebarMenuItem>
-                <SidebarMenuButton
-                  tooltip="Add Transaction"
-                  className="h-10 rounded-xl font-medium transition-all mt-2"
-                  style={{ background: 'var(--primary)', color: '#fff' }}
-                  onClick={onAdd}
-                >
-                  <Plus size={18} strokeWidth={2.5} />
-                  <span>Add Transaction</span>
-                </SidebarMenuButton>
-              </SidebarMenuItem>
+        {/* Quests group */}
+        <SidebarGroup>
+          <SidebarGroupLabel
+            className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest"
+            style={{ color: 'var(--muted-foreground)' }}
+          >
+            Quests
+          </SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu className="gap-0.5">
+              {questNav.map((item) => <NavItem key={item.title} item={item} />)}
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -133,7 +156,7 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
                   size={18}
                   style={{ color: pathname.startsWith('/profile') ? 'var(--primary)' : 'var(--muted-foreground)' }}
                 />
-                <span>Profile</span>
+                <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500 }}>Profile</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -145,15 +168,15 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
               onClick={() => signOut({ callbackUrl: '/auth/login' })}
             >
               <LogOut size={18} style={{ color: 'var(--danger)' }} />
-              <span>Log out</span>
+              <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500 }}>Log out</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
         </SidebarMenu>
 
-        {/* User chip */}
+        {/* User chip with initials avatar */}
         <div
           className="mt-3 flex items-center gap-2.5 rounded-xl p-3 group-data-[collapsible=icon]:hidden"
-          style={{ background: 'var(--surface-alt)' }}
+          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}
         >
           <div
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
@@ -162,8 +185,14 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="truncate text-sm font-semibold" style={{ color: 'var(--sidebar-foreground)' }}>
+            <div
+              className="truncate text-sm font-bold"
+              style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}
+            >
               {name}
+            </div>
+            <div className="text-xs" style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif', fontWeight: 600 }}>
+              Saver
             </div>
           </div>
         </div>

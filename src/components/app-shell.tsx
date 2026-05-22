@@ -11,6 +11,7 @@ import { Toaster } from '@/components/ui/sonner'
 import { AddTransactionSheet } from '@/components/add-transaction-sheet'
 import { getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead } from '@/lib/actions/notifications'
 import type { NotificationRow } from '@/lib/types/notifications'
+import { RightRailProvider, useRightRail } from '@/components/right-rail-context'
 
 const mobileNavItems = [
   { title: 'Home',      url: '/',          icon: House },
@@ -299,8 +300,9 @@ function NotificationBell() {
   )
 }
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function AppShellInner({ children }: { children: React.ReactNode }) {
   const [addOpen, setAddOpen] = useState(false)
+  const rightRail = useRightRail()
 
   return (
     <SidebarProvider defaultOpen={true}>
@@ -344,10 +346,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </header>
 
-          {/* Page content */}
-          <main className="flex-1 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8">
-            {children}
-          </main>
+          {/* Page content — 2-col on xl+ when right rail is present */}
+          <div className={`flex flex-1 min-w-0 ${rightRail ? 'xl:divide-x xl:divide-[var(--border)]' : ''}`}>
+            <main className="flex-1 min-w-0 px-4 py-6 pb-24 md:px-8 md:py-8 md:pb-8">
+              {children}
+            </main>
+
+            {/* Right rail — desktop only */}
+            {rightRail && (
+              <aside
+                className="hidden xl:flex xl:flex-col w-[300px] shrink-0 px-5 py-8 gap-5 overflow-y-auto"
+                style={{ background: 'var(--sidebar)' }}
+              >
+                {rightRail}
+              </aside>
+            )}
+          </div>
         </div>
       </div>
 
@@ -357,5 +371,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <AddTransactionSheet open={addOpen} onClose={() => setAddOpen(false)} />
       <Toaster position="top-right" richColors />
     </SidebarProvider>
+  )
+}
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <RightRailProvider>
+      <AppShellInner>{children}</AppShellInner>
+    </RightRailProvider>
   )
 }
