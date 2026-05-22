@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=Nunito+Sans:ital,opsz,wght@0,6..12,400;0,6..12,500;0,6..12,600;0,6..12,700;1,6..12,400&display=swap");
 @import "tailwindcss";
 @import "tw-animate-css";
 
@@ -6,7 +6,7 @@
 
 @theme inline {
   --font-sans: "Poppins", ui-sans-serif, system-ui, sans-serif;
-  --font-body: Calibri, "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-body: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
 
   /* ── Border radius ── */
   --radius-sm: 8px;
@@ -125,6 +125,36 @@
   --podium-gold:   #F2C94C;
   --podium-silver: #C9D2DA;
   --podium-bronze: #CD7F32;
+
+  /* ── Additional shadows ── */
+  --shadow-fab:  0 4px 12px rgba(0, 184, 148, 0.45);
+  --shadow-cta:  0 8px 32px rgba(0, 184, 148, 0.30);
+
+  /* ── Streak / amber hero gradient ── */
+  --gradient-amber: linear-gradient(135deg, #F59E0B, #FBBF24);
+  --gradient-amber-dark: linear-gradient(135deg, #D97706, #F59E0B);
+
+  /* ── 3D tile shadows (goal map) ── */
+  --tile-shadow-teal:   0 6px 0 #00916e, 0 10px 0 #006b51, 0 14px 16px rgba(0,0,0,0.4);
+  --tile-shadow-gold:   0 6px 0 #B45309, 0 10px 0 #92400E, 0 14px 16px rgba(0,0,0,0.4);
+  --tile-shadow-gray:   0 6px 0 #1E3A52, 0 10px 0 #162E43, 0 14px 16px rgba(0,0,0,0.3);
+
+  /* ── Type scale ── */
+  --type-display:    28px;
+  --type-display-lg: 48px;
+  --type-title:      22px;
+  --type-heading:    18px;
+  --type-subheading: 16px;
+  --type-body:       14px;
+  --type-small:      12px;
+  --type-tiny:       10px;
+
+  /* ── Motion ── */
+  --ease-out:    cubic-bezier(0.2, 0.6, 0.2, 1);
+  --ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+  --dur-fast:    150ms;
+  --dur-base:    300ms;
+  --dur-slow:    500ms;
 }
 
 /* ═══════════════════════════════════════════
@@ -183,7 +213,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
-    font-family: var(--font-body);
+    font-family: "Nunito Sans", ui-sans-serif, system-ui, sans-serif;
     font-feature-settings: "cv11", "ss01";
     line-height: 1.5;
     min-height: 100vh;
@@ -339,6 +369,53 @@
     font-size: 11px;
     font-weight: 600;
     font-family: var(--font-sans);
+  }
+
+  /* Amber streak hero gradient */
+  .bg-gradient-amber { background: var(--gradient-amber); }
+
+  /* FAB / CTA shadow utilities */
+  .shadow-fab { box-shadow: var(--shadow-fab); }
+  .shadow-cta { box-shadow: var(--shadow-cta); }
+
+  /* 3D tile shadow utilities */
+  .tile-3d-teal { box-shadow: var(--tile-shadow-teal); }
+  .tile-3d-gold { box-shadow: var(--tile-shadow-gold); }
+  .tile-3d-gray { box-shadow: var(--tile-shadow-gray); }
+
+  /* Eyebrow label (uppercase, spaced, primary teal) */
+  .eyebrow {
+    font-family: var(--font-sans);
+    font-size: var(--type-tiny);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--primary);
+  }
+
+  /* Hero number — large display stat */
+  .hero-number {
+    font-family: var(--font-sans);
+    font-weight: 700;
+    font-size: var(--type-display-lg);
+    line-height: 1;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+
+  /* Pill tab active state */
+  .pill-tab-active {
+    background: var(--primary);
+    color: #fff;
+    border-radius: var(--radius-full);
+  }
+
+  /* Right-rail section card */
+  .rail-card {
+    background: var(--card);
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-card);
+    padding: 20px;
   }
 }
 
