@@ -17,6 +17,7 @@ function iconFor(type: NotificationRow['type']) {
     case 'shared_goal_contribution':  return Trophy
     case 'shared_goal_completed':     return Trophy
     case 'shared_goal_removed':       return UsersIcon
+    case 'quest_completed':           return Sparkles
     default:                          return Bell
   }
 }

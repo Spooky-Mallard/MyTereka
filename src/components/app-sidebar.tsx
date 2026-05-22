@@ -24,6 +24,8 @@ const moneyNav = [
 const questNav = [
   { title: 'Goals',        url: '/goals',        icon: Target },
   { title: 'Streak',       url: '/streak',       icon: Flame },
+  { title: 'Badges',       url: '/profile',      icon: Trophy },
+  { title: 'Shared Goals', url: '/goals',        icon: Users  },
 ]
 
 export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
