@@ -5,9 +5,10 @@ import {
   BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer,
   PieChart, Pie, Cell, CartesianGrid,
 } from 'recharts'
-import { Lightbulb } from 'lucide-react'
+import { TrendingUp, TrendingDown, ChevronRight } from 'lucide-react'
 import { formatUGX } from '@/lib/format'
 import { categoryMeta } from '@/lib/mock-data'
+import { useSetRightRail } from '@/components/right-rail-context'
 import type { TransactionRow } from '@/lib/actions/transactions'
 
 type Period = 'daily' | 'weekly' | 'monthly' | 'yearly'
@@ -17,12 +18,7 @@ const PIE_COLORS = [
   '#EC4899', '#10B981', '#3B82F6', '#8B5CF6',
 ]
 
-const financialTips: Record<Period, string> = {
-  daily:   'Food is your biggest daily expense — try meal prepping with matooke and beans to cut 30% of costs.',
-  weekly:  'Check weekly spending against your budget. Buying from local markets instead of supermarkets saves up to 40%.',
-  monthly: 'Internet/Data costs add up. MTN offers bundles that cost less per GB when bought monthly.',
-  yearly:  'Keep using your MTN MoMo savings consistently — small regular deposits compound over time.',
-}
+const DAY_LABELS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
 
 function fmtShort(v: number) {
   if (v >= 1000000) return `${(v / 1000000).toFixed(1)}M`
@@ -38,16 +34,125 @@ function getWeekStart(d: Date) {
   return m.toISOString().split('T')[0]
 }
 
+function CategoryBreakdown({
+  pieData, totalExpForPct,
+}: {
+  pieData: { name: string; value: number }[]
+  totalExpForPct: number
+}) {
+  if (pieData.length === 0) {
+    return (
+      <div className="flex h-40 items-center justify-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
+        No expenses recorded
+      </div>
+    )
+  }
+  return (
+    <div className="flex flex-col gap-3">
+      {pieData.slice(0, 8).map(({ name, value }, i) => {
+        const meta = categoryMeta[name]
+        const Icon = meta?.icon
+        const tint = meta?.tint ?? PIE_COLORS[i % PIE_COLORS.length]
+        const pct  = totalExpForPct > 0 ? Math.round((value / totalExpForPct) * 100) : 0
+        return (
+          <div key={name} className="flex items-center gap-3">
+            <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+              style={{ background: `${tint}22`, color: tint }}>
+              {Icon ? <Icon size={14} /> : <span className="text-xs">{name[0]}</span>}
+            </span>
+            <div className="flex-1 min-w-0">
+              <div className="mb-1 flex items-center justify-between">
+                <span className="text-xs font-semibold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>{name}</span>
+                <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{pct}%</span>
+              </div>
+              <div className="progress-track" style={{ height: 5 }}>
+                <div className="progress-fill" style={{ width: `${pct}%`, background: PIE_COLORS[i % PIE_COLORS.length] }} />
+              </div>
+            </div>
+            <div className="w-20 shrink-0 text-right text-xs font-bold amount-expense" style={{ fontFamily: 'Poppins, sans-serif' }}>
+              {formatUGX(value)}
+            </div>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+function AnalyticsRightRail({
+  pieData, totalExpForPct, topCategory, totalIncome, totalExpenses,
+}: {
+  pieData: { name: string; value: number }[]
+  totalExpForPct: number
+  topCategory: string | null
+  totalIncome: number
+  totalExpenses: number
+}) {
+  return (
+    <>
+      {/* Income vs Expense summary */}
+      <div className="rail-card">
+        <div className="eyebrow mb-3">This Period</div>
+        <div className="flex flex-col gap-3">
+          <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'rgba(16,185,129,0.10)' }}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(16,185,129,0.18)' }}>
+              <TrendingUp size={14} style={{ color: 'var(--success)' }} />
+            </div>
+            <div className="flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--success)' }}>Income</div>
+              <div className="text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                {formatUGX(totalIncome)}
+              </div>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 rounded-xl p-3" style={{ background: 'rgba(239,68,68,0.10)' }}>
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg" style={{ background: 'rgba(239,68,68,0.18)' }}>
+              <TrendingDown size={14} style={{ color: 'var(--danger)' }} />
+            </div>
+            <div className="flex-1">
+              <div className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--danger)' }}>Expenses</div>
+              <div className="text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                {formatUGX(totalExpenses)}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Category breakdown */}
+      <div className="rail-card">
+        <div className="eyebrow mb-3">Where It Went</div>
+        <CategoryBreakdown pieData={pieData} totalExpForPct={totalExpForPct} />
+      </div>
+
+      {/* Insight */}
+      {topCategory && (
+        <div className="rounded-xl p-4" style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-base">🎯</span>
+            <span className="text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--warning)', fontFamily: 'Poppins, sans-serif' }}>Insight</span>
+          </div>
+          <div className="text-sm font-semibold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            {topCategory} is your top expense
+          </div>
+          <div className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+            Review your {topCategory.toLowerCase()} spend to find savings opportunities.
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function AnalyticsClient({ data }: { data: TransactionRow[] }) {
   const [period, setPeriod] = useState<Period>('monthly')
 
-  const { barData, pieData, totalIncome, totalExpenses } = useMemo(() => {
+  const { barData, pieData, totalIncome, totalExpenses, totalExpForPct, sparkPoints, daySpend } = useMemo(() => {
     const barMap = new Map<string, { income: number; expenses: number }>()
 
     for (const t of data) {
       const d = new Date(t.date)
       let key: string
-
       if (period === 'daily') {
         key = d.toLocaleDateString('en-UG', { weekday: 'short' })
       } else if (period === 'weekly') {
@@ -57,7 +162,6 @@ export function AnalyticsClient({ data }: { data: TransactionRow[] }) {
       } else {
         key = d.getFullYear().toString()
       }
-
       if (!barMap.has(key)) barMap.set(key, { income: 0, expenses: 0 })
       const entry = barMap.get(key)!
       if (t.type === 'income')  entry.income   += t.amount
@@ -76,105 +180,253 @@ export function AnalyticsClient({ data }: { data: TransactionRow[] }) {
 
     const totalIncome   = data.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
     const totalExpenses = data.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
+    const totalExpForPct = pieData.reduce((s, d) => s + d.value, 0)
 
-    return { barData, pieData, totalIncome, totalExpenses }
+    /* sparkline: daily cumulative savings over last 30 points */
+    const sorted = [...data].sort((a, b) => a.date.localeCompare(b.date))
+    let running = 0
+    const sparkMap = new Map<string, number>()
+    for (const t of sorted) {
+      if (t.type === 'income')  running += t.amount
+      if (t.type === 'expense') running -= t.amount
+      sparkMap.set(t.date, running)
+    }
+    const sparkPoints = Array.from(sparkMap.values()).slice(-30)
+
+    /* day-of-week spend totals: 0=Mon…6=Sun */
+    const dayTotals = [0, 0, 0, 0, 0, 0, 0]
+    for (const t of data.filter((t) => t.type === 'expense')) {
+      const jsDay = new Date(t.date).getDay() // 0=Sun
+      const monIdx = (jsDay + 6) % 7           // shift so Mon=0
+      dayTotals[monIdx] += t.amount
+    }
+    const maxDay = Math.max(...dayTotals, 1)
+    const daySpend = dayTotals.map((v) => v / maxDay)
+
+    return { barData, pieData, totalIncome, totalExpenses, totalExpForPct, sparkPoints, daySpend }
   }, [data, period])
 
-  const netSavings     = totalIncome - totalExpenses
-  const totalExpForPct = pieData.reduce((s, d) => s + d.value, 0)
+  const netSavings   = totalIncome - totalExpenses
+  const savingsRate  = totalIncome > 0 ? Math.round((netSavings / totalIncome) * 100) : 0
+  const topCategory  = pieData[0]?.name ?? null
+  const spendyDayIdx = daySpend.indexOf(Math.max(...daySpend))
+
+  /* sparkline SVG path */
+  const sparkPath = useMemo(() => {
+    if (sparkPoints.length < 2) return ''
+    const minV = Math.min(...sparkPoints)
+    const maxV = Math.max(...sparkPoints, minV + 1)
+    const W = 300, H = 44
+    const pts = sparkPoints.map((v, i) => {
+      const x = (i / (sparkPoints.length - 1)) * W
+      const y = H - 4 - ((v - minV) / (maxV - minV)) * (H - 8)
+      return [x, y]
+    })
+    const line = pts.map(([x, y], i) => `${i === 0 ? 'M' : 'L'}${x.toFixed(1)},${y.toFixed(1)}`).join(' ')
+    const fill = `${line} L${W},${H} L0,${H} Z`
+    return { line, fill }
+  }, [sparkPoints])
+
+  useSetRightRail(
+    <AnalyticsRightRail
+      pieData={pieData}
+      totalExpForPct={totalExpForPct}
+      topCategory={topCategory}
+      totalIncome={totalIncome}
+      totalExpenses={totalExpenses}
+    />
+  )
+
+  const periodLabels: Record<Period, string> = {
+    daily: 'Week', weekly: 'Month', monthly: 'Year', yearly: 'All time',
+  }
 
   return (
-    <div className="mx-auto flex max-w-5xl flex-col gap-6">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl"
-            style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
-            Analytics
-          </h1>
-          <p className="mt-0.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            Visual overview of your finances
-          </p>
-        </div>
-        <div className="flex rounded-full p-1" style={{ background: 'var(--surface-alt)' }}>
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
+      {/* Header + period pills */}
+      <div className="flex items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+          Analytics
+        </h1>
+        <div className="flex rounded-full p-1 gap-1" style={{ background: 'var(--surface-alt)' }}>
           {(['daily', 'weekly', 'monthly', 'yearly'] as Period[]).map((p) => (
             <button key={p} onClick={() => setPeriod(p)}
-              className="rounded-full px-3 py-1.5 text-xs font-medium capitalize transition"
+              className="rounded-full px-3 py-1.5 text-xs font-semibold capitalize transition"
               style={period === p
-                ? { background: 'var(--primary)', color: '#fff' }
-                : { color: 'var(--muted-foreground)' }}>
-              {p}
+                ? { background: 'var(--primary)', color: '#fff', fontFamily: 'Poppins, sans-serif' }
+                : { color: 'var(--muted-foreground)', fontFamily: 'Poppins, sans-serif' }}>
+              {p === 'daily' ? 'Week' : p === 'weekly' ? 'Month' : p === 'monthly' ? 'Year' : 'All'}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-4">
-        {[
-          { label: 'Total Income',   value: formatUGX(totalIncome),             color: 'var(--success)', bg: 'rgba(16,185,129,0.10)' },
-          { label: 'Total Expenses', value: formatUGX(totalExpenses),           color: 'var(--danger)',  bg: 'rgba(239,68,68,0.10)' },
-          { label: 'Net Savings',    value: formatUGX(Math.abs(netSavings)),     color: netSavings >= 0 ? 'var(--primary)' : 'var(--danger)', bg: netSavings >= 0 ? 'rgba(0,184,148,0.10)' : 'rgba(239,68,68,0.10)' },
-        ].map(({ label, value, color, bg }) => (
-          <div key={label} className="rounded-2xl p-4"
-            style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-            <div className="mb-2 inline-flex rounded-lg px-2 py-1 text-xs font-semibold"
-              style={{ background: bg, color }}>
-              {label}
-            </div>
-            <div className="text-lg font-bold" style={{ color, fontFamily: 'Poppins, sans-serif' }}>
-              {value}
-            </div>
+      {/* HERO — savings card with sparkline */}
+      <div
+        className="relative overflow-hidden rounded-[22px] p-5"
+        style={{ background: 'var(--gradient-primary)', boxShadow: 'var(--shadow-cta)', color: '#fff' }}
+      >
+        <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full"
+          style={{ background: 'rgba(255,255,255,0.12)', filter: 'blur(30px)' }} />
+        <div className="relative">
+          <div className="text-[11px] font-bold uppercase tracking-wider opacity-85">You saved</div>
+          <div className="mt-1.5 text-4xl font-bold leading-none tracking-tight" style={{ fontFamily: 'Poppins, sans-serif' }}>
+            {formatUGX(Math.abs(netSavings))}
           </div>
-        ))}
+          {savingsRate > 0 && (
+            <div className="mt-1 text-xs opacity-90">
+              That's <strong>{savingsRate}%</strong> of what you earned
+            </div>
+          )}
+
+          {/* Sparkline */}
+          {sparkPath && (
+            <>
+              <svg width="100%" height="44" viewBox="0 0 300 44" preserveAspectRatio="none" style={{ marginTop: 12 }}>
+                <defs>
+                  <linearGradient id="sparkFill" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stopColor="#fff" stopOpacity="0.3" />
+                    <stop offset="1" stopColor="#fff" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                <path d={sparkPath.fill} fill="url(#sparkFill)" />
+                <path d={sparkPath.line} fill="none" stroke="#fff" strokeWidth="2"
+                  strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+              <div className="flex justify-between" style={{ fontFamily: 'Poppins, sans-serif', fontSize: 9, fontWeight: 600, opacity: 0.8 }}>
+                <span>Earlier</span><span>Today</span>
+              </div>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Bar chart */}
-      <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-        <h3 className="mb-4 font-semibold" style={{ color: 'var(--foreground)' }}>Income vs Expenses</h3>
-        {barData.length === 0 ? (
-          <div className="flex h-60 items-center justify-center text-sm"
-            style={{ color: 'var(--muted-foreground)' }}>
-            No data for this period
+      {/* Income vs Expense cards */}
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-[16px] p-4" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg"
+              style={{ background: 'rgba(16,185,129,0.18)' }}>
+              <TrendingUp size={12} style={{ color: 'var(--success)' }} />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--success)' }}>Income</span>
           </div>
-        ) : (
-          <ResponsiveContainer width="100%" height={240}>
-            <BarChart data={barData} barGap={4} barCategoryGap="35%">
-              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
-              <XAxis dataKey="name" tick={{ fontSize: 12, fill: 'var(--muted-foreground)' }}
-                axisLine={false} tickLine={false} />
-              <YAxis tick={{ fontSize: 11, fill: 'var(--muted-foreground)' }}
-                axisLine={false} tickLine={false} tickFormatter={fmtShort} />
-              <Tooltip
-                contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)',
-                  borderRadius: 12, color: 'var(--foreground)', fontSize: 13 }}
-                formatter={(v: number, name: string) => [formatUGX(v), name === 'income' ? 'Income' : 'Expenses']}
-              />
-              <Bar dataKey="income"   fill="#10B981" radius={[6, 6, 0, 0]} />
-              <Bar dataKey="expenses" fill="#EF4444" radius={[6, 6, 0, 0]} />
-            </BarChart>
-          </ResponsiveContainer>
-        )}
-        <div className="mt-3 flex gap-4">
-          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            <span className="h-3 w-3 rounded-full" style={{ background: '#10B981' }} />Income
+          <div className="text-xl font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            {formatUGX(totalIncome)}
           </div>
-          <div className="flex items-center gap-2 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            <span className="h-3 w-3 rounded-full" style={{ background: '#EF4444' }} />Expenses
+        </div>
+        <div className="rounded-[16px] p-4" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex h-6 w-6 items-center justify-center rounded-lg"
+              style={{ background: 'rgba(239,68,68,0.18)' }}>
+              <TrendingDown size={12} style={{ color: 'var(--danger)' }} />
+            </div>
+            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color: 'var(--danger)' }}>Expenses</span>
+          </div>
+          <div className="text-xl font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            {formatUGX(totalExpenses)}
           </div>
         </div>
       </div>
 
-      {/* Donut + category breakdown */}
-      <div className="grid gap-4 lg:grid-cols-2">
-        <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <h3 className="mb-4 font-semibold" style={{ color: 'var(--foreground)' }}>Spending by Category</h3>
-          {pieData.length === 0 ? (
-            <div className="flex h-52 items-center justify-center text-sm"
-              style={{ color: 'var(--muted-foreground)' }}>No expenses recorded</div>
-          ) : (
-            <ResponsiveContainer width="100%" height={220}>
+      {/* Bar chart */}
+      <div className="rounded-[18px] p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="mb-4 text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+          Income vs Expenses
+        </div>
+        {barData.length === 0 ? (
+          <div className="flex h-52 items-center justify-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            No data for this period
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <BarChart data={barData} barGap={4} barCategoryGap="35%">
+              <CartesianGrid strokeDasharray="3 3" stroke="var(--border)" vertical={false} />
+              <XAxis dataKey="name" tick={{ fontSize: 11, fill: 'var(--muted-foreground)', fontFamily: 'Poppins, sans-serif' }}
+                axisLine={false} tickLine={false} />
+              <YAxis tick={{ fontSize: 10, fill: 'var(--muted-foreground)' }}
+                axisLine={false} tickLine={false} tickFormatter={fmtShort} />
+              <Tooltip
+                contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)',
+                  borderRadius: 12, color: 'var(--foreground)', fontSize: 12 }}
+                formatter={(v: number, name: string) => [formatUGX(v), name === 'income' ? 'Income' : 'Expenses']}
+              />
+              <Bar dataKey="income"   fill="var(--success)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="expenses" fill="var(--danger)"  radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
+        <div className="mt-2 flex gap-4">
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--success)' }} />Income
+          </div>
+          <div className="flex items-center gap-2 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            <span className="h-2.5 w-2.5 rounded-full" style={{ background: 'var(--danger)' }} />Expenses
+          </div>
+        </div>
+      </div>
+
+      {/* Day-of-week heat strip */}
+      <div className="rounded-[18px] p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="eyebrow mb-1">Your Spendiest Day</div>
+        {daySpend.some((v) => v > 0) ? (
+          <>
+            <div className="mb-3 text-base font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+              {DAY_LABELS[spendyDayIdx]}
+            </div>
+            <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(7, 1fr)' }}>
+              {daySpend.map((intensity, i) => (
+                <div key={i} className="flex flex-col items-center gap-1.5">
+                  <div className="w-full rounded-lg" style={{
+                    aspectRatio: '1',
+                    background: `rgba(239,68,68,${Math.max(0.08, intensity * 0.75)})`,
+                    border: i === spendyDayIdx ? '1.5px solid var(--danger)' : '1px solid transparent',
+                  }} />
+                  <div className="text-[9px] font-semibold" style={{
+                    color: i === spendyDayIdx ? 'var(--danger)' : 'var(--muted-foreground)',
+                    fontFamily: 'Poppins, sans-serif',
+                  }}>
+                    {DAY_LABELS[i].slice(0, 3)}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </>
+        ) : (
+          <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>No expense data yet</div>
+        )}
+      </div>
+
+      {/* Insight card */}
+      {topCategory && (
+        <div className="flex gap-3 items-start rounded-[16px] p-4"
+          style={{ background: 'rgba(245,158,11,0.08)', border: '1px solid rgba(245,158,11,0.3)' }}>
+          <div className="mt-0.5 text-xl">🎯</div>
+          <div>
+            <div className="text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+              {topCategory} is your top expense
+            </div>
+            <div className="mt-1 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+              Review your {topCategory.toLowerCase()} spending to find opportunities to save.
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Donut chart (kept per user request) + category breakdown — mobile only */}
+      <div className="xl:hidden rounded-[18px] p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="mb-4 text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+          Spending by Category
+        </div>
+        {pieData.length === 0 ? (
+          <div className="flex h-40 items-center justify-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            No expenses recorded
+          </div>
+        ) : (
+          <>
+            <ResponsiveContainer width="100%" height={180}>
               <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90}
+                <Pie data={pieData} cx="50%" cy="50%" innerRadius={50} outerRadius={80}
                   paddingAngle={3} dataKey="value">
                   {pieData.map((_, i) => (
                     <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
@@ -182,68 +434,44 @@ export function AnalyticsClient({ data }: { data: TransactionRow[] }) {
                 </Pie>
                 <Tooltip
                   contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)',
-                    borderRadius: 12, color: 'var(--foreground)', fontSize: 13 }}
+                    borderRadius: 12, color: 'var(--foreground)', fontSize: 12 }}
                   formatter={(v: number) => [formatUGX(v)]}
                 />
               </PieChart>
             </ResponsiveContainer>
-          )}
-        </div>
-
-        <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <h3 className="mb-4 font-semibold" style={{ color: 'var(--foreground)' }}>Category Breakdown</h3>
-          {pieData.length === 0 ? (
-            <div className="flex h-52 items-center justify-center text-sm"
-              style={{ color: 'var(--muted-foreground)' }}>No expenses recorded</div>
-          ) : (
-            <div className="flex flex-col gap-3">
-              {pieData.slice(0, 6).map(({ name, value }, i) => {
-                const meta = categoryMeta[name]
-                const Icon = meta?.icon
-                const pct  = totalExpForPct > 0 ? Math.round((value / totalExpForPct) * 100) : 0
-                return (
-                  <div key={name} className="flex items-center gap-3">
-                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
-                      style={{
-                        background: meta?.tint ? `${meta.tint}22` : 'var(--surface-alt)',
-                        color: meta?.tint ?? 'var(--muted-foreground)',
-                      }}>
-                      {Icon && <Icon size={14} />}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="mb-1 flex items-center justify-between text-xs">
-                        <span className="font-medium" style={{ color: 'var(--foreground)' }}>{name}</span>
-                        <span style={{ color: 'var(--muted-foreground)' }}>{pct}%</span>
-                      </div>
-                      <div className="progress-track" style={{ height: 6 }}>
-                        <div className="progress-fill"
-                          style={{ width: `${pct}%`, background: PIE_COLORS[i % PIE_COLORS.length] }} />
-                      </div>
-                    </div>
-                    <div className="w-24 shrink-0 text-right text-xs font-semibold amount-expense">
-                      {formatUGX(value)}
-                    </div>
-                  </div>
-                )
-              })}
+            <div className="mt-4">
+              <CategoryBreakdown pieData={pieData} totalExpForPct={totalExpForPct} />
             </div>
-          )}
-        </div>
+          </>
+        )}
       </div>
 
-      {/* Financial tip */}
-      <div className="flex items-start gap-4 rounded-2xl p-5"
-        style={{ background: 'rgba(0,184,148,0.10)', border: '1px solid rgba(0,184,148,0.25)' }}>
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-          style={{ background: 'var(--primary)' }}>
-          <Lightbulb size={18} color="#fff" />
+      {/* Donut chart on desktop — always show in main column */}
+      <div className="hidden xl:block rounded-[18px] p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="mb-4 text-sm font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+          Spending by Category
         </div>
-        <div>
-          <div className="mb-1 text-sm font-bold" style={{ color: 'var(--primary)' }}>Financial Tip</div>
-          <div className="text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>
-            {financialTips[period]}
+        {pieData.length === 0 ? (
+          <div className="flex h-40 items-center justify-center text-sm" style={{ color: 'var(--muted-foreground)' }}>
+            No expenses recorded
           </div>
-        </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={200}>
+            <PieChart>
+              <Pie data={pieData} cx="50%" cy="50%" innerRadius={60} outerRadius={90}
+                paddingAngle={3} dataKey="value">
+                {pieData.map((_, i) => (
+                  <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
+                ))}
+              </Pie>
+              <Tooltip
+                contentStyle={{ background: 'var(--card)', border: '1px solid var(--border)',
+                  borderRadius: 12, color: 'var(--foreground)', fontSize: 12 }}
+                formatter={(v: number) => [formatUGX(v)]}
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        )}
       </div>
     </div>
   )
