@@ -29,7 +29,20 @@ export async function getTodayQuest(): Promise<{ quest: DailyQuestRow; completed
     .from(userTipSeeds)
     .where(eq(userTipSeeds.userId, userId))
 
-  if (!seedRow) return null
+  let seed: number
+  if (!seedRow) {
+    seed = Math.floor(Math.random() * 9000) + 1000
+    try {
+      await db.insert(userTipSeeds).values({ userId, seed })
+    } catch {
+      // race condition — another insert won; re-fetch
+      const [refetched] = await db.select({ seed: userTipSeeds.seed }).from(userTipSeeds).where(eq(userTipSeeds.userId, userId))
+      if (!refetched) return null
+      seed = refetched.seed
+    }
+  } else {
+    seed = seedRow.seed
+  }
 
   const allQuests = await db
     .select()
@@ -39,7 +52,7 @@ export async function getTodayQuest(): Promise<{ quest: DailyQuestRow; completed
   if (allQuests.length === 0) return null
 
   const dayIndex = Math.floor((Date.now() + 3 * 60 * 60 * 1000) / 86400000)
-  const questIndex = (seedRow.seed + dayIndex) % allQuests.length
+  const questIndex = (seed + dayIndex) % allQuests.length
   const quest = allQuests[questIndex]
 
   const dateKey = todayKeyEAT()
