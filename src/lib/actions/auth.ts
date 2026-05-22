@@ -1,9 +1,9 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { users, categories, accounts } from '@/lib/schema'
+import { users, categories, accounts, badges } from '@/lib/schema'
 import bcrypt from 'bcryptjs'
-import { eq } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 
 const DEFAULT_EXPENSE_CATEGORIES = [
   { name: 'Food',              icon: 'utensils',    color: '#F59E0B' },
@@ -37,6 +37,14 @@ const DEFAULT_INVESTMENT_CATEGORIES = [
 const DEFAULT_ACCOUNTS = [
   { name: 'MTN Mobile Money', type: 'mobile_money' as const, balance: 0 },
   { name: 'Cash',             type: 'cash'         as const, balance: 0 },
+]
+
+const BASE_BADGES = [
+  { name: 'First Steps',   description: 'Logged your first transaction',          icon: '🐾', xpReward: 0,  triggerEvent: 'first_transaction' },
+  { name: 'Streak Master', description: 'Reached a 7-day streak',                 icon: '🔥', xpReward: 50, triggerEvent: 'streak_7'          },
+  { name: 'Goal Getter',   description: 'Completed your first goal',              icon: '🎯', xpReward: 0,  triggerEvent: 'goal_completed'    },
+  { name: 'Budget Boss',   description: 'Stayed under budget for a full period',  icon: '💰', xpReward: 20, triggerEvent: 'budget_completed'  },
+  { name: 'Team Player',   description: 'Joined a group savings goal',            icon: '🤝', xpReward: 0,  triggerEvent: 'group_joined'      },
 ]
 
 const USERNAME_REGEX = /^[a-z0-9_]{3,20}$/
@@ -91,6 +99,11 @@ export async function registerUser(formData: FormData) {
   await db.insert(accounts).values(
     DEFAULT_ACCOUNTS.map((a) => ({ ...a, userId: user.id })),
   )
+
+  const [{ count }] = await db.select({ count: sql<number>`count(*)` }).from(badges)
+  if (Number(count) === 0) {
+    await db.insert(badges).values(BASE_BADGES)
+  }
 
   return { success: true }
 }

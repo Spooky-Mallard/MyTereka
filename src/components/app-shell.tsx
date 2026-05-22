@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Bell, House, BarChart2, Plus, Target, User, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles } from 'lucide-react'
+import { Bell, House, BarChart2, Plus, Target, User, Wallet, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
@@ -17,7 +17,7 @@ const mobileNavItems = [
   { title: 'Analytics', url: '/analytics', icon: BarChart2 },
   { title: 'Add',       url: '#',          icon: Plus,   fab: true },
   { title: 'Goals',     url: '/goals',     icon: Target },
-  { title: 'Profile',   url: '/profile',   icon: User },
+  { title: 'Budgets',   url: '/budgets',   icon: Wallet },
 ]
 
 function MobileBottomNav({ onAdd }: { onAdd: () => void }) {
