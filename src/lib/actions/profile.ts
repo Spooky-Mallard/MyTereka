@@ -2,8 +2,8 @@
 
 import { auth } from '@/lib/auth'
 import { db } from '@/lib/db'
-import { users, userBadges, badges } from '@/lib/schema'
-import { eq, desc } from 'drizzle-orm'
+import { users, userBadges, badges, transactions, streakHistory } from '@/lib/schema'
+import { eq, desc, gte, and, sql } from 'drizzle-orm'
 
 export type ProfileData = {
   id:             string
@@ -85,4 +85,58 @@ export async function getUserCategories(): Promise<CategoryOption[]> {
   const { eq } = await import('drizzle-orm')
   return db.select({ id: categories.id, name: categories.name, type: categories.type, icon: categories.icon, color: categories.color })
     .from(categories).where(eq(categories.userId, session.user.id))
+}
+
+export type StreakHistoryRow = {
+  id:        string
+  startDate: string
+  endDate:   string | null
+  length:    number
+}
+
+export async function getStreakPageData(): Promise<{
+  streakCount:     number
+  longestStreak:   number
+  totalActiveDays: number
+  activeDates:     string[]
+  history:         StreakHistoryRow[]
+}> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const userId = session.user.id
+
+  const ninetyDaysAgo = new Date(Date.now() + 3 * 60 * 60 * 1000 - 90 * 86400000)
+    .toISOString().split('T')[0]
+
+  const [userRow, txDates, historyRows] = await Promise.all([
+    db.select({ streakCount: users.streakCount })
+      .from(users).where(eq(users.id, userId))
+      .then((r) => r[0]),
+
+    db.selectDistinct({ date: transactions.date })
+      .from(transactions)
+      .where(and(eq(transactions.userId, userId), gte(transactions.date, ninetyDaysAgo)))
+      .then((r) => r.map((x) => x.date)),
+
+    db.select({
+        id:        streakHistory.id,
+        startDate: streakHistory.startDate,
+        endDate:   streakHistory.endDate,
+        length:    streakHistory.length,
+      })
+      .from(streakHistory)
+      .where(eq(streakHistory.userId, userId))
+      .orderBy(desc(streakHistory.startDate))
+      .limit(10),
+  ])
+
+  const longestStreak = historyRows.reduce((max, r) => Math.max(max, r.length), 0)
+
+  return {
+    streakCount:     userRow?.streakCount ?? 0,
+    longestStreak,
+    totalActiveDays: txDates.length,
+    activeDates:     txDates,
+    history:         historyRows,
+  }
 }

@@ -36,6 +36,8 @@ export const users = pgTable('users', {
   streakCount:    integer('streak_count').default(0).notNull(),
   lastActiveDate: date('last_active_date'),
   createdAt:      timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+  appRating:     integer('app_rating'),
+  ratingAskedAt: timestamp('rating_asked_at', { withTimezone: true }),
 })
 
 export const accounts = pgTable('accounts', {
@@ -216,4 +218,23 @@ export const notifications = pgTable('notifications', {
   body:      text('body'),
   readAt:    timestamp('read_at', { withTimezone: true }),
   createdAt: timestamp('created_at', { withTimezone: true }).defaultNow().notNull(),
+})
+
+export const streakHistory = pgTable('streak_history', {
+  id:        uuid('id').defaultRandom().primaryKey(),
+  userId:    uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).notNull(),
+  startDate: date('start_date').notNull(),
+  endDate:   date('end_date'),
+  length:    integer('length').notNull(),
+})
+
+export const financialTips = pgTable('financial_tips', {
+  id:       integer('id').primaryKey().generatedAlwaysAsIdentity(),
+  body:     text('body').notNull(),
+  category: varchar('category', { length: 50 }),
+})
+
+export const userTipSeeds = pgTable('user_tip_seeds', {
+  userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).primaryKey(),
+  seed:   integer('seed').notNull(),
 })

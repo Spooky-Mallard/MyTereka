@@ -1,7 +1,7 @@
 'use server'
 
 import { db } from '@/lib/db'
-import { transactions, accounts, budgets, users, categories, goals } from '@/lib/schema'
+import { transactions, accounts, budgets, users, categories, goals, streakHistory } from '@/lib/schema'
 import { auth } from '@/lib/auth'
 import { eq, and, desc, sql, gte, lte } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
@@ -10,9 +10,17 @@ import { calcMoMoFee } from '@/lib/momo-fees'
 
 // ─────────────────────────────────────────────────────────────────────────────
 
+function todayEAT(): string {
+  return new Date(Date.now() + 3 * 60 * 60 * 1000).toISOString().split('T')[0]
+}
+
+function yesterdayEAT(): string {
+  return new Date(Date.now() + 3 * 60 * 60 * 1000 - 86400000).toISOString().split('T')[0]
+}
+
 export async function updateStreak(userId: string) {
-  const today     = todayISO()
-  const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0]
+  const today     = todayEAT()
+  const yesterday = yesterdayEAT()
 
   const [user] = await db
     .select({ streakCount: users.streakCount, lastActiveDate: users.lastActiveDate })
@@ -21,13 +29,40 @@ export async function updateStreak(userId: string) {
 
   if (!user || user.lastActiveDate === today) return
 
-  const newStreak =
-    user.lastActiveDate === yesterday ? user.streakCount + 1 : 1
+  const continued = user.lastActiveDate === yesterday
+  const newStreak = continued ? user.streakCount + 1 : 1
 
   await db
     .update(users)
     .set({ streakCount: newStreak, lastActiveDate: today })
     .where(eq(users.id, userId))
+
+  if (continued) {
+    const [open] = await db
+      .select({ id: streakHistory.id })
+      .from(streakHistory)
+      .where(and(eq(streakHistory.userId, userId), sql`end_date IS NULL`))
+    if (open) {
+      await db
+        .update(streakHistory)
+        .set({ endDate: today, length: newStreak })
+        .where(eq(streakHistory.id, open.id))
+    } else {
+      await db.insert(streakHistory).values({ userId, startDate: today, endDate: null, length: 1 })
+    }
+  } else {
+    const [open] = await db
+      .select({ id: streakHistory.id, length: streakHistory.length })
+      .from(streakHistory)
+      .where(and(eq(streakHistory.userId, userId), sql`end_date IS NULL`))
+    if (open) {
+      await db
+        .update(streakHistory)
+        .set({ endDate: yesterday, length: open.length })
+        .where(eq(streakHistory.id, open.id))
+    }
+    await db.insert(streakHistory).values({ userId, startDate: today, endDate: null, length: 1 })
+  }
 
   if (newStreak === 7) {
     await awardXP(userId, 'streak_7', 50, '7-day streak milestone')
