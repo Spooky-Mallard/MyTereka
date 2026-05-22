@@ -204,9 +204,11 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
               {user.xp} / {xpNext} XP
             </div>
           </div>
-          <div className="rounded-xl p-3" style={{ background: 'var(--surface-alt)' }}>
-            <StreakDots streak={user.streak} />
-          </div>
+          <Link href="/streak" className="block rounded-xl" style={{ textDecoration: 'none' }}>
+            <div className="rounded-xl p-3" style={{ background: 'var(--surface-alt)' }}>
+              <StreakDots streak={user.streak} />
+            </div>
+          </Link>
         </div>
       </div>
 
