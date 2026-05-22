@@ -1,12 +1,13 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, useTransition } from 'react'
-import { Eye, EyeOff, ChevronRight, Flame, Star, TrendingUp, TrendingDown, Sparkles, X } from 'lucide-react'
+import { useState, useTransition, useEffect } from 'react'
+import { Eye, EyeOff, ChevronRight, Flame, Star, TrendingUp, TrendingDown, Sparkles, X, Wallet } from 'lucide-react'
 import { formatUGX } from '@/lib/format'
 import { categoryMeta } from '@/lib/mock-data'
 import { UsernameSetupBanner } from '@/components/username-setup-banner'
 import { markNotificationRead } from '@/lib/actions/notifications'
+import { useSetRightRail } from '@/components/right-rail-context'
 import type { NudgeCard } from '@/lib/actions/nudges'
 
 const LEVEL_XP: Record<string, number> = {
@@ -16,40 +17,15 @@ const LEVEL_XP: Record<string, number> = {
 const RING_R = 30
 const RING_C = 2 * Math.PI * RING_R
 
-function GoalRingMini({ pct }: { pct: number }) {
+function GoalRingMini({ pct, color = 'var(--primary)' }: { pct: number; color?: string }) {
   const offset = RING_C * (1 - pct / 100)
   return (
-    <svg width="72" height="72" viewBox="0 0 72 72" className="goal-ring-svg">
+    <svg width="64" height="64" viewBox="0 0 72 72" className="goal-ring-svg">
       <circle cx="36" cy="36" r={RING_R} strokeWidth="6" className="goal-ring-bg" />
       <circle cx="36" cy="36" r={RING_R} strokeWidth="6"
-        strokeDasharray={RING_C} strokeDashoffset={offset} className="goal-ring-fill" />
+        strokeDasharray={RING_C} strokeDashoffset={offset}
+        className="goal-ring-fill" style={{ stroke: color }} />
     </svg>
-  )
-}
-
-function StreakDots({ streak }: { streak: number }) {
-  const today     = new Date()
-  const dayOfWeek = today.getDay()
-  const labels    = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
-  const dots      = labels.map((_, i) => i <= dayOfWeek && (dayOfWeek - i) < streak)
-
-  return (
-    <div className="flex flex-col gap-2">
-      <div className="flex items-center gap-2">
-        <Flame size={16} style={{ color: 'var(--warning)' }} />
-        <span className="text-sm font-bold" style={{ color: 'var(--warning)' }}>
-          {streak}-day streak
-        </span>
-      </div>
-      <div className="flex gap-1.5">
-        {dots.map((active, i) => (
-          <div key={i} className="flex flex-col items-center gap-1">
-            <div className={active ? 'streak-dot' : 'streak-dot-empty'} />
-            <span className="text-[9px]" style={{ color: 'var(--muted-foreground)' }}>{labels[i]}</span>
-          </div>
-        ))}
-      </div>
-    </div>
   )
 }
 
@@ -73,10 +49,121 @@ type Props = {
   dailyTip: { body: string; category: string | null } | null
 }
 
+function DashboardRightRail({ goals, budgets, user, xpNext, xpPct }: {
+  goals: Props['goals']
+  budgets: Props['budgets']
+  user: Props['user']
+  xpNext: number
+  xpPct: number
+}) {
+  return (
+    <>
+      {/* Level + XP */}
+      <div className="rail-card">
+        <div className="eyebrow mb-3">Your Progress</div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="level-badge">{user.level}</span>
+          <div className="flex items-center gap-1">
+            <Star size={13} style={{ color: 'var(--warning)' }} />
+            <span className="text-xs font-bold" style={{ color: 'var(--warning)', fontFamily: 'Poppins, sans-serif' }}>
+              {user.xp} XP
+            </span>
+          </div>
+        </div>
+        <div className="xp-bar"><div className="xp-bar-fill" style={{ width: `${xpPct}%` }} /></div>
+        <div className="mt-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          {user.xp} / {xpNext} XP to next level
+        </div>
+      </div>
+
+      {/* Goals */}
+      <div className="rail-card">
+        <div className="flex items-center justify-between mb-3">
+          <div className="eyebrow">Active Quests</div>
+          <Link href="/goals" className="text-xs font-semibold transition hover:opacity-70"
+            style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+            See all
+          </Link>
+        </div>
+        {goals.length === 0 ? (
+          <div className="py-4 text-center text-xs" style={{ color: 'var(--muted-foreground)' }}>
+            No active goals
+          </div>
+        ) : (
+          <div className="flex flex-col gap-3">
+            {goals.map((g) => {
+              const pct = Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100))
+              return (
+                <div key={g.id} className="flex items-center gap-3">
+                  <div className="relative flex shrink-0 items-center justify-center">
+                    <GoalRingMini pct={pct} />
+                    <span className="absolute text-base">{g.icon ?? '🎯'}</span>
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                      {g.name}
+                    </div>
+                    <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                      {formatUGX(g.currentAmount)} / {formatUGX(g.targetAmount)}
+                    </div>
+                  </div>
+                  <div className="text-sm font-bold" style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>{pct}%</div>
+                </div>
+              )
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Budgets */}
+      {budgets.length > 0 && (
+        <div className="rail-card">
+          <div className="flex items-center justify-between mb-3">
+            <div className="eyebrow">Budgets</div>
+            <Link href="/budgets" className="text-xs font-semibold transition hover:opacity-70"
+              style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+              Adjust
+            </Link>
+          </div>
+          <div className="flex flex-col gap-3">
+            {budgets.map((b) => {
+              const pct   = Math.min(100, Math.round((b.spentAmount / b.limitAmount) * 100))
+              const over  = b.spentAmount > b.limitAmount
+              const color = over ? 'var(--danger)' : pct >= 70 ? 'var(--warning)' : 'var(--success)'
+              return (
+                <div key={b.id}>
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-xs font-semibold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                      {b.categoryName}
+                    </span>
+                    <span className="text-xs" style={{ color: over ? 'var(--danger)' : 'var(--muted-foreground)' }}>
+                      {pct}%
+                    </span>
+                  </div>
+                  <div className="progress-track">
+                    <div className="progress-fill" style={{ width: `${pct}%`, background: color }} />
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
 export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals, nudges: initialNudges, dailyTip }: Props) {
   const [hideBalance, setHideBalance] = useState(true)
   const [dismissedNudges, setDismissedNudges] = useState<Set<string>>(new Set())
   const [, startDismiss] = useTransition()
+
+  const xpNext = LEVEL_XP[user.level] ?? 100
+  const xpPct  = Math.min(100, Math.round((user.xp / xpNext) * 100))
+
+  useSetRightRail(
+    <DashboardRightRail goals={goals} budgets={budgets} user={user} xpNext={xpNext} xpPct={xpPct} />
+  )
 
   function dismissNudge(nudge: NudgeCard) {
     setDismissedNudges((prev) => new Set([...prev, nudge.id]))
@@ -90,43 +177,40 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
   const totalIncome  = recentTxns.filter((t) => t.type === 'income').reduce((s, t) => s + t.amount, 0)
   const totalExpense = recentTxns.filter((t) => t.type === 'expense').reduce((s, t) => s + t.amount, 0)
 
-  const xpNext = LEVEL_XP[user.level] ?? 100
-  const xpPct  = Math.min(100, Math.round((user.xp / xpNext) * 100))
-
   const firstName = user.name.split(' ')[0] ?? user.name
   const hour      = new Date().getHours()
   const greeting  = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
 
+  /* week streak dots */
+  const today     = new Date()
+  const dayOfWeek = today.getDay()
+  const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+  const streakDots = dayLabels.map((_, i) => i <= dayOfWeek && (dayOfWeek - i) < user.streak)
+
   return (
-    <div className="mx-auto flex max-w-6xl flex-col gap-6">
+    <div className="mx-auto flex max-w-2xl flex-col gap-5">
       <UsernameSetupBanner initialUsername={user.username} />
-      <div className="flex flex-wrap items-end justify-between gap-2">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight md:text-3xl"
-            style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
-            {greeting}, {firstName} 👋
-          </h1>
-          <p className="mt-0.5 text-sm" style={{ color: 'var(--muted-foreground)' }}>
-            Here&apos;s how your money moved this month.
-          </p>
+
+      {/* Greeting */}
+      <div className="flex items-center gap-3">
+        <div
+          className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full text-sm font-bold text-white"
+          style={{ background: 'var(--gradient-primary)' }}
+        >
+          {firstName[0]?.toUpperCase()}
         </div>
-        <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-          {new Date().toLocaleDateString('en-UG', { weekday: 'long', month: 'long', day: 'numeric' })}
+        <div className="flex-1">
+          <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>{greeting} 👋</div>
+          <div className="text-base font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            {firstName}
+          </div>
+        </div>
+        <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+          {new Date().toLocaleDateString('en-UG', { weekday: 'short', month: 'short', day: 'numeric' })}
         </div>
       </div>
 
-      {dailyTip && (
-        <div className="card-base flex gap-3 items-start">
-          <div className="mt-0.5 shrink-0 text-lg">💡</div>
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide mb-1" style={{ color: 'var(--primary)' }}>
-              Tip of the Day
-            </p>
-            <p className="text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>{dailyTip.body}</p>
-          </div>
-        </div>
-      )}
-
+      {/* Nudges */}
       {visibleNudges.length > 0 && (
         <div className="flex flex-col gap-2">
           {visibleNudges.map((n) => (
@@ -144,12 +228,9 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
                 )}
                 {' '}is cheering you on — keep your streak alive!
               </span>
-              <button
-                onClick={() => dismissNudge(n)}
+              <button onClick={() => dismissNudge(n)}
                 className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full transition hover:opacity-70"
-                style={{ color: 'var(--muted-foreground)' }}
-                aria-label="Dismiss"
-              >
+                style={{ color: 'var(--muted-foreground)' }} aria-label="Dismiss">
                 <X size={13} />
               </button>
             </div>
@@ -157,211 +238,181 @@ export function DashboardClient({ user, totalBalance, recentTxns, budgets, goals
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Balance card */}
+      {/* HERO — streak card */}
+      <Link href="/streak" style={{ textDecoration: 'none' }}>
         <div
-          className="relative overflow-hidden rounded-2xl p-6 text-white lg:col-span-2"
-          style={{ background: 'var(--gradient-primary)', boxShadow: '0 8px 32px rgba(0,184,148,0.30)' }}
+          className="relative overflow-hidden rounded-[22px] p-4"
+          style={{
+            background: 'linear-gradient(160deg, #F59E0B 0%, #D97706 70%)',
+            boxShadow: '0 12px 30px rgba(245,158,11,0.28)',
+            color: '#fff',
+          }}
         >
-          <div className="pointer-events-none absolute -right-12 -top-12 h-48 w-48 rounded-full"
-            style={{ background: 'rgba(255,255,255,0.10)', filter: 'blur(40px)' }} />
+          <div className="pointer-events-none absolute -right-8 -top-8 h-36 w-36 rounded-full"
+            style={{ background: 'rgba(255,255,255,0.12)', filter: 'blur(30px)' }} />
 
-          <div className="relative flex flex-col gap-5">
-            <div className="flex items-center justify-between">
-              <span className="text-sm font-medium opacity-90">Total Balance</span>
-              <button onClick={() => setHideBalance((h) => !h)}
-                className="flex h-8 w-8 items-center justify-center rounded-full transition hover:opacity-70"
-                style={{ background: 'rgba(255,255,255,0.18)' }}>
-                {hideBalance ? <EyeOff size={15} /> : <Eye size={15} />}
-              </button>
+          <div className="relative flex items-center gap-4">
+            <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-[20px]"
+              style={{ background: 'rgba(255,255,255,0.18)', backdropFilter: 'blur(6px)' }}>
+              <Flame size={36} strokeWidth={2.4} />
             </div>
-            <div className="text-4xl font-bold tracking-tight md:text-5xl"
-              style={{ fontFamily: 'Poppins, sans-serif' }}>
-              {hideBalance ? '• • • • • •' : formatUGX(totalBalance)}
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { label: 'Income',   icon: TrendingUp,  value: totalIncome  },
-                { label: 'Expenses', icon: TrendingDown, value: totalExpense },
-              ].map(({ label, icon: Icon, value }) => (
-                <div key={label} className="rounded-xl p-3"
-                  style={{ background: 'rgba(255,255,255,0.14)', backdropFilter: 'blur(8px)' }}>
-                  <div className="flex items-center gap-1.5 text-xs opacity-80">
-                    <Icon size={13} /><span>{label}</span>
-                  </div>
-                  <div className="mt-1 text-lg font-semibold" style={{ fontFamily: 'Poppins, sans-serif' }}>
-                    {hideBalance ? '• • •' : formatUGX(value)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Gamification panel */}
-        <div className="flex flex-col gap-4 rounded-2xl p-5"
-          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <div className="flex items-center justify-between">
-            <div>
-              <div className="text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>Level</div>
-              <span className="level-badge mt-1">{user.level}</span>
-            </div>
-            <div className="flex items-center gap-1">
-              <Star size={14} style={{ color: 'var(--warning)' }} />
-              <span className="text-sm font-bold" style={{ color: 'var(--warning)' }}>{user.xp} XP</span>
-            </div>
-          </div>
-          <div>
-            <div className="xp-bar"><div className="xp-bar-fill" style={{ width: `${xpPct}%` }} /></div>
-            <div className="mt-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-              {user.xp} / {xpNext} XP
-            </div>
-          </div>
-          <Link href="/streak" className="block rounded-xl" style={{ textDecoration: 'none' }}>
-            <div className="rounded-xl p-3" style={{ background: 'var(--surface-alt)' }}>
-              <StreakDots streak={user.streak} />
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      <div className="grid gap-4 lg:grid-cols-3">
-        {/* Recent transactions */}
-        <section className="rounded-2xl p-6 lg:col-span-2"
-          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold" style={{ color: 'var(--foreground)' }}>Recent Transactions</h3>
-            <Link href="/transactions"
-              className="flex items-center gap-1 text-sm font-medium transition hover:opacity-70"
-              style={{ color: 'var(--primary)' }}>
-              See all <ChevronRight size={14} />
-            </Link>
-          </div>
-
-          {recentTxns.length === 0 ? (
-            <div className="flex flex-col items-center gap-3 py-8 text-center">
-              <div className="text-4xl">💸</div>
-              <div className="font-semibold" style={{ color: 'var(--foreground)' }}>No transactions yet</div>
-              <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>
-                Tap + to log your first transaction
+            <div className="flex-1">
+              <div className="text-[11px] font-semibold uppercase tracking-wider opacity-85">Your streak</div>
+              <div className="mt-0.5 leading-none" style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 38, letterSpacing: '-0.02em' }}>
+                {user.streak} <span style={{ fontSize: 14, fontWeight: 600, opacity: 0.85 }}>days</span>
+              </div>
+              <div className="mt-1 text-[11px] opacity-90">
+                Log today to keep it alive
               </div>
             </div>
-          ) : (
-            <ul className="flex flex-col gap-0">
-              {recentTxns.map((t, i) => {
-                const meta     = categoryMeta[t.categoryName]
-                const Icon     = meta?.icon
-                const isIncome = t.type === 'income'
-                return (
-                  <li key={t.id} className="flex items-center gap-3 py-3"
-                    style={{ borderTop: i > 0 ? '1px solid var(--border)' : undefined }}>
-                    <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-                      style={{
-                        background: meta?.tint ? `${meta.tint}22` : t.categoryColor ? `${t.categoryColor}22` : 'var(--surface-alt)',
-                        color: meta?.tint ?? t.categoryColor ?? 'var(--muted-foreground)',
-                      }}>
-                      {Icon && <Icon size={16} />}
-                    </span>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                        {t.note || t.categoryName}
-                      </div>
-                      <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                        {t.categoryName} · {t.accountName}
-                      </div>
-                    </div>
-                    <div className={`text-sm font-semibold ${isIncome ? 'amount-income' : 'amount-expense'}`}>
-                      {isIncome ? '+' : '−'}{formatUGX(t.amount)}
-                    </div>
-                  </li>
-                )
-              })}
-            </ul>
-          )}
-        </section>
-
-        {/* Savings targets */}
-        <section className="rounded-2xl p-6"
-          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold" style={{ color: 'var(--foreground)' }}>Savings Goals</h3>
-            <Link href="/goals"
-              className="flex items-center gap-1 text-sm font-medium transition hover:opacity-70"
-              style={{ color: 'var(--primary)' }}>
-              See all <ChevronRight size={14} />
-            </Link>
           </div>
 
-          {goals.length === 0 ? (
-            <div className="flex flex-col items-center gap-2 py-6 text-center">
-              <div className="text-3xl">🎯</div>
-              <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>No goals yet</div>
-              <Link href="/goals"
-                className="mt-1 rounded-full px-4 py-1.5 text-xs font-semibold text-white"
-                style={{ background: 'var(--primary)' }}>
-                Create goal
-              </Link>
-            </div>
-          ) : (
-            <div className="flex flex-col gap-4">
-              {goals.map((g) => {
-                const pct = Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100))
-                return (
-                  <div key={g.id} className="flex items-center gap-3">
-                    <div className="relative flex shrink-0 items-center justify-center">
-                      <GoalRingMini pct={pct} />
-                      <span className="absolute text-lg">{g.icon ?? '🎯'}</span>
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
-                        {g.name}
-                      </div>
-                      <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                        {formatUGX(g.currentAmount)} of {formatUGX(g.targetAmount)}
-                      </div>
-                    </div>
-                    <div className="text-sm font-bold" style={{ color: 'var(--primary)' }}>{pct}%</div>
-                  </div>
-                )
-              })}
-            </div>
-          )}
-        </section>
+          {/* Week dots */}
+          <div className="relative mt-3 flex justify-between">
+            {streakDots.map((active, i) => (
+              <div key={i} className="flex flex-col items-center gap-1">
+                <div style={{
+                  width: 10, height: 10, borderRadius: 9999,
+                  background: active ? '#fff' : 'rgba(255,255,255,0.3)',
+                  boxShadow: active ? '0 0 0 2px rgba(255,255,255,0.25)' : 'none',
+                }} />
+                <span style={{ fontSize: 9, fontFamily: 'Poppins, sans-serif', fontWeight: 600, opacity: 0.85 }}>
+                  {dayLabels[i]}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </Link>
+
+      {/* Balance — secondary */}
+      <div className="flex items-center gap-4 rounded-[18px] p-4"
+        style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--border)' }}>
+        <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px]"
+          style={{ background: 'var(--gradient-primary)' }}>
+          <Wallet size={20} strokeWidth={2} color="#fff" />
+        </div>
+        <div className="flex-1">
+          <div className="text-[11px] font-semibold uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>
+            Balance
+          </div>
+          <div className="mt-0.5 text-2xl font-bold tracking-tight" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+            {hideBalance ? '• • • • •' : formatUGX(totalBalance)}
+          </div>
+        </div>
+        <div className="flex flex-col items-end gap-1 text-right">
+          <div className="text-[11px] font-semibold" style={{ color: 'var(--success)' }}>
+            + {hideBalance ? '• • •' : formatUGX(totalIncome)}
+          </div>
+          <div className="text-[11px] font-semibold" style={{ color: 'var(--danger)' }}>
+            − {hideBalance ? '• • •' : formatUGX(totalExpense)}
+          </div>
+        </div>
+        <button onClick={() => setHideBalance((h) => !h)}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full transition hover:opacity-70"
+          style={{ background: 'var(--surface-alt)', color: 'var(--muted-foreground)' }}>
+          {hideBalance ? <EyeOff size={14} /> : <Eye size={14} />}
+        </button>
       </div>
 
-      {/* Budget snapshot */}
-      {budgets.length > 0 && (
-        <section className="rounded-2xl p-6"
-          style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="font-semibold" style={{ color: 'var(--foreground)' }}>Budget Overview</h3>
-            <Link href="/budgets"
-              className="flex items-center gap-1 text-sm font-medium transition hover:opacity-70"
-              style={{ color: 'var(--primary)' }}>
-              See all <ChevronRight size={14} />
+      {/* Goals — horizontal carousel */}
+      {goals.length > 0 && (
+        <div>
+          <div className="mb-2 flex items-center justify-between">
+            <div className="eyebrow">Active Quests</div>
+            <Link href="/goals" className="flex items-center gap-1 text-xs font-semibold transition hover:opacity-70"
+              style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+              See all <ChevronRight size={11} />
             </Link>
           </div>
-          <div className="grid gap-4 sm:grid-cols-3">
-            {budgets.map((b) => {
-              const pct   = Math.min(100, Math.round((b.spentAmount / b.limitAmount) * 100))
-              const over  = b.spentAmount > b.limitAmount
-              const color = over ? 'var(--danger)' : pct >= 70 ? 'var(--warning)' : 'var(--success)'
+          <div className="flex gap-3 overflow-x-auto pb-1" style={{ scrollbarWidth: 'none' }}>
+            {goals.map((g) => {
+              const pct = Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100))
               return (
-                <div key={b.id}>
-                  <div className="mb-1.5 flex items-center justify-between text-sm">
-                    <span className="font-medium" style={{ color: 'var(--foreground)' }}>{b.categoryName}</span>
-                    <span style={{ color: over ? 'var(--danger)' : 'var(--muted-foreground)' }}>
-                      {formatUGX(b.spentAmount)} / {formatUGX(b.limitAmount)}
-                    </span>
+                <Link key={g.id} href="/goals" style={{ textDecoration: 'none', flexShrink: 0 }}>
+                  <div className="relative overflow-hidden rounded-[16px] p-3 w-[130px]"
+                    style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--border)' }}>
+                    <div className="pointer-events-none absolute -right-2 -top-2 h-12 w-12 rounded-full opacity-20"
+                      style={{ background: 'var(--primary)' }} />
+                    <div className="text-xl">{g.icon ?? '🎯'}</div>
+                    <div className="mt-1.5 truncate text-xs font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                      {g.name}
+                    </div>
+                    <div className="mt-1.5 h-1.5 overflow-hidden rounded-full" style={{ background: 'var(--surface-alt)' }}>
+                      <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--primary)' }} />
+                    </div>
+                    <div className="mt-1 text-xs font-bold" style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+                      {pct}%
+                    </div>
                   </div>
-                  <div className="progress-track">
-                    <div className="progress-fill" style={{ width: `${pct}%`, background: color }} />
-                  </div>
-                </div>
+                </Link>
               )
             })}
           </div>
-        </section>
+        </div>
+      )}
+
+      {/* Recent transactions */}
+      <section className="rounded-[18px] p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+        <div className="mb-3 flex items-center justify-between">
+          <div className="eyebrow">Today's Moves</div>
+          <Link href="/transactions" className="flex items-center gap-1 text-xs font-semibold transition hover:opacity-70"
+            style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+            See all <ChevronRight size={11} />
+          </Link>
+        </div>
+
+        {recentTxns.length === 0 ? (
+          <div className="flex flex-col items-center gap-3 py-8 text-center">
+            <div className="text-4xl">💸</div>
+            <div className="font-semibold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>No transactions yet</div>
+            <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Tap + to log your first transaction</div>
+          </div>
+        ) : (
+          <ul className="flex flex-col">
+            {recentTxns.map((t, i) => {
+              const meta     = categoryMeta[t.categoryName]
+              const Icon     = meta?.icon
+              const tint     = meta?.tint ?? t.categoryColor ?? 'var(--muted-foreground)'
+              const isIncome = t.type === 'income'
+              return (
+                <li key={t.id} className="flex items-center gap-3 py-2.5"
+                  style={{ borderTop: i > 0 ? '1px solid var(--border)' : undefined }}>
+                  <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px]"
+                    style={{ background: `${tint}22`, color: tint }}>
+                    {Icon ? <Icon size={15} /> : <span className="text-sm">{t.categoryName[0]}</span>}
+                  </span>
+                  <div className="flex-1 min-w-0">
+                    <div className="truncate text-sm font-semibold" style={{ color: 'var(--foreground)' }}>
+                      {t.note || t.categoryName}
+                    </div>
+                    <div className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
+                      {t.categoryName} · {t.accountName}
+                    </div>
+                  </div>
+                  <div className={`text-sm font-bold ${isIncome ? 'amount-income' : 'amount-expense'}`}
+                    style={{ fontFamily: 'Poppins, sans-serif' }}>
+                    {isIncome ? '+' : '−'}{formatUGX(t.amount)}
+                  </div>
+                </li>
+              )
+            })}
+          </ul>
+        )}
+      </section>
+
+      {/* Daily tip */}
+      {dailyTip && (
+        <div className="flex gap-3 items-start rounded-[18px] p-4"
+          style={{ background: 'rgba(0,184,148,0.10)', border: '1px solid rgba(0,184,148,0.25)' }}>
+          <div className="mt-0.5 shrink-0 text-lg">💡</div>
+          <div>
+            <div className="text-xs font-bold uppercase tracking-wide mb-1" style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>
+              Tip of the Day
+            </div>
+            <div className="text-sm leading-relaxed" style={{ color: 'var(--foreground)' }}>{dailyTip.body}</div>
+          </div>
+        </div>
       )}
     </div>
   )
