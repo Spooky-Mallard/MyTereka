@@ -1,6 +1,6 @@
 import {
   pgTable, uuid, varchar, text, integer, boolean,
-  timestamp, date, pgEnum,
+  timestamp, date, pgEnum, serial, unique,
 } from 'drizzle-orm/pg-core'
 
 export const accountTypeEnum     = pgEnum('account_type',       ['cash', 'mobile_money', 'bank', 'sacco'])
@@ -17,6 +17,7 @@ export const notificationTypeEnum = pgEnum('notification_type', [
   'shared_goal_contribution',
   'shared_goal_completed',
   'shared_goal_removed',
+  'quest_completed',
 ])
 export const sharedGoalLeavePolicyEnum = pgEnum('shared_goal_leave_policy', ['refundable', 'forfeit'])
 export const sharedGoalMemberStatusEnum = pgEnum('shared_goal_member_status', ['invited', 'active', 'left', 'removed', 'declined'])
@@ -238,3 +239,21 @@ export const userTipSeeds = pgTable('user_tip_seeds', {
   userId: uuid('user_id').references(() => users.id, { onDelete: 'cascade' }).primaryKey(),
   seed:   integer('seed').notNull(),
 })
+
+export const dailyQuests = pgTable('daily_quests', {
+  id:          serial('id').primaryKey(),
+  title:       varchar('title', { length: 120 }).notNull(),
+  description: varchar('description', { length: 255 }),
+  xpReward:    integer('xp_reward').notNull().default(25),
+  triggerType: varchar('trigger_type', { length: 50 }).notNull(),
+})
+
+export const userQuestCompletions = pgTable('user_quest_completions', {
+  id:          serial('id').primaryKey(),
+  userId:      uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+  questId:     integer('quest_id').notNull().references(() => dailyQuests.id),
+  completedAt: timestamp('completed_at', { withTimezone: true }).defaultNow(),
+  dateKey:     varchar('date_key', { length: 10 }).notNull(),
+}, (t) => ({
+  uniq: unique().on(t.userId, t.questId, t.dateKey),
+}))

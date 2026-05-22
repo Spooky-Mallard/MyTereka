@@ -6,6 +6,7 @@ export type NotificationType =
   | 'shared_goal_contribution'
   | 'shared_goal_completed'
   | 'shared_goal_removed'
+  | 'quest_completed'
 
 export type NotificationRow = {
   id:        string

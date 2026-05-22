@@ -5,6 +5,7 @@ import { db } from '@/lib/db'
 import { goals, goalContributions, goalMilestones, goalCoins, accounts, badges } from '@/lib/schema'
 import { eq, and, sql, inArray } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
+import { completeQuestIfApplicable } from './quests'
 
 export async function createGoal(data: {
   name:         string
@@ -134,6 +135,8 @@ export async function contributeToGoal(
       coinsCollected.push(idx)
     }
   }
+
+  await completeQuestIfApplicable('contribute_goal')
 
   return {
     completed:              newAmount >= goal.targetAmount,
