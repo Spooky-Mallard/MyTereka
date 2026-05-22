@@ -526,10 +526,12 @@
   50%       { transform: translateY(-7px); }
 }
 
-.tile-current {
+.tile-current,
+.tile-pulse {
   animation: tile-pulse 1.8s ease-in-out infinite;
 }
 
-.avatar-pin {
+.avatar-pin,
+.avatar-bounce {
   animation: avatar-bounce 1.4s ease-in-out infinite;
 }
