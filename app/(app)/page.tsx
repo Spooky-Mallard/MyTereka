@@ -7,6 +7,9 @@ import { todayISO } from '@/lib/format'
 import { DashboardClient } from './dashboard-client'
 import { getRecentNudges } from '@/lib/actions/nudges'
 import { getDailyTip } from '@/lib/actions/profile'
+import { getTodayQuest } from '@/lib/actions/quests'
+import { getDashboardInsight } from '@/lib/actions/analytics'
+import { getUnreadCount } from '@/lib/actions/notifications'
 
 export default async function DashboardPage() {
   const session = await auth()
@@ -22,6 +25,9 @@ export default async function DashboardPage() {
     userGoals,
     recentNudges,
     dailyTip,
+    todayQuest,
+    insight,
+    unreadCount,
   ] = await Promise.all([
     db.query.users.findFirst({ where: eq(users.id, userId) }),
     db.select().from(accounts).where(eq(accounts.userId, userId)),
@@ -42,7 +48,7 @@ export default async function DashboardPage() {
       .innerJoin(accounts,   eq(transactions.accountId,  accounts.id))
       .where(eq(transactions.userId, userId))
       .orderBy(desc(transactions.date), desc(transactions.createdAt))
-      .limit(5),
+      .limit(8),
     db
       .select({
         id:            budgets.id,
@@ -70,6 +76,9 @@ export default async function DashboardPage() {
       .limit(3),
     getRecentNudges(),
     getDailyTip(),
+    getTodayQuest(),
+    getDashboardInsight(),
+    getUnreadCount(),
   ])
 
   const totalBalance = userAccounts.reduce((s, a) => s + a.balance, 0)
@@ -90,6 +99,9 @@ export default async function DashboardPage() {
       goals={userGoals}
       nudges={recentNudges}
       dailyTip={dailyTip}
+      todayQuest={todayQuest}
+      insight={insight}
+      unreadCount={unreadCount}
     />
   )
 }

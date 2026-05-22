@@ -5,6 +5,7 @@ import { transactions, accounts, budgets, users, categories, goals, streakHistor
 import { auth } from '@/lib/auth'
 import { eq, and, desc, sql, gte, lte } from 'drizzle-orm'
 import { awardXP, checkAndAwardBadge } from './gamification'
+import { completeQuestIfApplicable } from './quests'
 import { todayISO } from '@/lib/format'
 import { calcMoMoFee } from '@/lib/momo-fees'
 
@@ -151,6 +152,15 @@ export async function createTransaction(data: {
       .update(users)
       .set({ ratingAskedAt: sql`now()` })
       .where(eq(users.id, userId))
+  }
+
+  if (data.type === 'expense' || data.type === 'investment') {
+    await completeQuestIfApplicable('log_expense')
+  } else if (data.type === 'income') {
+    await completeQuestIfApplicable('log_income')
+  }
+  if (data.note && data.note.trim().length > 0) {
+    await completeQuestIfApplicable('add_note')
   }
 
   return { negativeBalance: willGoNegative, promptRating }
