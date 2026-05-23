@@ -676,3 +676,39 @@ export async function getCategoriesForUser() {
     .from(categories)
     .where(eq(categories.userId, session.user.id))
 }
+
+export async function createCategory(data: {
+  name:  string
+  type:  'expense' | 'income' | 'investment'
+  icon?: string
+  color?: string
+}) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const [row] = await db
+    .insert(categories)
+    .values({ ...data, userId: session.user.id, isDefault: false })
+    .returning({ id: categories.id })
+  return row
+}
+
+export async function deleteCategory(id: string) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const [cat] = await db
+    .select({ isDefault: categories.isDefault })
+    .from(categories)
+    .where(and(eq(categories.id, id), eq(categories.userId, session.user.id)))
+  if (!cat) throw new Error('Category not found')
+  if (cat.isDefault) throw new Error('Cannot delete a default category')
+  await db.delete(categories).where(and(eq(categories.id, id), eq(categories.userId, session.user.id)))
+}
+
+export async function updateCategory(id: string, data: { name?: string; icon?: string; color?: string }) {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  await db
+    .update(categories)
+    .set(data)
+    .where(and(eq(categories.id, id), eq(categories.userId, session.user.id)))
+}

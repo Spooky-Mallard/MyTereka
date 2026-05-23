@@ -161,9 +161,9 @@ export function AddTransactionSheet({
                           background: selected ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
                           border: selected ? '1.5px solid var(--primary)' : '1.5px solid transparent',
                         }}>
-                        <span className="flex h-8 w-8 items-center justify-center rounded-lg"
+                        <span className="flex h-8 w-8 items-center justify-center rounded-lg text-base"
                           style={{ background: `${tint}22`, color: tint }}>
-                          {Icon ? <Icon size={16} /> : <span className="text-xs">{cat.name[0]}</span>}
+                          {Icon ? <Icon size={16} /> : cat.icon ? cat.icon : <span className="text-xs">{cat.name[0]}</span>}
                         </span>
                         <span className="text-[10px] font-medium leading-tight"
                           style={{ color: selected ? 'var(--primary)' : 'var(--foreground)' }}>

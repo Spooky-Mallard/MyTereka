@@ -15,7 +15,7 @@ import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter,
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
-import { importTransactions, createAccount, updateAccount, deleteAccount, getAccountsForUser, transferBetweenAccounts } from '@/lib/actions/transactions'
+import { importTransactions, createAccount, updateAccount, deleteAccount, getAccountsForUser, transferBetweenAccounts, getCategoriesForUser, createCategory, deleteCategory, updateCategory } from '@/lib/actions/transactions'
 import type { ImportRow } from '@/lib/actions/transactions'
 import { calcMoMoFee } from '@/lib/momo-fees'
 import type { FeeResult } from '@/lib/momo-fees'
@@ -879,7 +879,176 @@ function AccountsManager() {
   )
 }
 
-type ProfileTab = 'settings' | 'badges' | 'import' | 'accounts' | 'friends'
+type ProfileTab = 'settings' | 'badges' | 'import' | 'accounts' | 'friends' | 'categories'
+
+const CATEGORY_EMOJIS = [
+  '🍽️','🚗','📱','🏠','🎓','💊','✈️','🎮','👕','🛒',
+  '💡','🔧','🏋️','🎸','☕','🐾','💰','🎁','📚','🌿',
+  '🍺','💈','🏥','🎬','🚌','⚽','💻','🎯','🔑','🌍',
+]
+
+type CatRow = { id: string; name: string; type: string; icon: string | null; color: string | null; isDefault: boolean }
+
+function CategoriesManager() {
+  const router = useRouter()
+  const [cats, setCats]         = useState<CatRow[]>([])
+  const [loading, setLoading]   = useState(true)
+  const [adding, setAdding]     = useState(false)
+  const [name, setName]         = useState('')
+  const [type, setType]         = useState<'expense'|'income'|'investment'>('expense')
+  const [icon, setIcon]         = useState('🎯')
+  const [saving, setSaving]     = useState(false)
+  const [editId, setEditId]     = useState<string|null>(null)
+  const [editIcon, setEditIcon] = useState('')
+
+  useEffect(() => {
+    getCategoriesForUser().then((rows) => { setCats(rows as CatRow[]); setLoading(false) })
+  }, [])
+
+  async function handleCreate() {
+    if (!name.trim()) { toast.error('Enter a category name'); return }
+    setSaving(true)
+    try {
+      await createCategory({ name: name.trim(), type, icon })
+      toast.success('Category created')
+      setAdding(false); setName(''); setIcon('🎯')
+      const fresh = await getCategoriesForUser()
+      setCats(fresh as CatRow[])
+      router.refresh()
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Failed') }
+    finally { setSaving(false) }
+  }
+
+  async function handleDelete(id: string) {
+    try {
+      await deleteCategory(id)
+      setCats((p) => p.filter((c) => c.id !== id))
+      router.refresh()
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Failed') }
+  }
+
+  async function handleUpdateIcon(id: string, newIcon: string) {
+    try {
+      await updateCategory(id, { icon: newIcon })
+      setCats((p) => p.map((c) => c.id === id ? { ...c, icon: newIcon } : c))
+      setEditId(null)
+    } catch (e) { toast.error(e instanceof Error ? e.message : 'Failed') }
+  }
+
+  const expense    = cats.filter((c) => c.type === 'expense')
+  const income     = cats.filter((c) => c.type === 'income')
+  const investment = cats.filter((c) => c.type === 'investment')
+
+  function CatSection({ title, items }: { title: string; items: CatRow[] }) {
+    return items.length === 0 ? null : (
+      <div className="mb-4">
+        <div className="mb-2 text-xs font-bold uppercase tracking-wider" style={{ color: 'var(--muted-foreground)' }}>{title}</div>
+        <div className="flex flex-col gap-2">
+          {items.map((c) => (
+            <div key={c.id} className="flex items-center gap-3 rounded-xl px-3 py-2.5" style={{ background: 'var(--surface-alt)' }}>
+              <button onClick={() => { setEditId(c.id); setEditIcon(c.icon ?? '🎯') }}
+                className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-xl"
+                style={{ background: 'var(--card)', border: '1px dashed var(--border)' }}
+                title="Change emoji">
+                {c.icon && c.icon.codePointAt(0)! > 127 ? c.icon : '🎯'}
+              </button>
+              <span className="flex-1 text-sm font-medium" style={{ color: 'var(--foreground)' }}>{c.name}</span>
+              {!c.isDefault && (
+                <button onClick={() => handleDelete(c.id)} style={{ color: 'var(--danger)' }}>
+                  <X size={14} />
+                </button>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <div>
+      {loading ? <div className="text-sm" style={{ color: 'var(--muted-foreground)' }}>Loading…</div> : (
+        <>
+          <CatSection title="Expense" items={expense} />
+          <CatSection title="Income" items={income} />
+          <CatSection title="Investment" items={investment} />
+        </>
+      )}
+
+      {/* Emoji picker modal */}
+      {editId && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: 'rgba(0,0,0,0.6)' }}
+          onClick={() => setEditId(null)}>
+          <div className="w-full max-w-xs rounded-2xl p-5" style={{ background: 'var(--card)' }} onClick={(e) => e.stopPropagation()}>
+            <div className="mb-3 text-sm font-bold" style={{ color: 'var(--foreground)' }}>Pick emoji</div>
+            <div className="flex flex-wrap gap-2 mb-4">
+              {CATEGORY_EMOJIS.map((em) => (
+                <button key={em} onClick={() => setEditIcon(em)}
+                  className="flex h-10 w-10 items-center justify-center rounded-xl text-xl"
+                  style={{ background: editIcon === em ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)', border: editIcon === em ? '1.5px solid var(--primary)' : '1.5px solid transparent' }}>
+                  {em}
+                </button>
+              ))}
+            </div>
+            <button onClick={() => handleUpdateIcon(editId, editIcon)}
+              className="w-full rounded-xl py-2.5 text-sm font-bold text-white"
+              style={{ background: 'var(--gradient-primary)' }}>
+              Save
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Add new category */}
+      {adding ? (
+        <div className="mt-4 rounded-2xl p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+          <div className="mb-3 text-sm font-bold" style={{ color: 'var(--foreground)' }}>New category</div>
+          <input type="text" placeholder="Category name" value={name} onChange={(e) => setName(e.target.value)}
+            className="mytereka-input mb-3" style={{ height: 44 }} />
+          <div className="mb-3 flex gap-2">
+            {(['expense','income','investment'] as const).map((t) => (
+              <button key={t} onClick={() => setType(t)}
+                className="rounded-full px-3 py-1 text-xs font-semibold capitalize transition"
+                style={{ background: type === t ? 'var(--primary)' : 'var(--surface-alt)', color: type === t ? '#fff' : 'var(--muted-foreground)' }}>
+                {t}
+              </button>
+            ))}
+          </div>
+          <div className="mb-3">
+            <div className="mb-2 text-xs font-medium" style={{ color: 'var(--muted-foreground)' }}>Emoji</div>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORY_EMOJIS.map((em) => (
+                <button key={em} onClick={() => setIcon(em)}
+                  className="flex h-9 w-9 items-center justify-center rounded-xl text-lg"
+                  style={{ background: icon === em ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)', border: icon === em ? '1.5px solid var(--primary)' : '1.5px solid transparent' }}>
+                  {em}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={handleCreate} disabled={saving}
+              className="flex-1 rounded-xl py-2.5 text-sm font-bold text-white disabled:opacity-60"
+              style={{ background: 'var(--gradient-primary)' }}>
+              {saving ? 'Saving…' : 'Create'}
+            </button>
+            <button onClick={() => setAdding(false)}
+              className="rounded-xl px-4 py-2.5 text-sm font-semibold"
+              style={{ background: 'var(--surface-alt)', color: 'var(--foreground)' }}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      ) : (
+        <button onClick={() => setAdding(true)}
+          className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl py-2.5 text-sm font-bold text-white"
+          style={{ background: 'var(--gradient-primary)' }}>
+          <Plus size={15} /> New Category
+        </button>
+      )}
+    </div>
+  )
+}
 
 export function ProfileClient({
   profile,
@@ -971,11 +1140,12 @@ export function ProfileClient({
       {/* Tabs */}
       <div className="flex rounded-2xl p-1 flex-wrap gap-1" style={{ background: 'var(--surface-alt)' }}>
         {([
-          { key: 'settings',  label: '⚙️ Settings' },
-          { key: 'friends',   label: '👥 Friends' },
-          { key: 'accounts',  label: '💳 Accounts' },
-          { key: 'badges',    label: '🏅 Badges' },
-          { key: 'import',    label: '📥 Import' },
+          { key: 'settings',    label: '⚙️ Settings' },
+          { key: 'friends',     label: '👥 Friends' },
+          { key: 'accounts',    label: '💳 Accounts' },
+          { key: 'categories',  label: '🏷️ Categories' },
+          { key: 'badges',      label: '🏅 Badges' },
+          { key: 'import',      label: '📥 Import' },
         ] as { key: ProfileTab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setActiveTab(key)}
             className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
@@ -1088,6 +1258,18 @@ export function ProfileClient({
               Add your cash, mobile money, bank, or SACCO accounts. Set the opening balance and track transfers between them.
             </div>
             <AccountsManager />
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'categories' && (
+        <div className="flex flex-col gap-4">
+          <div className="rounded-2xl p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
+            <div className="mb-1 text-sm font-bold" style={{ color: 'var(--foreground)' }}>My Categories</div>
+            <div className="mb-4 text-xs leading-relaxed" style={{ color: 'var(--muted-foreground)' }}>
+              Create custom categories with your own emoji. Default categories cannot be deleted.
+            </div>
+            <CategoriesManager />
           </div>
         </div>
       )}
