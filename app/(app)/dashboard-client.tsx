@@ -89,6 +89,32 @@ type Props = {
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
 
+const ICON_KEYWORD_MAP: Record<string, string> = {
+  laptop: "💻", computer: "💻", pc: "💻",
+  home: "🏠", house: "🏠",
+  car: "🚗", vehicle: "🚗",
+  phone: "📱", mobile: "📱",
+  school: "🎓", education: "📚", book: "📚",
+  travel: "✈️", holiday: "🌴", vacation: "🌴",
+  wedding: "💍", ring: "💍",
+  business: "💼", work: "💼",
+  baby: "👶", child: "🧒",
+  health: "🏥", hospital: "🏥",
+  food: "🍽️", groceries: "🛒",
+  savings: "💰", money: "💰", fund: "💰",
+  watch: "⌚", clock: "⌚",
+  tv: "📺", television: "📺",
+  bike: "🚲", bicycle: "🚲",
+  camera: "📷", photo: "📷",
+}
+
+function resolveGoalIcon(icon: string | null): string {
+  if (!icon) return "🎯"
+  // already an emoji (first char > basic ASCII)
+  if (icon.codePointAt(0)! > 127) return icon
+  return ICON_KEYWORD_MAP[icon.toLowerCase().trim()] ?? "🎯"
+}
+
 function weekStreakDots(streak: number) {
   // Mon–Sun labels (design uses M T W T F S S)
   const labels = ["M", "T", "W", "T", "F", "S", "S"];
@@ -105,7 +131,7 @@ function weekStreakDots(streak: number) {
 function StreakDots({ streak }: { streak: number }) {
   const dots = weekStreakDots(streak);
   return (
-    <div style={{ display: "flex", justifyContent: "space-evenly", marginTop: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginTop: 12 }}>
       {dots.map(({ label, active }, i) => (
         <div
           key={i}
@@ -113,8 +139,8 @@ function StreakDots({ streak }: { streak: number }) {
         >
           <div
             style={{
-              width: 10,
-              height: 10,
+              width: 12,
+              height: 12,
               borderRadius: 9999,
               background: active ? "#fff" : "rgba(255,255,255,0.3)",
               boxShadow: active ? "0 0 0 2px rgba(255,255,255,0.25)" : "none",
@@ -122,7 +148,7 @@ function StreakDots({ streak }: { streak: number }) {
           />
           <span
             style={{
-              fontSize: 9,
+              fontSize: 10,
               fontFamily: "Poppins, sans-serif",
               fontWeight: 600,
               opacity: 0.85,
@@ -276,7 +302,7 @@ function DesktopRightRail({
                       fontSize: 16,
                     }}
                   >
-                    {g.icon ?? "🎯"}
+                    {resolveGoalIcon(g.icon)}
                   </div>
                   <div style={{ flex: 1, minWidth: 0 }}>
                     <div
@@ -1139,8 +1165,8 @@ function MobileDashboard({
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
         <div
           style={{
-            width: 36,
-            height: 36,
+            width: 45,
+            height: 45,
             borderRadius: 9999,
             flexShrink: 0,
             background: "var(--gradient-primary)",
@@ -1159,7 +1185,7 @@ function MobileDashboard({
           <div
             style={{
               fontFamily: "Nunito Sans, sans-serif",
-              fontSize: 11,
+              fontSize: 15,
               color: "var(--muted-foreground)",
             }}
           >
@@ -1169,11 +1195,11 @@ function MobileDashboard({
             style={{
               fontFamily: "Poppins, sans-serif",
               fontWeight: 700,
-              fontSize: 15,
+              fontSize: 25,
               color: "var(--foreground)",
             }}
           >
-            {firstName}
+            {user.name}
           </div>
         </div>
         <Link
@@ -1581,7 +1607,7 @@ function MobileDashboard({
                         pointerEvents: "none",
                       }}
                     />
-                    <div style={{ fontSize: 22 }}>{g.icon ?? "🎯"}</div>
+                    <div style={{ fontSize: 22 }}>{resolveGoalIcon(g.icon)}</div>
                     <div
                       style={{
                         fontFamily: "Poppins, sans-serif",
