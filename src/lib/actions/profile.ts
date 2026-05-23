@@ -180,6 +180,16 @@ export async function getDailyTip(): Promise<DailyTip | null> {
   return tip ?? null
 }
 
+export async function updateProfile(data: { name?: string; email?: string }): Promise<void> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  const updates: Record<string, string> = {}
+  if (data.name?.trim())  updates.name  = data.name.trim()
+  if (data.email?.trim()) updates.email = data.email.trim().toLowerCase()
+  if (!Object.keys(updates).length) return
+  await db.update(users).set(updates).where(eq(users.id, session.user.id))
+}
+
 export async function submitAppRating(rating: number): Promise<void> {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')

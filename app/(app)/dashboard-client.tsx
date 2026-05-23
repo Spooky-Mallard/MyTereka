@@ -1546,6 +1546,31 @@ function MobileDashboard({
         </div>
       )}
 
+      {/* Mascot + goals carousel */}
+      {goals.length > 0 && (
+        <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: -4 }}>
+          <img
+            src="/mascot.png"
+            alt="MyTereka mascot"
+            style={{ width: 56, height: 56, objectFit: 'contain', flexShrink: 0 }}
+          />
+          <div style={{
+            flex: 1,
+            background: 'var(--surface-alt)',
+            borderRadius: '14px 14px 14px 4px',
+            padding: '8px 12px',
+            fontSize: 12,
+            fontWeight: 600,
+            color: 'var(--foreground)',
+            fontFamily: 'Poppins, sans-serif',
+            lineHeight: 1.4,
+            border: '1px solid var(--border)',
+          }}>
+            Keep saving! You&apos;re making great progress 🌟
+          </div>
+        </div>
+      )}
+
       {/* Active quests carousel */}
       {goals.length > 0 && (
         <div>

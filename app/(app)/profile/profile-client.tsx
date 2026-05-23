@@ -5,8 +5,8 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
-  User, Lock, Bell, Globe, HelpCircle, MessageCircle,
-  LogOut, Trash2, ChevronRight, Moon, Sun, Shield, Star, Flame,
+  User, Bell,
+  LogOut, Trash2, ChevronRight, Moon, Sun, Star, Flame,
   Upload, FileText, CheckCircle2, AlertCircle, Loader2,
   Plus, X, Wallet, Banknote, Building2, Users, ArrowRightLeft, CalendarDays, Smartphone, Pencil,
 } from 'lucide-react'
@@ -20,6 +20,7 @@ import type { ImportRow } from '@/lib/actions/transactions'
 import { calcMoMoFee } from '@/lib/momo-fees'
 import type { FeeResult } from '@/lib/momo-fees'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
+import { updateProfile } from '@/lib/actions/profile'
 import { formatUGX } from '@/lib/format'
 import { FriendsTab } from '@/components/friends-tab'
 import { UsernameEditModal } from '@/components/username-edit-modal'
@@ -1061,18 +1062,36 @@ export function ProfileClient({
   const [budgetAlerts,  setBudgetAlerts]  = useState(true)
   const [goalReminders, setGoalReminders] = useState(true)
   const [streakAlerts,  setStreakAlerts]  = useState(true)
-  const [logoutOpen,    setLogoutOpen]    = useState(false)
-  const [activeTab,     setActiveTab]     = useState<ProfileTab>('settings')
-  const [usernameOpen,  setUsernameOpen]  = useState(false)
+  const [logoutOpen,       setLogoutOpen]       = useState(false)
+  const [activeTab,        setActiveTab]        = useState<ProfileTab>('settings')
+  const [usernameOpen,     setUsernameOpen]     = useState(false)
+  const [editProfileOpen,  setEditProfileOpen]  = useState(false)
+  const [profileName,      setProfileName]      = useState(profile.name)
+  const [profileEmail,     setProfileEmail]     = useState(profile.email)
+  const [profileSaving,    setProfileSaving]    = useState(false)
   const router = useRouter()
 
-  const initials    = profile.name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+  const initials    = profileName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
   const xpNext      = LEVEL_XP[profile.level] ?? 9999
   const xpPct       = Math.min(100, Math.round((profile.xpPoints / xpNext) * 100))
   const earnedSet   = new Set(earnedBadges.map((b) => b.name))
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/auth/login' })
+  }
+
+  const handleProfileSave = async () => {
+    setProfileSaving(true)
+    try {
+      await updateProfile({ name: profileName, email: profileEmail })
+      toast.success('Profile updated')
+      setEditProfileOpen(false)
+      router.refresh()
+    } catch (e: unknown) {
+      toast.error(e instanceof Error ? e.message : 'Failed to update profile')
+    } finally {
+      setProfileSaving(false)
+    }
   }
 
   return (
@@ -1095,7 +1114,7 @@ export function ProfileClient({
             {initials}
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{profile.name}</div>
+            <div className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{profileName}</div>
             <button
               onClick={() => setUsernameOpen(true)}
               className="group flex items-center gap-1 text-sm transition hover:opacity-80"
@@ -1107,7 +1126,7 @@ export function ProfileClient({
               </span>
               <Pencil size={11} className="opacity-70 group-hover:opacity-100" />
             </button>
-            <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>{profile.email}</div>
+            <div className="truncate text-xs" style={{ color: 'var(--muted-foreground)' }}>{profileEmail}</div>
             <div className="mt-1 flex items-center gap-2">
               <span className="level-badge">{profile.level}</span>
               <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--warning)' }}>
@@ -1116,7 +1135,8 @@ export function ProfileClient({
               </div>
             </div>
           </div>
-          <button className="rounded-xl border px-4 py-2 text-sm font-semibold transition hover:opacity-80"
+          <button onClick={() => setEditProfileOpen(true)}
+            className="rounded-xl border px-4 py-2 text-sm font-semibold transition hover:opacity-80"
             style={{ borderColor: 'var(--border)', color: 'var(--foreground)', background: 'var(--surface-alt)' }}>
             Edit
           </button>
@@ -1161,9 +1181,16 @@ export function ProfileClient({
       {activeTab === 'settings' && (
         <>
           <SettingsCard title="Account">
-            <SettingRow icon={User}   label="Edit profile"    sub="Name, photo, mobile number"  iconColor="var(--primary)" iconBg="rgba(0,184,148,0.12)"   href="/profile/edit" />
-            <SettingRow icon={Lock}   label="Change password" sub="Update your login password"  iconColor="#6366F1"        iconBg="rgba(99,102,241,0.12)"  href="/profile/password" />
-            <SettingRow icon={Shield} label="Biometric login" sub="Fingerprint or Face ID"      iconColor="var(--success)" iconBg="rgba(16,185,129,0.12)"  href="/profile/security" />
+            <SettingRow
+              icon={User}  label="Edit profile"  sub="Name and email address"
+              iconColor="var(--primary)" iconBg="rgba(0,184,148,0.12)"
+              onClick={() => setEditProfileOpen(true)}
+            />
+            <SettingRow
+              icon={Pencil} label="Change username" sub={profile.username ? `@${profile.username}` : 'Not set yet'}
+              iconColor="#6366F1" iconBg="rgba(99,102,241,0.12)"
+              onClick={() => setUsernameOpen(true)}
+            />
           </SettingsCard>
 
           <SettingsCard title="Preferences">
@@ -1176,7 +1203,6 @@ export function ProfileClient({
               right={<Toggle on={dark} onToggle={toggle} />}
               onClick={toggle}
             />
-            <SettingRow icon={Globe} label="Language" sub="English" iconColor="#14B8A6" iconBg="rgba(20,184,166,0.12)" href="/profile/language" />
           </SettingsCard>
 
           <SettingsCard title="Notifications">
@@ -1198,11 +1224,6 @@ export function ProfileClient({
               right={<Toggle on={streakAlerts}   onToggle={() => setStreakAlerts((n) => !n)} />}
               onClick={() => setStreakAlerts((n) => !n)}
             />
-          </SettingsCard>
-
-          <SettingsCard title="Support">
-            <SettingRow icon={HelpCircle}    label="Help center"     sub="FAQs and guides"    iconColor="#6366F1"        iconBg="rgba(99,102,241,0.12)" href="/help" />
-            <SettingRow icon={MessageCircle} label="Contact support" sub="Chat with our team" iconColor="var(--primary)" iconBg="rgba(0,184,148,0.12)"  href="/support" />
           </SettingsCard>
 
           <SettingsCard title="Account actions">
@@ -1319,6 +1340,52 @@ export function ProfileClient({
           initialUsername={profile.username}
           onClose={() => setUsernameOpen(false)}
         />
+      )}
+
+      {/* Edit Profile Modal */}
+      {editProfileOpen && (
+        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-4"
+          style={{ background: 'rgba(0,0,0,0.6)' }}
+          onClick={(e) => e.target === e.currentTarget && setEditProfileOpen(false)}>
+          <div className="w-full max-w-md rounded-2xl p-6 flex flex-col gap-5"
+            style={{ background: 'var(--card)', boxShadow: 'var(--shadow-lg)' }}>
+            <div className="flex items-center justify-between">
+              <h2 className="text-lg font-bold" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+                Edit Profile
+              </h2>
+              <button onClick={() => setEditProfileOpen(false)} style={{ color: 'var(--muted-foreground)' }}>
+                <X size={20} />
+              </button>
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                Full name
+              </label>
+              <input type="text" value={profileName} onChange={(e) => setProfileName(e.target.value)}
+                className="mytereka-input" placeholder="Your name" />
+            </div>
+            <div>
+              <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                Email address
+              </label>
+              <input type="email" value={profileEmail} onChange={(e) => setProfileEmail(e.target.value)}
+                className="mytereka-input" placeholder="you@example.com" />
+            </div>
+            <div className="flex gap-3">
+              <button onClick={() => setEditProfileOpen(false)}
+                className="rounded-full px-5 py-3 text-sm font-semibold transition hover:opacity-80"
+                style={{ background: 'var(--surface-alt)', color: 'var(--foreground)' }}>
+                Cancel
+              </button>
+              <button onClick={handleProfileSave} disabled={profileSaving}
+                className="flex-1 rounded-full py-3 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60 flex items-center justify-center gap-2"
+                style={{ background: 'var(--gradient-primary)' }}>
+                {profileSaving && <Loader2 size={16} className="animate-spin" />}
+                Save changes
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   )
