@@ -4,7 +4,7 @@ import { useState, useEffect, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
-  Plus, Lock, Trophy, Target, Plane, Laptop, Car, Home, BookOpen, Heart, Star, X, Loader2,
+  Plus, Lock, Trophy, X, Loader2,
   CalendarDays, Users, UserPlus, Map,
 } from 'lucide-react'
 import { toast } from 'sonner'
@@ -21,16 +21,35 @@ import type { SharedGoalCard, SharedGoalInvite } from '@/lib/types/shared-goals'
 type GoalRow = InferSelectModel<typeof goals>
 type AccountRow = { id: string; name: string; balance: number; type: string }
 
-const iconMap: Record<string, React.ElementType> = {
-  laptop:  Laptop,
-  plane:   Plane,
-  car:     Car,
-  home:    Home,
-  book:    BookOpen,
-  heart:   Heart,
-  trophy:  Trophy,
-  target:  Target,
-  star:    Star,
+const GOAL_EMOJI_OPTIONS = [
+  '🎯','💻','🏠','🚗','✈️','📱','⌚','📚','❤️','⭐',
+  '💰','🏥','🎓','💍','👶','🌴','💼','🛒','📷','🚲',
+  '🏆','🎮','🎸','🏋️','🌍','🏡','🎉','🔑','🛋️','🎁',
+]
+
+function resolveGoalIcon(icon: string | null): string {
+  if (!icon) return '🎯'
+  if (icon.codePointAt(0)! > 127) return icon
+  const keywordMap: Record<string, string> = {
+    laptop: '💻', computer: '💻', pc: '💻',
+    home: '🏠', house: '🏠',
+    car: '🚗', vehicle: '🚗',
+    phone: '📱', mobile: '📱',
+    school: '🎓', education: '📚', book: '📚',
+    travel: '✈️', holiday: '🌴', vacation: '🌴',
+    wedding: '💍', ring: '💍',
+    business: '💼', work: '💼',
+    baby: '👶', child: '🧒',
+    health: '🏥', hospital: '🏥',
+    savings: '💰', money: '💰', fund: '💰',
+    watch: '⌚', clock: '⌚',
+    plane: '✈️',
+    heart: '❤️',
+    trophy: '🏆',
+    target: '🎯',
+    star: '⭐',
+  }
+  return keywordMap[icon.toLowerCase().trim()] ?? '🎯'
 }
 
 function GoalRing({ pct, size = 80 }: { pct: number; size?: number }) {
@@ -174,7 +193,6 @@ function ContributeModal({ goal, onClose }: { goal: GoalRow; onClose: () => void
 
 function GoalCard({ goal, onContribute, featured = false }: { goal: GoalRow; onContribute: (g: GoalRow) => void; featured?: boolean }) {
   const pct       = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
-  const Icon      = goal.icon ? iconMap[goal.icon] ?? Target : Target
   const remaining = Math.max(0, goal.targetAmount - goal.currentAmount)
 
   if (featured) {
@@ -194,7 +212,7 @@ function GoalCard({ goal, onContribute, featured = false }: { goal: GoalRow; onC
         <div className="flex items-start gap-3 mb-3">
           <div className="flex h-13 w-13 shrink-0 items-center justify-center rounded-[16px] text-2xl"
             style={{ background: 'rgba(0,184,148,0.22)', width: 52, height: 52 }}>
-            {goal.icon ?? <Icon size={24} />}
+            {resolveGoalIcon(goal.icon)}
           </div>
           <div className="flex-1 min-w-0 pt-0.5">
             <div className="font-bold text-base leading-tight" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
@@ -242,7 +260,7 @@ function GoalCard({ goal, onContribute, featured = false }: { goal: GoalRow; onC
         <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] text-xl"
           style={{ background: goal.isCompleted ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
                    color: goal.isCompleted ? 'var(--primary)' : 'var(--muted-foreground)' }}>
-          {goal.isCompleted ? <Trophy size={18} /> : (goal.icon ?? <Icon size={18} />)}
+          {goal.isCompleted ? <Trophy size={18} /> : resolveGoalIcon(goal.icon)}
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 flex-wrap">
@@ -288,8 +306,6 @@ function GoalCard({ goal, onContribute, featured = false }: { goal: GoalRow; onC
 
 function SharedGoalCardItem({ goal }: { goal: SharedGoalCard }) {
   const pct  = goal.targetAmount > 0 ? Math.min(100, Math.round((goal.currentAmount / goal.targetAmount) * 100)) : 0
-  const Icon = goal.icon ? iconMap[goal.icon] ?? Target : Target
-
   return (
     <Link href={`/goals/shared/${goal.id}`} className="block" style={{ textDecoration: 'none' }}>
       <div className="rounded-[16px] p-4 transition hover:opacity-90"
@@ -298,7 +314,7 @@ function SharedGoalCardItem({ goal }: { goal: SharedGoalCard }) {
           <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[12px] text-xl"
             style={{ background: goal.isCompleted ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
                      color: goal.isCompleted ? 'var(--primary)' : 'var(--muted-foreground)' }}>
-            {goal.isCompleted ? <Trophy size={18} /> : (goal.icon ?? <Icon size={18} />)}
+            {goal.isCompleted ? <Trophy size={18} /> : resolveGoalIcon(goal.icon)}
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 flex-wrap">
@@ -350,8 +366,6 @@ function SharedGoalCardItem({ goal }: { goal: SharedGoalCard }) {
 function InviteCard({ invite, onResponded }: { invite: SharedGoalInvite; onResponded: () => void }) {
   const router = useRouter()
   const [pending, start] = useTransition()
-  const Icon = invite.icon ? iconMap[invite.icon] ?? Target : Target
-
   function respond(action: 'accept' | 'decline') {
     start(async () => {
       try {
@@ -368,9 +382,9 @@ function InviteCard({ invite, onResponded }: { invite: SharedGoalInvite; onRespo
   return (
     <div className="rounded-2xl p-4 flex items-start gap-3"
       style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)', border: '1px solid var(--primary)' }}>
-      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
-        style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
-        <Icon size={18} />
+      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xl"
+        style={{ background: 'rgba(0,184,148,0.15)' }}>
+        {resolveGoalIcon(invite.icon ?? null)}
       </div>
       <div className="flex-1 min-w-0">
         <div className="text-sm font-semibold" style={{ color: 'var(--foreground)' }}>{invite.name}</div>
@@ -408,8 +422,7 @@ function GoalMap({ goals: goalList }: { goals: GoalRow[] }) {
     const y     = 50 + i * stepY
     const pct   = g.targetAmount > 0 ? Math.min(100, Math.round((g.currentAmount / g.targetAmount) * 100)) : 0
     const done  = g.isCompleted
-    const Icon  = g.icon ? iconMap[g.icon] ?? Target : Target
-    return { g, x, y, pct, done, Icon }
+    return { g, x, y, pct, done }
   })
 
   const pathParts: string[] = []
@@ -426,14 +439,13 @@ function GoalMap({ goals: goalList }: { goals: GoalRow[] }) {
           <path key={i} d={d} fill="none" stroke="var(--border)" strokeWidth={4}
             strokeDasharray="8 6" strokeLinecap="round" />
         ))}
-        {nodes.map(({ g, x, y, done, Icon }, i) => (
+        {nodes.map(({ g, x, y, done }, i) => (
           <g key={g.id}>
             <circle cx={x} cy={y} r={nodeR + 4} fill={done ? 'var(--primary)' : 'var(--card)'}
               stroke={done ? 'var(--primary)' : 'var(--border)'} strokeWidth={3} />
-            {done
-              ? <Trophy x={x - 11} y={y - 11} size={22} color="white" strokeWidth={1.8} />
-              : <Icon   x={x - 10} y={y - 10} size={20} color="var(--muted-foreground)" strokeWidth={1.8} />
-            }
+            <text x={x} y={y + 6} textAnchor="middle" fontSize={done ? 16 : 16} style={{ userSelect: 'none' }}>
+              {done ? '🏆' : resolveGoalIcon(g.icon)}
+            </text>
             <text x={x} y={y + nodeR + 20} textAnchor="middle"
               style={{ fill: 'var(--foreground)', fontSize: 12, fontWeight: 600 }}>
               {g.name}
@@ -445,14 +457,12 @@ function GoalMap({ goals: goalList }: { goals: GoalRow[] }) {
   )
 }
 
-const GOAL_ICONS = ['laptop','plane','car','home','book','heart','trophy','target','star'] as const
-
 function NewGoalModal({ onClose }: { onClose: () => void }) {
   const router = useRouter()
   const [name,       setName]       = useState('')
   const [target,     setTarget]     = useState('')
   const [targetDate, setTargetDate] = useState('')
-  const [icon,       setIcon]       = useState('target')
+  const [icon,       setIcon]       = useState('🎯')
   const [locked,     setLocked]     = useState(false)
   const [saving,     setSaving]     = useState(false)
 
@@ -517,22 +527,18 @@ function NewGoalModal({ onClose }: { onClose: () => void }) {
         </div>
 
         <div>
-          <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Icon</label>
+          <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>Emoji</label>
           <div className="flex flex-wrap gap-2">
-            {GOAL_ICONS.map((ic) => {
-              const Icon = iconMap[ic] ?? Target
-              return (
-                <button key={ic} onClick={() => setIcon(ic)}
-                  className="flex h-10 w-10 items-center justify-center rounded-xl transition-all"
-                  style={{
-                    background: icon === ic ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
-                    border: icon === ic ? '1.5px solid var(--primary)' : '1.5px solid transparent',
-                    color: icon === ic ? 'var(--primary)' : 'var(--muted-foreground)',
-                  }}>
-                  <Icon size={18} />
-                </button>
-              )
-            })}
+            {GOAL_EMOJI_OPTIONS.map((em) => (
+              <button key={em} onClick={() => setIcon(em)}
+                className="flex h-10 w-10 items-center justify-center rounded-xl text-xl transition-all"
+                style={{
+                  background: icon === em ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
+                  border: icon === em ? '1.5px solid var(--primary)' : '1.5px solid transparent',
+                }}>
+                {em}
+              </button>
+            ))}
           </div>
         </div>
 
