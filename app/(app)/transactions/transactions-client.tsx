@@ -185,9 +185,14 @@ function EditTransactionSheet({
                             background: selected ? 'rgba(0,184,148,0.15)' : 'var(--surface-alt)',
                             border: selected ? '1.5px solid var(--primary)' : '1.5px solid transparent',
                           }}>
-                          <span className="flex h-8 w-8 items-center justify-center rounded-lg"
+                          <span className="flex h-8 w-8 items-center justify-center rounded-lg text-base"
                             style={{ background: `${tint}22`, color: tint }}>
-                            {Icon ? <Icon size={16} /> : <span className="text-xs">{cat.name[0]}</span>}
+                            {Icon
+                              ? <Icon size={16} />
+                              : cat.icon && cat.icon.codePointAt(0)! > 127
+                                ? cat.icon
+                                : <span className="text-xs">{cat.name[0]}</span>
+                            }
                           </span>
                           <span className="text-[10px] font-medium leading-tight"
                             style={{ color: selected ? 'var(--primary)' : 'var(--foreground)' }}>
@@ -410,7 +415,12 @@ export function TransactionsClient({ initialData }: { initialData: TransactionRo
                           background: meta?.tint ? `${meta.tint}22` : t.categoryColor ? `${t.categoryColor}22` : 'var(--surface-alt)',
                           color: meta?.tint ?? t.categoryColor ?? 'var(--muted-foreground)',
                         }}>
-                        {isInvest && !Icon ? <TrendingUp size={18} /> : Icon ? <Icon size={18} /> : null}
+                        {Icon
+                          ? <Icon size={18} />
+                          : t.categoryIcon && t.categoryIcon.codePointAt(0)! > 127
+                            ? <span style={{ fontSize: 18 }}>{t.categoryIcon}</span>
+                            : isInvest ? <TrendingUp size={18} /> : <span className="text-xs font-bold">{t.categoryName[0]}</span>
+                        }
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="truncate text-sm font-medium" style={{ color: 'var(--foreground)' }}>

@@ -192,7 +192,12 @@ function TxnItem({ t, i }: { t: TxnRow; i: number }) {
           flexShrink: 0,
         }}
       >
-        {Icon ? <Icon size={14} /> : <span>{t.categoryName[0]}</span>}
+        {Icon
+          ? <Icon size={14} />
+          : t.categoryIcon && t.categoryIcon.codePointAt(0)! > 127
+            ? <span style={{ fontSize: 14 }}>{t.categoryIcon}</span>
+            : <span style={{ fontSize: 11 }}>{t.categoryName[0]}</span>
+        }
       </span>
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
