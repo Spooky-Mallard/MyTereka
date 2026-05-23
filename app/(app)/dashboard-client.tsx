@@ -131,27 +131,27 @@ function weekStreakDots(streak: number) {
 function StreakDots({ streak }: { streak: number }) {
   const dots = weekStreakDots(streak);
   return (
-    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginTop: 12 }}>
+    <div style={{ display: "flex", justifyContent: "space-between", width: "100%", marginTop: 16 }}>
       {dots.map(({ label, active }, i) => (
         <div
           key={i}
-          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}
+          style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 5 }}
         >
           <div
             style={{
-              width: 12,
-              height: 12,
+              width: 20,
+              height: 20,
               borderRadius: 9999,
-              background: active ? "#fff" : "rgba(255,255,255,0.3)",
-              boxShadow: active ? "0 0 0 2px rgba(255,255,255,0.25)" : "none",
+              background: active ? "#fff" : "rgba(255,255,255,0.28)",
+              boxShadow: active ? "0 0 0 3px rgba(255,255,255,0.2)" : "none",
             }}
           />
           <span
             style={{
-              fontSize: 10,
+              fontSize: 13,
               fontFamily: "Poppins, sans-serif",
-              fontWeight: 600,
-              opacity: 0.85,
+              fontWeight: 700,
+              opacity: 0.9,
               color: "#fff",
             }}
           >
@@ -197,7 +197,7 @@ function TxnItem({ t, i }: { t: TxnRow; i: number }) {
       <div style={{ flex: 1, minWidth: 0 }}>
         <div
           style={{
-            fontFamily: "Nunito Sans, sans-serif",
+            fontFamily: "Poppins, sans-serif",
             fontSize: 13,
             fontWeight: 600,
             color: "var(--foreground)",
@@ -525,7 +525,7 @@ function DesktopDashboard({
         <div>
           <div
             style={{
-              fontFamily: "Nunito Sans, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               fontSize: 12,
               color: "var(--muted-foreground)",
             }}
@@ -822,7 +822,7 @@ function DesktopDashboard({
                 <div
                   style={{
                     marginTop: 2,
-                    fontFamily: "Nunito Sans, sans-serif",
+                    fontFamily: "Poppins, sans-serif",
                     fontSize: 11,
                     opacity: 0.9,
                   }}
@@ -867,7 +867,7 @@ function DesktopDashboard({
             </div>
             <div
               style={{
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 fontSize: 12,
                 color: "var(--muted-foreground)",
                 marginTop: 6,
@@ -923,7 +923,7 @@ function DesktopDashboard({
             </div>
             <div
               style={{
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 fontSize: 12,
                 color: "var(--muted-foreground)",
                 marginTop: 6,
@@ -1184,7 +1184,7 @@ function MobileDashboard({
         <div style={{ flex: 1 }}>
           <div
             style={{
-              fontFamily: "Nunito Sans, sans-serif",
+              fontFamily: "Poppins, sans-serif",
               fontSize: 15,
               color: "var(--muted-foreground)",
             }}
@@ -1326,7 +1326,7 @@ function MobileDashboard({
                 style={{
                   marginTop: 2,
                   fontSize: 11,
-                  fontFamily: "Nunito Sans, sans-serif",
+                  fontFamily: "Poppins, sans-serif",
                   opacity: 0.9,
                 }}
               >
@@ -1361,7 +1361,7 @@ function MobileDashboard({
               style={{
                 fontSize: 11,
                 color: "var(--muted-foreground)",
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
               }}
             >
               {Math.max(0, xpNext - user.xp)} XP to next level
@@ -1519,7 +1519,7 @@ function MobileDashboard({
                 alignItems: "center",
                 gap: 6,
                 color: "var(--success)",
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 fontSize: 12,
                 fontWeight: 600,
               }}
@@ -1529,7 +1529,7 @@ function MobileDashboard({
           ) : (
             <div
               style={{
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 fontSize: 11,
                 color: "var(--muted-foreground)",
                 marginBottom: 12,
@@ -1745,7 +1745,7 @@ function MobileDashboard({
             </div>
             <div
               style={{
-                fontFamily: "Nunito Sans, sans-serif",
+                fontFamily: "Poppins, sans-serif",
                 fontSize: 13,
                 color: "var(--foreground)",
                 lineHeight: 1.5,
