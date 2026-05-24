@@ -30,6 +30,7 @@ export const users = pgTable('users', {
   passwordHash:   text('password_hash').notNull(),
   mobileNumber:   varchar('mobile_number',  { length: 20 }),
   avatarUrl:      text('avatar_url'),
+  avatarId:       varchar('avatar_id', { length: 10 }),
   currency:       varchar('currency',       { length: 10  }).default('UGX').notNull(),
   theme:          varchar('theme',          { length: 10  }).default('dark').notNull(),
   xpPoints:       integer('xp_points').default(0).notNull(),

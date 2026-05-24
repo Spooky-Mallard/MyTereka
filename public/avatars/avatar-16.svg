@@ -1,0 +1,6961 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="543.99 304.31 116.74 124.25">
+  <defs>
+    <style>
+      .b {
+        fill: #834932;
+      }
+
+      .c {
+        fill: #2b375b;
+      }
+
+      .d {
+        fill: #2b2c2b;
+      }
+
+      .e {
+        fill: #814328;
+      }
+
+      .f {
+        fill: #e3e3e2;
+      }
+
+      .g {
+        fill: #744026;
+      }
+
+      .h {
+        fill: #1b1a19;
+      }
+
+      .i {
+        fill: #87472d;
+      }
+
+      .j {
+        fill: #f1f1f1;
+      }
+
+      .k {
+        fill: #dfdede;
+      }
+
+      .l {
+        fill: #b06b4a;
+      }
+
+      .m {
+        fill: #01a9b3;
+      }
+
+      .n {
+        fill: #8a2a37;
+      }
+
+      .o {
+        fill: #01acb5;
+      }
+
+      .p {
+        fill: #bcbcbd;
+      }
+
+      .q {
+        fill: #4f2b2c;
+      }
+
+      .r {
+        fill: #2a2828;
+      }
+
+      .s {
+        fill: #e9e9ea;
+      }
+
+      .t {
+        fill: #b56b46;
+      }
+
+      .u {
+        fill: #cb9682;
+      }
+
+      .v {
+        fill: #d6d6d8;
+      }
+
+      .w {
+        fill: #8d5c45;
+      }
+
+      .x {
+        fill: #3c2d26;
+      }
+
+      .y {
+        fill: #894a2d;
+      }
+
+      .z {
+        fill: #e32a3c;
+      }
+
+      .aa {
+        fill: #2a2c2b;
+      }
+
+      .ab {
+        fill: #f4f3f4;
+      }
+
+      .ac {
+        fill: #d2d1d2;
+      }
+
+      .ad {
+        fill: #8a4b2d;
+      }
+
+      .ae {
+        fill: #f6ce1c;
+      }
+
+      .af {
+        fill: #1c2220;
+      }
+
+      .ag {
+        fill: #01aab4;
+      }
+
+      .ah {
+        fill: #b56e4b;
+      }
+
+      .ai {
+        fill: #b16540;
+      }
+
+      .aj {
+        fill: #f8f8f9;
+      }
+
+      .ak {
+        fill: #824428;
+      }
+
+      .al {
+        fill: #d7282f;
+      }
+
+      .am {
+        fill: #f89711;
+      }
+
+      .an {
+        fill: #8d563b;
+      }
+
+      .ao {
+        fill: #2ba566;
+      }
+
+      .ap {
+        fill: #6d351d;
+      }
+
+      .aq {
+        fill: #00b1bf;
+      }
+
+      .ar {
+        fill: #e0e0e0;
+      }
+
+      .as {
+        fill: #f0ae17;
+      }
+
+      .at {
+        fill: #e97829;
+      }
+
+      .au {
+        fill: #028e97;
+      }
+
+      .av {
+        fill: #1fbcd0;
+      }
+
+      .aw {
+        fill: #743e27;
+      }
+
+      .ax {
+        fill: #242428;
+      }
+
+      .ay {
+        fill: #8a5a6f;
+      }
+
+      .az {
+        fill: #2b2b2b;
+      }
+
+      .ba {
+        fill: #1b9750;
+      }
+
+      .bb {
+        fill: #222842;
+      }
+
+      .bc {
+        fill: #85492f;
+      }
+
+      .bd {
+        fill: #b36c49;
+      }
+
+      .be {
+        fill: #b8b3b4;
+      }
+
+      .bf {
+        fill: #854f39;
+      }
+
+      .bg {
+        fill: #2facb7;
+      }
+
+      .bh {
+        fill: #956b57;
+      }
+
+      .bi {
+        fill: #2ab267;
+      }
+
+      .bj {
+        fill: #b16d4c;
+      }
+
+      .bk {
+        fill: #72371f;
+      }
+
+      .bl {
+        fill: #2c292a;
+      }
+
+      .bm {
+        fill: #abe2fa;
+      }
+
+      .bn {
+        fill: #22201e;
+      }
+
+      .bo {
+        fill: #a57662;
+      }
+
+      .bp {
+        fill: #8360c5;
+      }
+
+      .bq {
+        fill: #186f40;
+      }
+
+      .br {
+        fill: #aeadaf;
+      }
+
+      .bs {
+        fill: #b97352;
+      }
+
+      .bt {
+        fill: #f0f0ef;
+      }
+
+      .bu {
+        fill: #01abb6;
+      }
+
+      .bv {
+        fill: #fbfafa;
+      }
+
+      .bw {
+        fill: #aa6446;
+      }
+
+      .bx {
+        fill: #01a7b3;
+      }
+
+      .by {
+        fill: #7abedd;
+      }
+
+      .bz {
+        fill: #cbccce;
+      }
+
+      .ca {
+        fill: #904e2e;
+      }
+
+      .cb {
+        fill: #1c1b1b;
+      }
+
+      .cc {
+        fill: #e8e0db;
+      }
+
+      .cd {
+        fill: #9b5739;
+      }
+
+      .ce {
+        fill: #231f1c;
+      }
+
+      .cf {
+        fill: #242421;
+      }
+
+      .cg {
+        fill: #2b2b2c;
+      }
+
+      .ch {
+        fill: #2c2928;
+      }
+
+      .ci {
+        fill: #303031;
+      }
+
+      .cj {
+        fill: #d8d9d9;
+      }
+
+      .ck {
+        fill: #05aebb;
+      }
+
+      .cl {
+        fill: #914c2d;
+      }
+
+      .cm {
+        fill: #e26a40;
+      }
+
+      .cn {
+        fill: #6a6b6b;
+      }
+
+      .co {
+        fill: #894a2c;
+      }
+
+      .cp {
+        fill: #8a4c2f;
+      }
+
+      .cq {
+        fill: #3f4144;
+      }
+
+      .cr {
+        fill: #5470b0;
+      }
+
+      .cs {
+        fill: #27b268;
+      }
+
+      .ct {
+        fill: #b6b7b7;
+      }
+
+      .cu {
+        fill: #7a462d;
+      }
+
+      .cv {
+        fill: #67321d;
+      }
+
+      .cw {
+        fill: #7c4631;
+      }
+
+      .cx {
+        fill: #d7d6d7;
+      }
+
+      .cy {
+        fill: #21b05f;
+      }
+
+      .cz {
+        fill: #4f5778;
+      }
+
+      .da {
+        fill: #e4e6e6;
+      }
+
+      .db {
+        fill: #292928;
+      }
+
+      .dc {
+        fill: #1db360;
+      }
+
+      .dd {
+        fill: #1faf5f;
+      }
+
+      .de {
+        fill: #73351e;
+      }
+
+      .df {
+        fill: #21201f;
+      }
+
+      .dg {
+        fill: #d04b42;
+      }
+
+      .dh {
+        fill: #fbd11f;
+      }
+
+      .di {
+        fill: #c1c1c3;
+      }
+
+      .dj {
+        fill: #03a5b1;
+      }
+
+      .dk {
+        fill: #bfc1c2;
+      }
+
+      .dl {
+        fill: #f1c81f;
+      }
+
+      .dm {
+        fill: #f3f4f3;
+      }
+
+      .dn {
+        fill: #aa6243;
+      }
+
+      .do {
+        fill: #542529;
+      }
+
+      .dp {
+        fill: #13a0a2;
+      }
+
+      .dq {
+        fill: #fccf22;
+      }
+
+      .dr {
+        fill: #814329;
+      }
+
+      .ds {
+        fill: #e0dfde;
+      }
+
+      .dt {
+        fill: #cdcdce;
+      }
+
+      .du {
+        fill: #262428;
+      }
+
+      .dv {
+        fill: #b16d4a;
+      }
+
+      .dw {
+        fill: #884a2d;
+      }
+
+      .dx {
+        fill: #2d292a;
+      }
+
+      .dy {
+        fill: #a45e3d;
+      }
+
+      .dz {
+        fill: #68331f;
+      }
+
+      .ea {
+        fill: #b92361;
+      }
+
+      .eb {
+        fill: #e6e7e6;
+      }
+
+      .ec {
+        fill: #795e4f;
+      }
+
+      .ed {
+        fill: #dd3935;
+      }
+
+      .ee {
+        fill: #952c3c;
+      }
+
+      .ef {
+        fill: #c94a2f;
+      }
+
+      .eg {
+        fill: #9c5942;
+      }
+
+      .eh {
+        fill: #6c5a59;
+      }
+
+      .ei {
+        fill: #b66d49;
+      }
+
+      .ej {
+        fill: #ad6e4d;
+      }
+
+      .ek {
+        fill: #564035;
+      }
+
+      .el {
+        fill: #bc2c30;
+      }
+
+      .em {
+        fill: #0a4387;
+      }
+
+      .en {
+        fill: #6a6b69;
+      }
+
+      .eo {
+        fill: #04909a;
+      }
+
+      .ep {
+        fill: #eaf2f6;
+      }
+
+      .eq {
+        fill: #232a43;
+      }
+
+      .er {
+        fill: #bec0c0;
+      }
+
+      .es {
+        fill: #e4e5e5;
+      }
+
+      .et {
+        fill: #2c2b2a;
+      }
+
+      .eu {
+        fill: #e6e7e4;
+      }
+
+      .ev {
+        fill: #23b864;
+      }
+
+      .ew {
+        fill: #efb316;
+      }
+
+      .ex {
+        fill: #6a321d;
+      }
+
+      .ey {
+        fill: #fafdfd;
+      }
+
+      .ez {
+        fill: #0dabaf;
+      }
+
+      .fa {
+        fill: #5e1924;
+      }
+
+      .fb {
+        fill: #d6d6d6;
+      }
+
+      .fc {
+        fill: #5f1724;
+      }
+
+      .fd {
+        fill: #292426;
+      }
+
+      .fe {
+        fill: #82462d;
+      }
+
+      .ff {
+        fill: #e4443b;
+      }
+
+      .fg {
+        fill: #e1e1e2;
+      }
+
+      .fh {
+        fill: #242a45;
+      }
+
+      .fi {
+        fill: #b56d4a;
+      }
+
+      .fj {
+        fill: #197b49;
+      }
+
+      .fk {
+        fill: #b36b46;
+      }
+
+      .fl {
+        fill: #85492e;
+      }
+
+      .fm {
+        fill: #42496c;
+      }
+
+      .fn {
+        fill: #e7e7e5;
+      }
+
+      .fo {
+        fill: #cc3239;
+      }
+
+      .fp {
+        fill: #d3332f;
+      }
+
+      .fq {
+        fill: #f59411;
+      }
+
+      .fr {
+        fill: #272328;
+      }
+
+      .fs {
+        fill: #9c573a;
+      }
+
+      .ft {
+        fill: #42ae9f;
+      }
+
+      .fu {
+        fill: #cb2e3c;
+      }
+
+      .fv {
+        fill: #c79783;
+      }
+
+      .fw {
+        fill: #262d43;
+      }
+
+      .fx {
+        fill: #f1bf16;
+      }
+
+      .fy {
+        fill: #864a2f;
+      }
+
+      .fz {
+        fill: #f8cc20;
+      }
+
+      .ga {
+        fill: #8b4a2c;
+      }
+
+      .gb {
+        fill: #932938;
+      }
+
+      .gc {
+        fill: #242322;
+      }
+
+      .gd {
+        fill: #7e4127;
+      }
+
+      .ge {
+        fill: #8b4c2f;
+      }
+
+      .gf {
+        fill: #d9dada;
+      }
+
+      .gg {
+        fill: #c3c2c2;
+      }
+
+      .gh {
+        fill: #eeb48b;
+      }
+
+      .gi {
+        fill: #232323;
+      }
+
+      .gj {
+        fill: #d6d6da;
+      }
+
+      .gk {
+        fill: #7f472d;
+      }
+
+      .gl {
+        fill: #945131;
+      }
+
+      .gm {
+        fill: #292726;
+      }
+
+      .gn {
+        fill: #eaeaea;
+      }
+
+      .go {
+        fill: #212d46;
+      }
+
+      .gp {
+        fill: #764329;
+      }
+
+      .gq {
+        fill: #d1d1d2;
+      }
+
+      .gr {
+        fill: #9c5d3f;
+      }
+
+      .gs {
+        fill: #292929;
+      }
+
+      .gt {
+        fill: #eeedee;
+      }
+
+      .gu {
+        fill: #874a2e;
+      }
+
+      .gv {
+        fill: #f4b91c;
+      }
+
+      .gw {
+        fill: #dfdfe0;
+      }
+
+      .gx {
+        fill: #9d583b;
+      }
+
+      .gy {
+        fill: #1ab3bd;
+      }
+
+      .gz {
+        fill: #d1d2d3;
+      }
+
+      .ha {
+        fill: #7c4228;
+      }
+
+      .hb {
+        fill: #524694;
+      }
+
+      .hc {
+        fill: #282726;
+      }
+
+      .hd {
+        fill: #ce342e;
+      }
+
+      .he {
+        fill: #2b2f33;
+      }
+
+      .hf {
+        fill: #222944;
+      }
+
+      .hg {
+        fill: #e5e6e6;
+      }
+
+      .hh {
+        fill: #26af65;
+      }
+
+      .hi {
+        fill: #f7f7f8;
+      }
+
+      .hj {
+        fill: #e7e7e8;
+      }
+
+      .hk {
+        fill: #c5c6c5;
+      }
+
+      .hl {
+        fill: #b06b4c;
+      }
+
+      .hm {
+        fill: #3db2af;
+      }
+
+      .hn {
+        fill: #874d36;
+      }
+
+      .ho {
+        fill: #e7e8e8;
+      }
+
+      .hp {
+        fill: #865cc4;
+      }
+
+      .hq {
+        fill: #2ab065;
+      }
+
+      .hr {
+        fill: #12aa5c;
+      }
+
+      .hs {
+        fill: #d8d8d9;
+      }
+
+      .ht {
+        fill: #1f233d;
+      }
+
+      .hu {
+        fill: #8a4331;
+      }
+
+      .hv {
+        fill: #c0c1c5;
+      }
+
+      .hw {
+        fill: #292727;
+      }
+
+      .hx {
+        fill: #272524;
+      }
+
+      .hy {
+        fill: #85462d;
+      }
+
+      .hz {
+        fill: #4e4642;
+      }
+
+      .ia {
+        fill: #f7f6f7;
+      }
+
+      .ib {
+        fill: #e3e3e3;
+      }
+
+      .ic {
+        fill: #343332;
+      }
+
+      .id {
+        fill: #f9faf9;
+      }
+
+      .ie {
+        fill: #f5f5f6;
+      }
+
+      .if {
+        fill: #7a5f51;
+      }
+
+      .ig {
+        fill: #01aec3;
+      }
+
+      .ih {
+        fill: #df4d2d;
+      }
+
+      .ii {
+        fill: #faf485;
+      }
+
+      .ij {
+        fill: #fa9e1a;
+      }
+
+      .ik {
+        fill: #322c2c;
+      }
+
+      .il {
+        fill: #c8493a;
+      }
+
+      .im {
+        fill: #c8cacb;
+      }
+
+      .in {
+        fill: #b5b1b3;
+      }
+
+      .io {
+        fill: #9b5337;
+      }
+
+      .ip {
+        fill: #e6e6e6;
+      }
+
+      .iq {
+        fill: #f2f1f2;
+      }
+
+      .ir {
+        fill: #af6a48;
+      }
+
+      .is {
+        fill: #242422;
+      }
+
+      .it {
+        fill: #b16e4c;
+      }
+
+      .iu {
+        fill: #2a375b;
+      }
+
+      .iv {
+        fill: #8155c4;
+      }
+
+      .iw {
+        fill: #2c3146;
+      }
+
+      .ix {
+        fill: #2a2525;
+      }
+
+      .iy {
+        fill: #65483e;
+      }
+
+      .iz {
+        fill: #242c45;
+      }
+
+      .ja {
+        fill: #2c2927;
+      }
+
+      .jb {
+        fill: #ab6344;
+      }
+
+      .jc {
+        fill: #e9dbbd;
+      }
+
+      .jd {
+        fill: #87472b;
+      }
+
+      .je {
+        fill: #facc16;
+      }
+
+      .jf {
+        fill: #5d42a9;
+      }
+
+      .jg {
+        fill: #9e5739;
+      }
+
+      .jh {
+        fill: #81462b;
+      }
+
+      .ji {
+        fill: #21b361;
+      }
+
+      .jj {
+        fill: #1d914e;
+      }
+
+      .jk {
+        fill: #be9f79;
+      }
+
+      .jl {
+        fill: #66351e;
+      }
+
+      .jm {
+        fill: #4e526b;
+      }
+
+      .jn {
+        fill: #434c72;
+      }
+
+      .jo {
+        fill: #92634f;
+      }
+
+      .jp {
+        fill: #8f4e34;
+      }
+
+      .jq {
+        fill: #631f2e;
+      }
+
+      .jr {
+        fill: #212223;
+      }
+
+      .js {
+        fill: #db4544;
+      }
+
+      .jt {
+        fill: #6d331c;
+      }
+
+      .ju {
+        fill: #293658;
+      }
+
+      .jv {
+        fill: #e33839;
+      }
+
+      .jw {
+        fill: #c6c7c8;
+      }
+
+      .jx {
+        fill: #6c351f;
+      }
+
+      .jy {
+        fill: #27ac64;
+      }
+
+      .jz {
+        fill: #aa6142;
+      }
+
+      .ka {
+        fill: #28ae61;
+      }
+
+      .kb {
+        fill: #773920;
+      }
+
+      .kc {
+        fill: #228f54;
+      }
+
+      .kd {
+        fill: #8a4d31;
+      }
+
+      .ke {
+        fill: #81452a;
+      }
+
+      .kf {
+        fill: #322c29;
+      }
+
+      .kg {
+        fill: #80432b;
+      }
+
+      .kh {
+        fill: #b77251;
+      }
+
+      .ki {
+        fill: #1f2023;
+      }
+
+      .kj {
+        fill: #8c4c2e;
+      }
+
+      .kk {
+        fill: #e9eae8;
+      }
+
+      .kl {
+        fill: #2a2927;
+      }
+
+      .km {
+        fill: #8b4d31;
+      }
+
+      .kn {
+        fill: #c3d2d2;
+      }
+
+      .ko {
+        fill: #2a2524;
+      }
+
+      .kp {
+        fill: #9e5637;
+      }
+
+      .kq {
+        fill: #982d3f;
+      }
+
+      .kr {
+        fill: #834830;
+      }
+
+      .ks {
+        fill: #1eb1bc;
+      }
+
+      .kt {
+        fill: #ebecec;
+      }
+
+      .ku {
+        fill: #df9e12;
+      }
+
+      .kv {
+        fill: #d5d4d5;
+      }
+
+      .kw {
+        fill: #faba11;
+      }
+
+      .kx {
+        fill: #88492d;
+      }
+
+      .ky {
+        fill: #f6f6f1;
+      }
+
+      .kz {
+        fill: #c5c5c6;
+      }
+
+      .la {
+        fill: #b36b48;
+      }
+
+      .lb {
+        fill: #232222;
+      }
+
+      .lc {
+        fill: #82462c;
+      }
+
+      .ld {
+        fill: #37b05f;
+      }
+
+      .le {
+        fill: #81472d;
+      }
+
+      .lf {
+        fill: #774833;
+      }
+
+      .lg {
+        fill: #f6bb16;
+      }
+
+      .lh {
+        fill: #8b4d2f;
+      }
+
+      .li {
+        fill: #84462d;
+      }
+
+      .lj {
+        fill: #575869;
+      }
+
+      .lk {
+        fill: #222220;
+      }
+
+      .ll {
+        fill: #312e2b;
+      }
+
+      .lm {
+        fill: #f9b81a;
+      }
+
+      .ln {
+        fill: #a3363f;
+      }
+
+      .lo {
+        fill: #edecef;
+      }
+
+      .lp {
+        fill: #b77557;
+      }
+
+      .lq {
+        fill: #894f34;
+      }
+
+      .lr {
+        fill: #f2f2f1;
+      }
+
+      .ls {
+        fill: #9e7360;
+      }
+
+      .lt {
+        fill: #b67150;
+      }
+
+      .lu {
+        fill: #bdc0c1;
+      }
+
+      .lv {
+        fill: #894b2e;
+      }
+
+      .lw {
+        fill: #27b0b4;
+      }
+
+      .lx {
+        fill: #9b5335;
+      }
+
+      .ly {
+        fill: #b66e4c;
+      }
+
+      .lz {
+        fill: #e2e2e2;
+      }
+
+      .ma {
+        fill: #c7c8c9;
+      }
+
+      .mb {
+        fill: #efefef;
+      }
+
+      .mc {
+        fill: #f9cf25;
+      }
+
+      .md {
+        fill: #2a2527;
+      }
+
+      .me {
+        fill: #e3e4e4;
+      }
+
+      .mf {
+        fill: #733822;
+      }
+
+      .mg {
+        fill: #773a23;
+      }
+
+      .mh {
+        fill: #dcddde;
+      }
+
+      .mi {
+        fill: #e43b34;
+      }
+
+      .mj {
+        fill: #7f432b;
+      }
+
+      .mk {
+        fill: #e4e4e4;
+      }
+
+      .ml {
+        fill: #02a9c2;
+      }
+
+      .mm {
+        fill: #824f37;
+      }
+
+      .mn {
+        fill: #f4ce19;
+      }
+
+      .mo {
+        fill: #8d2132;
+      }
+
+      .mp {
+        fill: #dddede;
+      }
+
+      .mq {
+        fill: #77472e;
+      }
+
+      .mr {
+        fill: #f6f6f6;
+      }
+
+      .ms {
+        fill: #d97b14;
+      }
+
+      .mt {
+        fill: #d47c17;
+      }
+
+      .mu {
+        fill: #e9d7b8;
+      }
+
+      .mv {
+        fill: #ede1c6;
+      }
+
+      .mw {
+        fill: #ef453d;
+      }
+
+      .mx {
+        fill: #211925;
+      }
+
+      .my {
+        fill: #ebebeb;
+      }
+
+      .mz {
+        fill: #eaebec;
+      }
+
+      .na {
+        fill: #8d4a2e;
+      }
+
+      .nb {
+        fill: #9b5435;
+      }
+
+      .nc {
+        fill: #d9d9d9;
+      }
+
+      .nd {
+        fill: #88372a;
+      }
+
+      .ne {
+        fill: #c8c9cb;
+      }
+
+      .nf {
+        fill: #f4f4f4;
+      }
+
+      .ng {
+        fill: #b8b8b9;
+      }
+
+      .nh {
+        fill: #6f4fc1;
+      }
+
+      .ni {
+        fill: #d44039;
+      }
+
+      .nj {
+        fill: #631c29;
+      }
+
+      .nk {
+        fill: #8a4b2f;
+      }
+
+      .nl {
+        fill: #fbc016;
+      }
+
+      .nm {
+        fill: #232223;
+      }
+
+      .nn {
+        fill: #673622;
+      }
+
+      .no {
+        fill: #72361d;
+      }
+
+      .np {
+        fill: #2d2c2d;
+      }
+
+      .nq {
+        fill: #d7d3cd;
+      }
+
+      .nr {
+        fill: #db6e13;
+      }
+
+      .ns {
+        fill: #894c32;
+      }
+
+      .nt {
+        fill: #252a29;
+      }
+
+      .nu {
+        fill: #45406b;
+      }
+
+      .nv {
+        fill: #6d2431;
+      }
+
+      .nw {
+        fill: #844a2f;
+      }
+
+      .nx {
+        fill: #eb2746;
+      }
+
+      .ny {
+        fill: #843ec3;
+      }
+
+      .nz {
+        fill: #8a4c31;
+      }
+
+      .oa {
+        fill: #8c4d2e;
+      }
+
+      .ob {
+        fill: #783b22;
+      }
+
+      .oc {
+        fill: #f7fcf8;
+      }
+
+      .od {
+        fill: #2e2b29;
+      }
+
+      .oe {
+        fill: #a2a2a3;
+      }
+
+      .of {
+        fill: #b4704d;
+      }
+
+      .og {
+        fill: #b77250;
+      }
+
+      .oh {
+        fill: #29292a;
+      }
+
+      .oi {
+        fill: #da7114;
+      }
+
+      .oj {
+        fill: #ed5d36;
+      }
+
+      .ok {
+        fill: #2e3447;
+      }
+
+      .ol {
+        fill: #fbb70e;
+      }
+
+      .om {
+        fill: #7b432c;
+      }
+
+      .on {
+        fill: #6f5042;
+      }
+
+      .oo {
+        fill: #f3f2f3;
+      }
+
+      .op {
+        fill: #754938;
+      }
+
+      .oq {
+        fill: #cecece;
+      }
+
+      .or {
+        fill: #e9eaea;
+      }
+
+      .os {
+        fill: #9f593b;
+      }
+
+      .ot {
+        fill: #2c2c2c;
+      }
+
+      .ou {
+        fill: #974f32;
+      }
+
+      .ov {
+        fill: #28292a;
+      }
+
+      .ow {
+        fill: #e9423b;
+      }
+
+      .ox {
+        fill: #171717;
+      }
+
+      .oy {
+        fill: #73371f;
+      }
+
+      .oz {
+        fill: #e43431;
+      }
+
+      .pa {
+        fill: #6d331d;
+      }
+
+      .pb {
+        fill: #2a2727;
+      }
+
+      .pc {
+        fill: #22a65b;
+      }
+
+      .pd {
+        fill: #715c33;
+      }
+
+      .pe {
+        fill: #23b6bc;
+      }
+
+      .pf {
+        fill: #e1e2e3;
+      }
+
+      .pg {
+        fill: #363e5c;
+      }
+
+      .ph {
+        fill: #eeefef;
+      }
+
+      .pi {
+        fill: #2e3c64;
+      }
+
+      .pj {
+        fill: #2b282b;
+      }
+
+      .pk {
+        fill: #8c5034;
+      }
+
+      .pl {
+        fill: #25ab66;
+      }
+
+      .pm {
+        fill: #ecebea;
+      }
+
+      .pn {
+        fill: #6b412e;
+      }
+
+      .po {
+        fill: #6d3923;
+      }
+
+      .pp {
+        fill: #262526;
+      }
+
+      .pq {
+        fill: #3f4146;
+      }
+
+      .pr {
+        fill: #b1704e;
+      }
+
+      .ps {
+        fill: #cdced0;
+      }
+
+      .pt {
+        fill: #87492d;
+      }
+
+      .pu {
+        fill: #72402c;
+      }
+
+      .pv {
+        fill: #835cc6;
+      }
+
+      .pw {
+        fill: #269558;
+      }
+
+      .px {
+        fill: #783d26;
+      }
+
+      .py {
+        fill: #d03641;
+      }
+
+      .pz {
+        fill: #ad5f3e;
+      }
+
+      .qa {
+        fill: #e85e3a;
+      }
+
+      .qb {
+        fill: #8b492b;
+      }
+
+      .qc {
+        fill: #741e36;
+      }
+
+      .qd {
+        fill: #f8f9f7;
+      }
+
+      .qe {
+        fill: #eaebeb;
+      }
+
+      .qf {
+        fill: #322f2c;
+      }
+
+      .qg {
+        fill: #1b2220;
+      }
+
+      .qh {
+        fill: #783f25;
+      }
+
+      .qi {
+        fill: #946652;
+      }
+
+      .qj {
+        fill: #6b51b0;
+      }
+
+      .qk {
+        fill: #8b2b3b;
+      }
+
+      .ql {
+        fill: #2c2a2a;
+      }
+
+      .qm {
+        fill: #01adb6;
+      }
+
+      .qn {
+        fill: #e34239;
+      }
+
+      .qo {
+        fill: #9d5639;
+      }
+
+      .qp {
+        fill: #d8d9db;
+      }
+
+      .qq {
+        fill: #2f2c2b;
+      }
+
+      .qr {
+        fill: #262e46;
+      }
+
+      .qs {
+        fill: #242942;
+      }
+
+      .qt {
+        fill: #d0a28c;
+      }
+
+      .qu {
+        fill: #b26b4a;
+      }
+
+      .qv {
+        fill: #c08364;
+      }
+
+      .qw {
+        fill: #f1a907;
+      }
+
+      .qx {
+        fill: #995036;
+      }
+
+      .qy {
+        fill: #fcfcfd;
+      }
+
+      .qz {
+        fill: #8f4c31;
+      }
+
+      .ra {
+        fill: #85482e;
+      }
+
+      .rb {
+        fill: #ce2e37;
+      }
+
+      .rc {
+        fill: #eaeae8;
+      }
+
+      .rd {
+        fill: #028b91;
+      }
+
+      .re {
+        fill: #9f5535;
+      }
+
+      .rf {
+        fill: #ad6b4b;
+      }
+
+      .rg {
+        fill: #5c5f63;
+      }
+
+      .rh {
+        fill: #fbfbfa;
+      }
+
+      .ri {
+        fill: #d33a3e;
+      }
+
+      .rj {
+        fill: #342d2b;
+      }
+
+      .rk {
+        fill: #e9e5e2;
+      }
+
+      .rl {
+        fill: #fbf9f8;
+      }
+
+      .rm {
+        fill: #353633;
+      }
+
+      .rn {
+        fill: #6f3a23;
+      }
+
+      .ro {
+        fill: #e5e5e4;
+      }
+
+      .rp {
+        fill: #04a7be;
+      }
+
+      .rq {
+        fill: #202121;
+      }
+
+      .rr {
+        fill: #c1c3c3;
+      }
+
+      .rs {
+        fill: #f0a835;
+      }
+
+      .rt {
+        fill: #f88c1a;
+      }
+
+      .ru {
+        fill: #965439;
+      }
+
+      .rv {
+        fill: #f7d113;
+      }
+
+      .rw {
+        fill: #6d351e;
+      }
+
+      .rx {
+        fill: #7b4027;
+      }
+
+      .ry {
+        fill: #1f9350;
+      }
+
+      .rz {
+        fill: #653bbc;
+      }
+
+      .sa {
+        fill: #2f2e2c;
+      }
+
+      .sb {
+        fill: #793fb4;
+      }
+
+      .sc {
+        fill: #1e1e1e;
+      }
+
+      .sd {
+        fill: #fbfcfc;
+      }
+
+      .se {
+        fill: #553b30;
+      }
+
+      .sf {
+        fill: #82472d;
+      }
+
+      .sg {
+        fill: #c2947d;
+      }
+
+      .sh {
+        fill: #a7694b;
+      }
+
+      .si {
+        fill: #6f1e30;
+      }
+
+      .sj {
+        fill: #272d46;
+      }
+
+      .sk {
+        fill: #f3c71b;
+      }
+
+      .sl {
+        fill: #33416b;
+      }
+
+      .sm {
+        fill: #b7734f;
+      }
+
+      .sn {
+        fill: #f5b414;
+      }
+
+      .so {
+        fill: #e1dcd4;
+      }
+
+      .sp {
+        fill: #8d5338;
+      }
+
+      .sq {
+        fill: #b56f4e;
+      }
+
+      .sr {
+        fill: #703820;
+      }
+
+      .ss {
+        fill: #ca2e37;
+      }
+
+      .st {
+        fill: #de9d12;
+      }
+
+      .su {
+        fill: #eaecec;
+      }
+
+      .sv {
+        fill: #b26e4e;
+      }
+
+      .sw {
+        fill: #ececed;
+      }
+
+      .sx {
+        fill: #6e38b2;
+      }
+
+      .sy {
+        fill: #87462d;
+      }
+
+      .sz {
+        fill: #8a4b2e;
+      }
+
+      .ta {
+        fill: #81482e;
+      }
+
+      .tb {
+        fill: #31302e;
+      }
+
+      .tc {
+        fill: #dedfe1;
+      }
+
+      .td {
+        fill: #facd19;
+      }
+
+      .te {
+        fill: #e8f3ee;
+      }
+
+      .tf {
+        fill: #bebdc2;
+      }
+
+      .tg {
+        fill: #8059c4;
+      }
+
+      .th {
+        fill: #f6a328;
+      }
+
+      .ti {
+        fill: #b66f4d;
+      }
+
+      .tj {
+        fill: #ab6545;
+      }
+
+      .tk {
+        fill: #0e8990;
+      }
+
+      .tl {
+        fill: #ebebec;
+      }
+
+      .tm {
+        fill: #d94039;
+      }
+
+      .tn {
+        fill: #2ab368;
+      }
+
+      .to {
+        fill: #0fb0b1;
+      }
+
+      .tp {
+        fill: #992e3d;
+      }
+
+      .tq {
+        fill: #018b92;
+      }
+
+      .tr {
+        fill: #676666;
+      }
+
+      .ts {
+        fill: #89492f;
+      }
+
+      .tt {
+        fill: #84492e;
+      }
+
+      .tu {
+        fill: #8b4a2f;
+      }
+
+      .tv {
+        fill: #8e4e2f;
+      }
+
+      .tw {
+        fill: #cacacc;
+      }
+
+      .tx {
+        fill: #d1d0d1;
+      }
+
+      .ty {
+        fill: #e2362e;
+      }
+
+      .tz {
+        fill: #89492c;
+      }
+
+      .ua {
+        fill: #afadad;
+      }
+
+      .ub {
+        fill: #e0433e;
+      }
+
+      .uc {
+        fill: #962944;
+      }
+
+      .ud {
+        fill: #7cbfdc;
+      }
+
+      .ue {
+        fill: #8c4f32;
+      }
+
+      .uf {
+        fill: #d6d8d8;
+      }
+
+      .ug {
+        fill: #d8d8da;
+      }
+
+      .uh {
+        fill: #86472b;
+      }
+
+      .ui {
+        fill: #dedfdf;
+      }
+
+      .uj {
+        fill: #854429;
+      }
+
+      .uk {
+        fill: #86482b;
+      }
+
+      .ul {
+        fill: #e3a378;
+      }
+
+      .um {
+        fill: #fcfbfb;
+      }
+
+      .un {
+        fill: #8b4d30;
+      }
+
+      .uo {
+        fill: #212121;
+      }
+
+      .up {
+        fill: #723820;
+      }
+
+      .uq {
+        fill: #905032;
+      }
+
+      .ur {
+        fill: #f9c712;
+      }
+
+      .us {
+        fill: #e6d1b0;
+      }
+
+      .ut {
+        fill: #e5e5e5;
+      }
+
+      .uu {
+        fill: #854c34;
+      }
+
+      .uv {
+        fill: #824c30;
+      }
+
+      .uw {
+        fill: #a73021;
+      }
+
+      .ux {
+        fill: #ece6df;
+      }
+
+      .uy {
+        fill: #c2c3c3;
+      }
+
+      .uz {
+        fill: #8a4f32;
+      }
+
+      .va {
+        fill: #fcfcfb;
+      }
+
+      .vb {
+        fill: #b1704f;
+      }
+
+      .vc {
+        fill: #f6c727;
+      }
+
+      .vd {
+        fill: #a05a3c;
+      }
+
+      .ve {
+        fill: #8d4c2e;
+      }
+
+      .vf {
+        fill: #fca21b;
+      }
+
+      .vg {
+        fill: #7a4a32;
+      }
+
+      .vh {
+        fill: #0a8a8d;
+      }
+
+      .vi {
+        fill: #fed116;
+      }
+
+      .vj {
+        fill: #842c39;
+      }
+
+      .vk {
+        fill: #313030;
+      }
+
+      .vl {
+        fill: #af6748;
+      }
+
+      .vm {
+        fill: #874f33;
+      }
+
+      .vn {
+        fill: #aa6346;
+      }
+
+      .vo {
+        fill: #252624;
+      }
+
+      .vp {
+        fill: #6a4c3f;
+      }
+
+      .vq {
+        fill: #22ab5c;
+      }
+
+      .vr {
+        fill: #86482d;
+      }
+
+      .vs {
+        fill: #834c36;
+      }
+
+      .vt {
+        fill: #7d58c4;
+      }
+
+      .vu {
+        fill: #e6e7e7;
+      }
+
+      .vv {
+        fill: #84472c;
+      }
+
+      .vw {
+        fill: #9d9d9d;
+      }
+
+      .vx {
+        fill: #d56914;
+      }
+
+      .vy {
+        fill: #01abb4;
+      }
+
+      .vz {
+        fill: #a33452;
+      }
+
+      .wa {
+        fill: #f1f1f0;
+      }
+
+      .wb {
+        fill: #efc60c;
+      }
+
+      .wc {
+        fill: #ab6443;
+      }
+
+      .wd {
+        fill: #212122;
+      }
+
+      .we {
+        fill: #6d3921;
+      }
+
+      .wf {
+        fill: #703b26;
+      }
+
+      .wg {
+        fill: #d32646;
+      }
+
+      .wh {
+        fill: #a38a7d;
+      }
+
+      .wi {
+        fill: #02acb7;
+      }
+
+      .wj {
+        fill: #84482a;
+      }
+
+      .wk {
+        fill: #2a2826;
+      }
+
+      .wl {
+        fill: #302e2b;
+      }
+
+      .wm {
+        fill: #cfd0d1;
+      }
+
+      .wn {
+        fill: #b37353;
+      }
+
+      .wo {
+        fill: #845123;
+      }
+
+      .wp {
+        fill: #945033;
+      }
+
+      .wq {
+        fill: #272627;
+      }
+
+      .wr {
+        fill: #a4def7;
+      }
+
+      .ws {
+        fill: #7e4933;
+      }
+
+      .wt {
+        fill: #a05144;
+      }
+
+      .wu {
+        fill: #a7694a;
+      }
+
+      .wv {
+        fill: #656668;
+      }
+
+      .ww {
+        fill: #27ac63;
+      }
+
+      .wx {
+        fill: #f8f9f5;
+      }
+
+      .wy {
+        fill: #3db8b6;
+      }
+
+      .wz {
+        fill: #8a4d32;
+      }
+
+      .xa {
+        fill: #6d54c3;
+      }
+
+      .xb {
+        fill: #5e2332;
+      }
+
+      .xc {
+        fill: #dedede;
+      }
+
+      .xd {
+        fill: #d5d6d7;
+      }
+
+      .xe {
+        fill: #12b9cb;
+      }
+
+      .xf {
+        fill: #7445b4;
+      }
+
+      .xg {
+        fill: #2d2b2b;
+      }
+
+      .xh {
+        fill: #804128;
+      }
+
+      .xi {
+        fill: #84462b;
+      }
+
+      .xj {
+        fill: #eadbbe;
+      }
+
+      .xk {
+        fill: #332923;
+      }
+
+      .xl {
+        fill: #cea48f;
+      }
+
+      .xm {
+        fill: #7c3f26;
+      }
+
+      .xn {
+        fill: #27b064;
+      }
+
+      .xo {
+        fill: #fab414;
+      }
+
+      .xp {
+        fill: #eef3f5;
+      }
+
+      .xq {
+        fill: #e7e5de;
+      }
+
+      .xr {
+        fill: #2f3653;
+      }
+
+      .xs {
+        fill: #7c59c4;
+      }
+
+      .xt {
+        fill: #fac31a;
+      }
+
+      .xu {
+        fill: #3cc666;
+      }
+
+      .xv {
+        fill: #272727;
+      }
+
+      .xw {
+        fill: #201e1f;
+      }
+
+      .xx {
+        fill: #83462e;
+      }
+
+      .xy {
+        fill: #6757c1;
+      }
+
+      .xz {
+        fill: #703821;
+      }
+
+      .ya {
+        fill: #8d4f33;
+      }
+
+      .yb {
+        fill: #7852c0;
+      }
+
+      .yc {
+        fill: #ebb016;
+      }
+
+      .yd {
+        fill: #a6a5a4;
+      }
+
+      .ye {
+        fill: #c8c8cb;
+      }
+
+      .yf {
+        fill: #c6c6c6;
+      }
+
+      .yg {
+        fill: #dadbdb;
+      }
+
+      .yh {
+        fill: #f0eff0;
+      }
+
+      .yi {
+        fill: #777574;
+      }
+
+      .yj {
+        fill: #c8c4c3;
+      }
+
+      .yk {
+        fill: #3b4264;
+      }
+
+      .yl {
+        fill: #abe0f9;
+      }
+
+      .ym {
+        fill: #29232a;
+      }
+
+      .yn {
+        fill: #bbbdbd;
+      }
+
+      .yo {
+        fill: #85482d;
+      }
+
+      .yp {
+        fill: #84492d;
+      }
+
+      .yq {
+        fill: #9e5a3f;
+      }
+
+      .yr {
+        fill: #d36915;
+      }
+
+      .ys {
+        fill: #432b27;
+      }
+
+      .yt {
+        fill: #f3d021;
+      }
+
+      .yu {
+        fill: #29af63;
+      }
+
+      .yv {
+        fill: #8a5136;
+      }
+
+      .yw {
+        fill: #dadadb;
+      }
+
+      .yx {
+        fill: #6f3cb2;
+      }
+
+      .yy {
+        fill: #f6d51b;
+      }
+
+      .yz {
+        fill: #656569;
+      }
+
+      .za {
+        fill: #f8b90b;
+      }
+
+      .zb {
+        fill: #5e5c7c;
+      }
+
+      .zc {
+        fill: #605fb7;
+      }
+
+      .zd {
+        fill: #e3e2e5;
+      }
+
+      .ze {
+        fill: #06a9b3;
+      }
+
+      .zf {
+        fill: #d0d1d2;
+      }
+
+      .zg {
+        fill: #8d4d2f;
+      }
+
+      .zh {
+        fill: #764832;
+      }
+
+      .zi {
+        fill: #af6e4e;
+      }
+
+      .zj {
+        fill: #f1f2f2;
+      }
+
+      .zk {
+        fill: #7b452b;
+      }
+
+      .zl {
+        fill: #631927;
+      }
+
+      .zm {
+        fill: #7e472d;
+      }
+
+      .zn {
+        fill: #26ae64;
+      }
+
+      .zo {
+        fill: #db7331;
+      }
+
+      .zp {
+        fill: #c0c1c3;
+      }
+
+      .zq {
+        fill: #9b5437;
+      }
+
+      .zr {
+        fill: #e7ba12;
+      }
+
+      .zs {
+        fill: #414851;
+      }
+
+      .zt {
+        fill: #bebebe;
+      }
+
+      .zu {
+        fill: #222321;
+      }
+
+      .zv {
+        fill: #93502f;
+      }
+
+      .zw {
+        fill: #222121;
+      }
+
+      .zx {
+        fill: #87492e;
+      }
+
+      .zy {
+        fill: #dc6e13;
+      }
+
+      .zz {
+        fill: #ce3348;
+      }
+
+      .aaa {
+        fill: #cd9f8a;
+      }
+
+      .aab {
+        fill: #753a22;
+      }
+
+      .aac {
+        fill: #242324;
+      }
+
+      .aad {
+        fill: #c8c9ca;
+      }
+
+      .aae {
+        fill: #292626;
+      }
+
+      .aaf {
+        fill: #8153c1;
+      }
+
+      .aag {
+        fill: #c7c7c7;
+      }
+
+      .aah {
+        fill: #e3463d;
+      }
+
+      .aai {
+        fill: #2a2a29;
+      }
+
+      .aaj {
+        fill: #ca3736;
+      }
+
+      .aak {
+        fill: #d8302b;
+      }
+
+      .aal {
+        fill: #222122;
+      }
+
+      .aam {
+        fill: #834a2f;
+      }
+
+      .aan {
+        fill: #bf333e;
+      }
+
+      .aao {
+        fill: #c6c6c8;
+      }
+
+      .aap {
+        fill: #e0e0e1;
+      }
+
+      .aaq {
+        fill: #2c2632;
+      }
+
+      .aar {
+        fill: #03adb9;
+      }
+
+      .aas {
+        fill: #f7f8f8;
+      }
+
+      .aat {
+        fill: #ebeae5;
+      }
+
+      .aau {
+        fill: #292725;
+      }
+
+      .aav {
+        fill: #282329;
+      }
+
+      .aaw {
+        fill: #292625;
+      }
+
+      .aax {
+        fill: #01b2ca;
+      }
+
+      .aay {
+        fill: #3d3f47;
+      }
+
+      .aaz {
+        fill: #bf8262;
+      }
+
+      .aba {
+        fill: #ddd;
+      }
+
+      .abb {
+        fill: #7e3f25;
+      }
+
+      .abc {
+        fill: #e5e3e1;
+      }
+
+      .abd {
+        fill: #f8ce20;
+      }
+
+      .abe {
+        fill: #cb9c84;
+      }
+
+      .abf {
+        fill: #d5433c;
+      }
+
+      .abg {
+        fill: #2fa960;
+      }
+
+      .abh {
+        fill: #c7c7c8;
+      }
+
+      .abi {
+        fill: #e4e4e6;
+      }
+
+      .abj {
+        fill: #ccd8dc;
+      }
+
+      .abk {
+        fill: #d3d3d4;
+      }
+
+      .abl {
+        fill: #ded1b5;
+      }
+
+      .abm {
+        fill: #b26b49;
+      }
+
+      .abn {
+        fill: #212323;
+      }
+
+      .abo {
+        fill: #b46e4b;
+      }
+
+      .abp {
+        fill: #212120;
+      }
+
+      .abq {
+        fill: #dedee0;
+      }
+
+      .abr {
+        fill: #7f49d8;
+      }
+
+      .abs {
+        fill: #7b442a;
+      }
+
+      .abt {
+        fill: #fcfdfc;
+      }
+
+      .abu {
+        fill: #20c3d5;
+      }
+
+      .abv {
+        fill: #d4d5d6;
+      }
+
+      .abw {
+        fill: #b26e4d;
+      }
+
+      .abx {
+        fill: #a7ddf5;
+      }
+
+      .aby {
+        fill: #22b15f;
+      }
+
+      .abz {
+        fill: #7f492b;
+      }
+
+      .aca {
+        fill: #772338;
+      }
+
+      .acb {
+        fill: #b06e4d;
+      }
+
+      .acc {
+        fill: #f7d722;
+      }
+
+      .acd {
+        fill: #dcd8d9;
+      }
+
+      .ace {
+        fill: #d9433a;
+      }
+
+      .acf {
+        fill: #e8e8e9;
+      }
+
+      .acg {
+        fill: #f3efea;
+      }
+
+      .ach {
+        fill: #282727;
+      }
+
+      .aci {
+        fill: #69351f;
+      }
+
+      .acj {
+        fill: #fafbf9;
+      }
+
+      .ack {
+        fill: #884a30;
+      }
+
+      .acl {
+        fill: #b5b1af;
+      }
+
+      .acm {
+        fill: #f2f3f3;
+      }
+
+      .acn {
+        fill: #de9c08;
+      }
+
+      .aco {
+        fill: #dbdcdc;
+      }
+
+      .acp {
+        fill: #aca69e;
+      }
+
+      .acq {
+        fill: #cf3339;
+      }
+
+      .acr {
+        fill: #753f27;
+      }
+
+      .acs {
+        fill: #40b7b4;
+      }
+
+      .act {
+        fill: #b76e4c;
+      }
+
+      .acu {
+        fill: #252323;
+      }
+
+      .acv {
+        fill: #fab926;
+      }
+
+      .acw {
+        fill: #232e47;
+      }
+
+      .acx {
+        fill: #cb3138;
+      }
+
+      .acy {
+        fill: #87482b;
+      }
+
+      .acz {
+        fill: #bdbdc0;
+      }
+
+      .ada {
+        fill: #df383f;
+      }
+
+      .adb {
+        fill: #434449;
+      }
+
+      .adc {
+        fill: #475d91;
+      }
+
+      .add {
+        fill: #9d583d;
+      }
+
+      .ade {
+        fill: #babbbc;
+      }
+
+      .adf {
+        fill: #9b353d;
+      }
+
+      .adg {
+        fill: #fb9f1d;
+      }
+
+      .adh {
+        fill: #884b2f;
+      }
+
+      .adi {
+        fill: #b4704e;
+      }
+
+      .adj {
+        fill: #e7e4e1;
+      }
+
+      .adk {
+        fill: #01afb9;
+      }
+
+      .adl {
+        fill: #e8e8e7;
+      }
+
+      .adm {
+        fill: #85482c;
+      }
+
+      .adn {
+        fill: #e7e7e7;
+      }
+
+      .ado {
+        fill: #02a7b2;
+      }
+
+      .adp {
+        fill: #7b52c4;
+      }
+
+      .adq {
+        fill: #985235;
+      }
+
+      .adr {
+        fill: #76c999;
+      }
+
+      .ads {
+        fill: #302b28;
+      }
+
+      .adt {
+        fill: #1e1e1f;
+      }
+
+      .adu {
+        fill: #b66e4b;
+      }
+
+      .adv {
+        fill: #eeeae8;
+      }
+
+      .adw {
+        fill: #2fb365;
+      }
+
+      .adx {
+        fill: #28b165;
+      }
+
+      .ady {
+        fill: #2a2a28;
+      }
+
+      .adz {
+        fill: #a8603f;
+      }
+
+      .aea {
+        fill: #6b371f;
+      }
+
+      .aeb {
+        fill: #262525;
+      }
+
+      .aec {
+        fill: #e2e1e2;
+      }
+
+      .aed {
+        fill: #282528;
+      }
+
+      .aee {
+        fill: #ddddde;
+      }
+
+      .aef {
+        fill: #e7423b;
+      }
+
+      .aeg {
+        fill: #88492c;
+      }
+
+      .aeh {
+        fill: #242223;
+      }
+
+      .aei {
+        fill: #2e2c2b;
+      }
+
+      .aej {
+        fill: #b46e4c;
+      }
+
+      .aek {
+        fill: #b26e4c;
+      }
+
+      .ael {
+        fill: #884d31;
+      }
+
+      .aem {
+        fill: #12a5d7;
+      }
+
+      .aen {
+        fill: #ab6c4c;
+      }
+
+      .aeo {
+        fill: #fdcf14;
+      }
+
+      .aep {
+        fill: #c7c8c8;
+      }
+
+      .aeq {
+        fill: #864e35;
+      }
+
+      .aer {
+        fill: #efeeec;
+      }
+
+      .aes {
+        fill: #b26b48;
+      }
+
+      .aet {
+        fill: #bbbcbe;
+      }
+
+      .aeu {
+        fill: #1f1f20;
+      }
+
+      .aev {
+        fill: #b16a4a;
+      }
+
+      .aew {
+        fill: #e9ece5;
+      }
+
+      .aex {
+        fill: #9e573a;
+      }
+
+      .aey {
+        fill: #f7f7f6;
+      }
+
+      .aez {
+        fill: #d0a690;
+      }
+
+      .afa {
+        fill: #1f2021;
+      }
+
+      .afb {
+        fill: #733e2d;
+      }
+
+      .afc {
+        fill: #ececeb;
+      }
+
+      .afd {
+        fill: #b47250;
+      }
+
+      .afe {
+        fill: #86233c;
+      }
+
+      .aff {
+        fill: #c52a2d;
+      }
+
+      .afg {
+        fill: #252324;
+      }
+
+      .afh {
+        fill: #e0ddce;
+      }
+
+      .afi {
+        fill: #9c5435;
+      }
+
+      .afj {
+        fill: #626162;
+      }
+
+      .afk {
+        fill: #bd7d5e;
+      }
+
+      .afl {
+        fill: #ccc2bd;
+      }
+
+      .afm {
+        fill: #712033;
+      }
+
+      .afn {
+        fill: #df3e38;
+      }
+
+      .afo {
+        fill: #66341f;
+      }
+
+      .afp {
+        fill: #292827;
+      }
+
+      .afq {
+        fill: #bc7d5d;
+      }
+
+      .afr {
+        fill: #f3f2f2;
+      }
+
+      .afs {
+        fill: #313756;
+      }
+
+      .aft {
+        fill: #743d25;
+      }
+
+      .afu {
+        fill: #252425;
+      }
+
+      .afv {
+        fill: #84482d;
+      }
+
+      .afw {
+        fill: #7b45b5;
+      }
+
+      .afx {
+        fill: #847668;
+      }
+
+      .afy {
+        fill: #ba7d57;
+      }
+
+      .afz {
+        fill: #83472d;
+      }
+
+      .aga {
+        fill: #753d2f;
+      }
+
+      .agb {
+        fill: #edefef;
+      }
+
+      .agc {
+        fill: #ebe7e3;
+      }
+
+      .agd {
+        fill: #693fad;
+      }
+
+      .age {
+        fill: #4a4f52;
+      }
+
+      .agf {
+        fill: #be2c37;
+      }
+
+      .agg {
+        fill: #02aeba;
+      }
+
+      .agh {
+        fill: #575454;
+      }
+
+      .agi {
+        fill: #814128;
+      }
+
+      .agj {
+        fill: #f9cc13;
+      }
+
+      .agk {
+        fill: #874b2f;
+      }
+
+      .agl {
+        fill: #494f53;
+      }
+
+      .agm {
+        fill: #262626;
+      }
+
+      .agn {
+        fill: #eceeee;
+      }
+
+      .ago {
+        fill: #82442d;
+      }
+
+      .agp {
+        fill: #f6c40e;
+      }
+
+      .agq {
+        fill: #252222;
+      }
+
+      .agr {
+        fill: #a96143;
+      }
+
+      .ags {
+        fill: #894f32;
+      }
+
+      .agt {
+        fill: #c1c2c4;
+      }
+
+      .agu {
+        fill: #a65a3a;
+      }
+
+      .agv {
+        fill: #8e5135;
+      }
+
+      .agw {
+        fill: #f1f1f2;
+      }
+
+      .agx {
+        fill: #6d341f;
+      }
+
+      .agy {
+        fill: #ad6c4c;
+      }
+
+      .agz {
+        fill: #c12c35;
+      }
+
+      .aha {
+        fill: #a05837;
+      }
+
+      .ahb {
+        fill: #f1ae81;
+      }
+
+      .ahc {
+        fill: #f1d709;
+      }
+
+      .ahd {
+        fill: #8c4b30;
+      }
+
+      .ahe {
+        fill: #7d462c;
+      }
+
+      .ahf {
+        fill: #252424;
+      }
+
+      .ahg {
+        fill: #8c4e31;
+      }
+
+      .ahh {
+        fill: #d73635;
+      }
+
+      .ahi {
+        fill: #374772;
+      }
+
+      .ahj {
+        fill: #d2d2d4;
+      }
+
+      .ahk {
+        fill: #52362d;
+      }
+
+      .ahl {
+        fill: #af6c4c;
+      }
+
+      .ahm {
+        fill: #282526;
+      }
+
+      .ahn {
+        fill: #f4f3ef;
+      }
+
+      .aho {
+        fill: #e6473e;
+      }
+
+      .ahp {
+        fill: #de3d36;
+      }
+
+      .ahq {
+        fill: #e5e9e3;
+      }
+
+      .ahr {
+        fill: #242626;
+      }
+
+      .ahs {
+        fill: #433231;
+      }
+
+      .aht {
+        fill: #202125;
+      }
+
+      .ahu {
+        fill: #8c4b2d;
+      }
+
+      .ahv {
+        fill: #986b56;
+      }
+
+      .ahw {
+        fill: #35322d;
+      }
+
+      .ahx {
+        fill: #2d2b2c;
+      }
+
+      .ahy {
+        fill: #636264;
+      }
+
+      .ahz {
+        fill: #01adb7;
+      }
+
+      .aia {
+        fill: #228d55;
+      }
+
+      .aib {
+        fill: #7f54c1;
+      }
+
+      .aic {
+        fill: #894a2e;
+      }
+
+      .aid {
+        fill: #733b26;
+      }
+
+      .aie {
+        fill: #864d31;
+      }
+
+      .aif {
+        fill: #228b51;
+      }
+
+      .aig {
+        fill: #e44b2e;
+      }
+
+      .aih {
+        fill: #29282a;
+      }
+
+      .aii {
+        fill: #d6d6d7;
+      }
+
+      .aij {
+        fill: #dcdddd;
+      }
+
+      .aik {
+        fill: #c8423f;
+      }
+
+      .ail {
+        fill: #b06a49;
+      }
+
+      .aim {
+        fill: #2e2b2a;
+      }
+
+      .ain {
+        fill: #cbcccd;
+      }
+
+      .aio {
+        fill: #232947;
+      }
+
+      .aip {
+        fill: #c3c5c6;
+      }
+
+      .aiq {
+        fill: #9a5336;
+      }
+
+      .air {
+        fill: #f0f0f0;
+      }
+
+      .ais {
+        fill: #83482d;
+      }
+
+      .ait {
+        fill: #24a7aa;
+      }
+
+      .aiu {
+        fill: #5f2030;
+      }
+
+      .aiv {
+        fill: #651f2c;
+      }
+
+      .aiw {
+        fill: #854b2f;
+      }
+
+      .aix {
+        fill: #b16f4e;
+      }
+
+      .aiy {
+        fill: #b46d4b;
+      }
+
+      .aiz {
+        fill: #b26d4b;
+      }
+
+      .aja {
+        fill: #038d96;
+      }
+
+      .ajb {
+        fill: #454347;
+      }
+
+      .ajc {
+        fill: #6c341d;
+      }
+
+      .ajd {
+        fill: #242424;
+      }
+
+      .aje {
+        fill: #e7eeef;
+      }
+
+      .ajf {
+        fill: #d84543;
+      }
+
+      .ajg {
+        fill: #292728;
+      }
+
+      .ajh {
+        fill: #8a4d2f;
+      }
+
+      .aji {
+        fill: #4e332a;
+      }
+
+      .ajj {
+        fill: #f6f9fa;
+      }
+
+      .ajk {
+        fill: #e2e2e1;
+      }
+
+      .ajl {
+        fill: #262424;
+      }
+
+      .ajm {
+        fill: #242f49;
+      }
+
+      .ajn {
+        fill: #9b5638;
+      }
+
+      .ajo {
+        fill: #ecf3f7;
+      }
+
+      .ajp {
+        fill: #2d395f;
+      }
+
+      .ajq {
+        fill: #581826;
+      }
+
+      .ajr {
+        fill: #817b76;
+      }
+
+      .ajs {
+        fill: #ae6a4a;
+      }
+
+      .ajt {
+        fill: #e8dabe;
+      }
+
+      .aju {
+        fill: #bcbcbc;
+      }
+
+      .ajv {
+        fill: #8d5238;
+      }
+
+      .ajw {
+        fill: #afa7a2;
+      }
+
+      .ajx {
+        fill: #ea4e43;
+      }
+
+      .ajy {
+        fill: #8158c4;
+      }
+
+      .ajz {
+        fill: #6c341f;
+      }
+
+      .aka {
+        fill: #972946;
+      }
+
+      .akb {
+        fill: #8d4f31;
+      }
+
+      .akc {
+        fill: #dcdcde;
+      }
+
+      .akd {
+        fill: #3f3e40;
+      }
+
+      .ake {
+        fill: #982e3f;
+      }
+
+      .akf {
+        fill: #905134;
+      }
+
+      .akg {
+        fill: #7c55c2;
+      }
+
+      .akh {
+        fill: #2d2826;
+      }
+
+      .aki {
+        fill: #7b55c2;
+      }
+
+      .akj {
+        fill: #3f2e26;
+      }
+
+      .akk {
+        fill: #844e36;
+      }
+
+      .akl {
+        fill: #69686a;
+      }
+
+      .akm {
+        fill: #cececf;
+      }
+
+      .akn {
+        fill: #b57453;
+      }
+
+      .ako {
+        fill: #f9cd1a;
+      }
+
+      .akp {
+        fill: #b66f4c;
+      }
+
+      .akq {
+        fill: #723e30;
+      }
+
+      .akr {
+        fill: #dd4042;
+      }
+
+      .aks {
+        fill: #77bfde;
+      }
+
+      .akt {
+        fill: #c38f71;
+      }
+
+      .aku {
+        fill: #02adb8;
+      }
+
+      .akv {
+        fill: #875ec9;
+      }
+
+      .akw {
+        fill: #2a2929;
+      }
+
+      .akx {
+        fill: #e7bb1b;
+      }
+
+      .aky {
+        fill: #272726;
+      }
+
+      .akz {
+        fill: #c5c6c6;
+      }
+
+      .ala {
+        fill: #f2b30c;
+      }
+
+      .alb {
+        fill: #f1f0f1;
+      }
+
+      .alc {
+        fill: #f3f4f4;
+      }
+
+      .ald {
+        fill: #7f4127;
+      }
+
+      .ale {
+        fill: #02aab5;
+      }
+
+      .alf {
+        fill: #664638;
+      }
+
+      .alg {
+        fill: #b06d4d;
+      }
+
+      .alh {
+        fill: #21b363;
+      }
+
+      .ali {
+        fill: #e6d5b7;
+      }
+
+      .alj {
+        fill: #d9d8d9;
+      }
+
+      .alk {
+        fill: #9b999b;
+      }
+
+      .all {
+        fill: #09a2a6;
+      }
+
+      .alm {
+        fill: #19b365;
+      }
+
+      .aln {
+        fill: #83492f;
+      }
+
+      .alo {
+        fill: #624238;
+      }
+
+      .alp {
+        fill: #17af56;
+      }
+
+      .alq {
+        fill: #aa6647;
+      }
+
+      .alr {
+        fill: #c99f85;
+      }
+
+      .als {
+        fill: #854b31;
+      }
+
+      .alt {
+        fill: #dddddc;
+      }
+
+      .alu {
+        fill: #ae6a49;
+      }
+
+      .alv {
+        fill: #902839;
+      }
+
+      .alw {
+        fill: #666667;
+      }
+
+      .alx {
+        fill: #2ab264;
+      }
+
+      .aly {
+        fill: #4399d6;
+      }
+
+      .alz {
+        fill: #894e32;
+      }
+
+      .ama {
+        fill: #fafafa;
+      }
+
+      .amb {
+        fill: #d7d7d9;
+      }
+
+      .amc {
+        fill: #343433;
+      }
+
+      .amd {
+        fill: #4b433e;
+      }
+
+      .ame {
+        fill: #facc18;
+      }
+
+      .amf {
+        fill: #2fb8b7;
+      }
+
+      .amg {
+        fill: #e1571d;
+      }
+
+      .amh {
+        fill: #ade1f7;
+      }
+
+      .ami {
+        fill: #8a2940;
+      }
+
+      .amj {
+        fill: #f5f4ec;
+      }
+
+      .amk {
+        fill: #cd9e89;
+      }
+
+      .aml {
+        fill: #f3c51a;
+      }
+
+      .amm {
+        fill: #222229;
+      }
+
+      .amn {
+        fill: #e3e2e0;
+      }
+
+      .amo {
+        fill: #e2e2e3;
+      }
+
+      .amp {
+        fill: #696869;
+      }
+
+      .amq {
+        fill: #d1d3d3;
+      }
+
+      .amr {
+        fill: #da3f34;
+      }
+
+      .ams {
+        fill: #b46d4a;
+      }
+
+      .amt {
+        fill: #ad7253;
+      }
+
+      .amu {
+        fill: #9a3352;
+      }
+
+      .amv {
+        fill: #932b3d;
+      }
+
+      .amw {
+        fill: #cabab6;
+      }
+
+      .amx {
+        fill: #e42729;
+      }
+
+      .amy {
+        fill: #2c2a29;
+      }
+
+      .amz {
+        fill: #322d2c;
+      }
+
+      .ana {
+        fill: #b67351;
+      }
+
+      .anb {
+        fill: #464749;
+      }
+
+      .anc {
+        fill: #21bcd2;
+      }
+
+      .and {
+        fill: #f7cc28;
+      }
+
+      .ane {
+        fill: #2e2728;
+      }
+
+      .anf {
+        fill: #a3ddf4;
+      }
+
+      .ang {
+        fill: #e34438;
+      }
+
+      .anh {
+        fill: #7f3e25;
+      }
+
+      .ani {
+        fill: #c9c9cb;
+      }
+
+      .anj {
+        fill: #b5704d;
+      }
+
+      .ank {
+        fill: #202221;
+      }
+
+      .anl {
+        fill: #d1d2d2;
+      }
+
+      .anm {
+        fill: #d0d1d1;
+      }
+
+      .ann {
+        fill: #f19f15;
+      }
+
+      .ano {
+        fill: #292e4c;
+      }
+
+      .anp {
+        fill: #b57a57;
+      }
+
+      .anq {
+        fill: #e8463d;
+      }
+
+      .anr {
+        fill: #f8cc1b;
+      }
+
+      .ans {
+        fill: #691d2f;
+      }
+
+      .ant {
+        fill: #36342f;
+      }
+
+      .anu {
+        fill: #6b351e;
+      }
+
+      .anv {
+        fill: #6d4bd5;
+      }
+
+      .anw {
+        fill: #70351e;
+      }
+
+      .anx {
+        fill: #272626;
+      }
+
+      .any {
+        fill: #f6faf7;
+      }
+
+      .anz {
+        fill: #03929c;
+      }
+
+      .aoa {
+        fill: #874b31;
+      }
+
+      .aob {
+        fill: #2b2928;
+      }
+
+      .aoc {
+        fill: #e6e1d9;
+      }
+
+      .aod {
+        fill: #fcd01d;
+      }
+
+      .aoe {
+        fill: #212c49;
+      }
+
+      .aof {
+        fill: #683aa4;
+      }
+
+      .aog {
+        fill: #7b3f28;
+      }
+
+      .aoh {
+        fill: #a15e3f;
+      }
+
+      .aoi {
+        fill: #222c4b;
+      }
+
+      .aoj {
+        fill: #884d32;
+      }
+
+      .aok {
+        fill: #af6847;
+      }
+
+      .aol {
+        fill: #2a292a;
+      }
+
+      .aom {
+        fill: #6f371f;
+      }
+
+      .aon {
+        fill: #e7f1f6;
+      }
+
+      .aoo {
+        fill: #272424;
+      }
+
+      .aop {
+        fill: #b16b4a;
+      }
+
+      .aoq {
+        fill: #f8b30e;
+      }
+
+      .aor {
+        fill: #d1a893;
+      }
+
+      .aos {
+        fill: #e9e9e9;
+      }
+
+      .aot {
+        fill: #f8f7f8;
+      }
+
+      .aou {
+        fill: #e3e3e4;
+      }
+
+      .aov {
+        fill: #f8f8f8;
+      }
+
+      .aow {
+        fill: #26ad64;
+      }
+
+      .aox {
+        fill: silver;
+      }
+
+      .aoy {
+        fill: #3bbdbe;
+      }
+
+      .aoz {
+        fill: #a96047;
+      }
+
+      .apa {
+        fill: #3d3d3c;
+      }
+
+      .apb {
+        fill: #e1e1e3;
+      }
+
+      .apc {
+        fill: #d83f3c;
+      }
+
+      .apd {
+        fill: #596efb;
+      }
+
+      .ape {
+        fill: #a25b3e;
+      }
+
+      .apf {
+        fill: #604231;
+      }
+
+      .apg {
+        fill: #485f94;
+      }
+
+      .aph {
+        fill: #713923;
+      }
+
+      .api {
+        fill: #b16b4b;
+      }
+
+      .apj {
+        fill: #292828;
+      }
+
+      .apk {
+        fill: #242526;
+      }
+
+      .apl {
+        fill: #2c2a2b;
+      }
+
+      .apm {
+        fill: #713820;
+      }
+
+      .apn {
+        fill: #edeeed;
+      }
+
+      .apo {
+        fill: #e9bd13;
+      }
+
+      .app {
+        fill: #2d2b2a;
+      }
+
+      .apq {
+        fill: #2a2827;
+      }
+
+      .apr {
+        fill: #82442f;
+      }
+
+      .aps {
+        fill: #1f253f;
+      }
+
+      .apt {
+        fill: #884a2e;
+      }
+
+      .apu {
+        fill: #2a385e;
+      }
+
+      .apv {
+        fill: #812637;
+      }
+
+      .apw {
+        fill: #736fd7;
+      }
+
+      .apx {
+        fill: #e83430;
+      }
+
+      .apy {
+        fill: #713ab1;
+      }
+
+      .apz {
+        fill: #8d5033;
+      }
+
+      .aqa {
+        fill: #7040b7;
+      }
+
+      .aqb {
+        fill: #323952;
+      }
+
+      .aqc {
+        fill: #232a45;
+      }
+
+      .aqd {
+        fill: #edeeef;
+      }
+
+      .aqe {
+        fill: #21212a;
+      }
+
+      .aqf {
+        fill: #463127;
+      }
+
+      .aqg {
+        fill: #282527;
+      }
+
+      .aqh {
+        fill: #1b2d42;
+      }
+
+      .aqi {
+        fill: #e14e30;
+      }
+
+      .aqj {
+        fill: #d9dadb;
+      }
+
+      .aqk {
+        fill: #c5c5c7;
+      }
+
+      .aql {
+        fill: #e1dedf;
+      }
+
+      .aqm {
+        fill: #7f452b;
+      }
+
+      .aqn {
+        fill: #f2a714;
+      }
+
+      .aqo {
+        fill: #9bb953;
+      }
+
+      .aqp {
+        fill: #f8fcf7;
+      }
+
+      .aqq {
+        fill: #9f705b;
+      }
+
+      .aqr {
+        fill: #282628;
+      }
+
+      .aqs {
+        fill: #696665;
+      }
+
+      .aqt {
+        fill: #302828;
+      }
+
+      .aqu {
+        fill: #e84c30;
+      }
+
+      .aqv {
+        fill: #d34539;
+      }
+
+      .aqw {
+        fill: #28282a;
+      }
+
+      .aqx {
+        fill: #292829;
+      }
+
+      .aqy {
+        fill: #17a2c5;
+      }
+
+      .aqz {
+        fill: #c3c2c4;
+      }
+
+      .ara {
+        fill: #f7f7f7;
+      }
+
+      .arb {
+        fill: #272427;
+      }
+
+      .arc {
+        fill: #f8a50c;
+      }
+
+      .ard {
+        fill: #e8e9ea;
+      }
+
+      .are {
+        fill: #654b4b;
+      }
+
+      .arf {
+        fill: #1b203c;
+      }
+
+      .arg {
+        fill: #b36d4e;
+      }
+
+      .arh {
+        fill: #252423;
+      }
+
+      .ari {
+        fill: #723923;
+      }
+
+      .arj {
+        fill: #91ceed;
+      }
+
+      .ark {
+        fill: #764f42;
+      }
+
+      .arl {
+        fill: #e34338;
+      }
+
+      .arm {
+        fill: #963647;
+      }
+
+      .arn {
+        fill: #763a22;
+      }
+
+      .aro {
+        fill: #27304a;
+      }
+
+      .arp {
+        fill: #9d5a39;
+      }
+
+      .arq {
+        fill: #ebe9ec;
+      }
+
+      .arr {
+        fill: #282828;
+      }
+
+      .ars {
+        fill: #e0483f;
+      }
+
+      .art {
+        fill: #02a4ae;
+      }
+
+      .aru {
+        fill: #e54a3e;
+      }
+
+      .arv {
+        fill: #864d34;
+      }
+
+      .arw {
+        fill: #fcf6e9;
+      }
+
+      .arx {
+        fill: #fefefe;
+      }
+
+      .ary {
+        fill: #b19489;
+      }
+
+      .arz {
+        fill: #ede7e2;
+      }
+
+      .asa {
+        fill: #b57555;
+      }
+
+      .asb {
+        fill: #f8ef76;
+      }
+
+      .asc {
+        fill: #894a2f;
+      }
+
+      .asd {
+        fill: #f9c816;
+      }
+
+      .ase {
+        fill: #ecbb13;
+      }
+
+      .asf {
+        fill: #232122;
+      }
+
+      .asg {
+        fill: #37261d;
+      }
+
+      .ash {
+        fill: #dddedf;
+      }
+
+      .asi {
+        fill: #312b2b;
+      }
+
+      .asj {
+        fill: #232322;
+      }
+
+      .ask {
+        fill: #2d2a29;
+      }
+
+      .asl {
+        fill: #b37151;
+      }
+
+      .asm {
+        fill: #e7a375;
+      }
+
+      .asn {
+        fill: #79442b;
+      }
+
+      .aso {
+        fill: #bebdc4;
+      }
+
+      .asp {
+        fill: #ac6443;
+      }
+
+      .asq {
+        fill: #eeeeef;
+      }
+
+      .asr {
+        fill: #f6f6f5;
+      }
+
+      .ass {
+        fill: #334069;
+      }
+
+      .ast {
+        fill: #8a4e31;
+      }
+
+      .asu {
+        fill: #d2d2d3;
+      }
+
+      .asv {
+        fill: #884e31;
+      }
+
+      .asw {
+        fill: #f68614;
+      }
+
+      .asx {
+        fill: #eae4e2;
+      }
+
+      .asy {
+        fill: #cda191;
+      }
+
+      .asz {
+        fill: #2a2b2a;
+      }
+
+      .ata {
+        fill: #2a353b;
+      }
+
+      .atb {
+        fill: #82482f;
+      }
+
+      .atc {
+        fill: #e6e6e7;
+      }
+
+      .atd {
+        fill: #76381f;
+      }
+
+      .ate {
+        fill: #8e2939;
+      }
+
+      .atf {
+        fill: #b67657;
+      }
+
+      .atg {
+        fill: #81442b;
+      }
+
+      .ath {
+        fill: #2f2f36;
+      }
+
+      .ati {
+        fill: #7c736b;
+      }
+
+      .atj {
+        fill: #272624;
+      }
+
+      .atk {
+        fill: #2e374e;
+      }
+
+      .atl {
+        fill: #242c36;
+      }
+
+      .atm {
+        fill: #efeff0;
+      }
+
+      .atn {
+        fill: #5773b2;
+      }
+
+      .ato {
+        fill: #2a2928;
+      }
+
+      .atp {
+        fill: #9a303c;
+      }
+
+      .atq {
+        fill: #886ac0;
+      }
+
+      .atr {
+        fill: #f4830a;
+      }
+
+      .ats {
+        fill: #f6f5f5;
+      }
+
+      .att {
+        fill: #874b30;
+      }
+
+      .atu {
+        fill: #dd322f;
+      }
+
+      .atv {
+        fill: #cca18c;
+      }
+
+      .atw {
+        fill: #03abb7;
+      }
+
+      .atx {
+        fill: #985236;
+      }
+
+      .aty {
+        fill: #6c361e;
+      }
+
+      .atz {
+        fill: #eff6f8;
+      }
+
+      .aua {
+        fill: #3a4264;
+      }
+
+      .aub {
+        fill: #2b2929;
+      }
+
+      .auc {
+        fill: #1f1f1f;
+      }
+
+      .aud {
+        fill: #f2f2f2;
+      }
+
+      .aue {
+        fill: #232423;
+      }
+
+      .auf {
+        fill: #641f30;
+      }
+
+      .aug {
+        fill: #f9c012;
+      }
+
+      .auh {
+        fill: #03a3bb;
+      }
+
+      .aui {
+        fill: #1fa75c;
+      }
+
+      .auj {
+        fill: #232a44;
+      }
+
+      .auk {
+        fill: #de6d1a;
+      }
+
+      .aul {
+        fill: #de3534;
+      }
+
+      .aum {
+        fill: #1bb05a;
+      }
+
+      .aun {
+        fill: #646465;
+      }
+
+      .auo {
+        fill: #1f2743;
+      }
+
+      .aup {
+        fill: #2a2b2d;
+      }
+
+      .auq {
+        fill: #e4463e;
+      }
+
+      .aur {
+        fill: #6c3621;
+      }
+
+      .aus {
+        fill: #2c2c2b;
+      }
+
+      .aut {
+        fill: #3c96d6;
+      }
+
+      .auu {
+        fill: #804529;
+      }
+
+      .auv {
+        fill: #5a595a;
+      }
+
+      .auw {
+        fill: #d5d4d6;
+      }
+
+      .aux {
+        fill: #ebeaea;
+      }
+
+      .auy {
+        fill: #b16f4f;
+      }
+
+      .auz {
+        fill: #7c432c;
+      }
+
+      .ava {
+        fill: #dbdbdc;
+      }
+
+      .avb {
+        fill: #202120;
+      }
+
+      .avc {
+        fill: #93543c;
+      }
+
+      .avd {
+        fill: #b06f4c;
+      }
+
+      .ave {
+        fill: #f5f5f5;
+      }
+
+      .avf {
+        fill: #6d4e4c;
+      }
+
+      .avg {
+        fill: #626061;
+      }
+
+      .avh {
+        fill: #3fb2b0;
+      }
+
+      .avi {
+        fill: #6e341f;
+      }
+
+      .avj {
+        fill: #354470;
+      }
+
+      .avk {
+        fill: #2a3658;
+      }
+
+      .avl {
+        fill: #f7cb1b;
+      }
+
+      .avm {
+        fill: #414245;
+      }
+
+      .avn {
+        fill: #a25b3c;
+      }
+
+      .avo {
+        fill: #2a2a2a;
+      }
+
+      .avp {
+        fill: #7f412a;
+      }
+
+      .avq {
+        fill: #373a3a;
+      }
+
+      .avr {
+        fill: #342e2b;
+      }
+
+      .avs {
+        fill: #d2d3d3;
+      }
+
+      .avt {
+        fill: #ae6a4b;
+      }
+
+      .avu {
+        fill: #8b4b2d;
+      }
+
+      .avv {
+        fill: #474637;
+      }
+
+      .avw {
+        fill: #7b462f;
+      }
+
+      .avx {
+        fill: #cacacb;
+      }
+
+      .avy {
+        fill: #9d593c;
+      }
+
+      .avz {
+        fill: #5c1625;
+      }
+
+      .awa {
+        fill: #2e2a2a;
+      }
+
+      .awb {
+        fill: #7e462c;
+      }
+
+      .awc {
+        fill: #634037;
+      }
+
+      .awd {
+        fill: #723920;
+      }
+
+      .awe {
+        fill: #e5d2b5;
+      }
+
+      .awf {
+        fill: #e1e1e1;
+      }
+
+      .awg {
+        fill: #c6c4c8;
+      }
+
+      .awh {
+        fill: #9e5434;
+      }
+
+      .awi {
+        fill: #e8e3df;
+      }
+
+      .awj {
+        fill: #864a2e;
+      }
+
+      .awk {
+        fill: #e2e5e2;
+      }
+
+      .awl {
+        fill: #ed5a43;
+      }
+
+      .awm {
+        fill: #272e47;
+      }
+
+      .awn {
+        fill: #844d33;
+      }
+
+      .awo {
+        fill: #473029;
+      }
+
+      .awp {
+        fill: #e46719;
+      }
+
+      .awq {
+        fill: #b4704f;
+      }
+
+      .awr {
+        fill: #636365;
+      }
+
+      .aws {
+        fill: #ab6a4a;
+      }
+
+      .awt {
+        fill: #9e5534;
+      }
+
+      .awu {
+        fill: #8a4a2d;
+      }
+
+      .awv {
+        fill: #a9a7a7;
+      }
+
+      .aww {
+        fill: #f3f1f0;
+      }
+
+      .awx {
+        fill: #844429;
+      }
+
+      .awy {
+        fill: #242221;
+      }
+
+      .awz {
+        fill: #e37816;
+      }
+
+      .axa {
+        fill: #97593d;
+      }
+
+      .axb {
+        fill: #6b361f;
+      }
+
+      .axc {
+        fill: #3e3e3f;
+      }
+
+      .axd {
+        fill: #e7e7e6;
+      }
+
+      .axe {
+        fill: #2f3b5f;
+      }
+
+      .axf {
+        fill: #c1c2c2;
+      }
+
+      .axg {
+        fill: #f4fcfb;
+      }
+
+      .axh {
+        fill: #c0c6c8;
+      }
+
+      .axi {
+        fill: #2f2d2c;
+      }
+
+      .axj {
+        fill: #1a924e;
+      }
+
+      .axk {
+        fill: #201f20;
+      }
+
+      .axl {
+        fill: #f3f2f0;
+      }
+
+      .axm {
+        fill: #37393e;
+      }
+
+      .axn {
+        fill: #723caf;
+      }
+
+      .axo {
+        fill: #242423;
+      }
+
+      .axp {
+        fill: #e3e3e5;
+      }
+
+      .axq {
+        fill: #cccdce;
+      }
+
+      .axr {
+        fill: #b06f4e;
+      }
+
+      .axs {
+        fill: #646364;
+      }
+
+      .axt {
+        fill: #2b395e;
+      }
+
+      .axu {
+        fill: #2f2e2d;
+      }
+
+      .axv {
+        fill: #a23944;
+      }
+
+      .axw {
+        fill: #2b2a28;
+      }
+
+      .axx {
+        fill: #7d3e22;
+      }
+
+      .axy {
+        fill: #e5e7e7;
+      }
+
+      .axz {
+        fill: #f2a126;
+      }
+
+      .aya {
+        fill: #eba211;
+      }
+
+      .ayb {
+        fill: #8d613f;
+      }
+
+      .ayc {
+        fill: #a15837;
+      }
+
+      .ayd {
+        fill: #252526;
+      }
+
+      .aye {
+        fill: #864e32;
+      }
+
+      .ayf {
+        fill: #383936;
+      }
+
+      .ayg {
+        fill: #e4e4e5;
+      }
+
+      .ayh {
+        fill: #671c2a;
+      }
+
+      .ayi {
+        fill: #faba0d;
+      }
+
+      .ayj {
+        fill: #5e40d7;
+      }
+
+      .ayk {
+        fill: #885035;
+      }
+
+      .ayl {
+        fill: #7c3d24;
+      }
+
+      .aym {
+        fill: #f2c81e;
+      }
+
+      .ayn {
+        fill: #c3c4c6;
+      }
+
+      .ayo {
+        fill: #11a6ab;
+      }
+
+      .ayp {
+        fill: #895036;
+      }
+
+      .ayq {
+        fill: #222b46;
+      }
+
+      .ayr {
+        fill: #242b4a;
+      }
+
+      .ays {
+        fill: #5e5c5d;
+      }
+
+      .ayt {
+        fill: #f3f3f3;
+      }
+
+      .ayu {
+        fill: #4a4b44;
+      }
+
+      .ayv {
+        fill: #acbfc1;
+      }
+
+      .ayw {
+        fill: #dc392f;
+      }
+
+      .ayx {
+        fill: #fbfcfb;
+      }
+
+      .ayy {
+        fill: #f9f4ed;
+      }
+
+      .ayz {
+        fill: #e6463c;
+      }
+
+      .aza {
+        fill: #917ec6;
+      }
+
+      .azb {
+        fill: #5c606c;
+      }
+
+      .azc {
+        fill: #edae83;
+      }
+
+      .azd {
+        fill: #958f86;
+      }
+
+      .aze {
+        fill: #4f1524;
+      }
+
+      .azf {
+        fill: #713720;
+      }
+
+      .azg {
+        fill: #34436d;
+      }
+
+      .azh {
+        fill: #f8bc1d;
+      }
+
+      .azi {
+        fill: #2c2827;
+      }
+
+      .azj {
+        fill: #a96b4d;
+      }
+
+      .azk {
+        fill: #29b46c;
+      }
+
+      .azl {
+        fill: #9076c1;
+      }
+
+      .azm {
+        fill: #6a3d27;
+      }
+
+      .azn {
+        fill: #e52d56;
+      }
+
+      .azo {
+        fill: #af6b4b;
+      }
+
+      .azp {
+        fill: #713d22;
+      }
+
+      .azq {
+        fill: #f4cb1c;
+      }
+
+      .azr {
+        fill: #ebedec;
+      }
+
+      .azs {
+        fill: #fbfbfb;
+      }
+
+      .azt {
+        fill: #fcfcfc;
+      }
+
+      .azu {
+        fill: #fcb51b;
+      }
+
+      .azv {
+        fill: #f5f8f1;
+      }
+
+      .azw {
+        fill: #ea3a36;
+      }
+
+      .azx {
+        fill: #252525;
+      }
+
+      .azy {
+        fill: #e3aa83;
+      }
+
+      .azz {
+        fill: #dfe0e2;
+      }
+
+      .baa {
+        fill: #018b93;
+      }
+
+      .bab {
+        fill: #da7216;
+      }
+
+      .bac {
+        fill: #18ac62;
+      }
+
+      .bad {
+        fill: #2aaa64;
+      }
+
+      .bae {
+        fill: #1c1b22;
+      }
+
+      .baf {
+        fill: #81472b;
+      }
+
+      .bag {
+        fill: #1b8b4c;
+      }
+
+      .bah {
+        fill: #bfbfc0;
+      }
+
+      .bai {
+        fill: #dedfe0;
+      }
+
+      .baj {
+        fill: #d6d7d8;
+      }
+
+      .bak {
+        fill: #272728;
+      }
+
+      .bal {
+        fill: #7a4931;
+      }
+
+      .bam {
+        fill: #8c4b2e;
+      }
+
+      .ban {
+        fill: #644a3e;
+      }
+
+      .bao {
+        fill: #eadcc1;
+      }
+
+      .bap {
+        fill: #272625;
+      }
+
+      .baq {
+        fill: #cc3638;
+      }
+
+      .bar {
+        fill: #cdcecf;
+      }
+
+      .bas {
+        fill: #f4f3f1;
+      }
+
+      .bat {
+        fill: #3e3737;
+      }
+
+      .bau {
+        fill: #784130;
+      }
+
+      .bav {
+        fill: #5c392d;
+      }
+
+      .baw {
+        fill: #e95bab;
+      }
+
+      .bax {
+        fill: #e8f2ed;
+      }
+
+      .bay {
+        fill: #d2363e;
+      }
+
+      .baz {
+        fill: #e13330;
+      }
+
+      .bba {
+        fill: #651f2b;
+      }
+
+      .bbb {
+        fill: #f7ae0e;
+      }
+
+      .bbc {
+        fill: #88492e;
+      }
+
+      .bbd {
+        fill: #e95eae;
+      }
+
+      .bbe {
+        fill: #ededec;
+      }
+
+      .bbf {
+        fill: #884c30;
+      }
+
+      .bbg {
+        fill: #7a442e;
+      }
+
+      .bbh {
+        fill: #28304a;
+      }
+
+      .bbi {
+        fill: #f2c312;
+      }
+
+      .bbj {
+        fill: #5e6061;
+      }
+
+      .bbk {
+        fill: #f5c60e;
+      }
+
+      .bbl {
+        fill: #893e2b;
+      }
+
+      .bbm {
+        fill: #e44239;
+      }
+
+      .bbn {
+        fill: #a0333c;
+      }
+
+      .bbo {
+        fill: #83482f;
+      }
+
+      .bbp {
+        fill: #f0f1f1;
+      }
+
+      .bbq {
+        fill: #74422c;
+      }
+
+      .bbr {
+        fill: #2b2a29;
+      }
+
+      .bbs {
+        fill: #f9cc17;
+      }
+
+      .bbt {
+        fill: #f7cd1e;
+      }
+
+      .bbu {
+        fill: #932939;
+      }
+
+      .bbv {
+        fill: #d5d4d3;
+      }
+
+      .bbw {
+        fill: #d83a3a;
+      }
+
+      .bbx {
+        fill: #884b2e;
+      }
+
+      .bby {
+        fill: #293753;
+      }
+
+      .bbz {
+        fill: #e761aa;
+      }
+
+      .bca {
+        fill: #f2edee;
+      }
+
+      .bcb {
+        fill: #e72e34;
+      }
+
+      .bcc {
+        fill: #716c6d;
+      }
+
+      .bcd {
+        fill: #02abc2;
+      }
+
+      .bce {
+        fill: #f8b615;
+      }
+
+      .bcf {
+        fill: #282a28;
+      }
+
+      .bcg {
+        fill: #cccccd;
+      }
+
+      .bch {
+        fill: #753d25;
+      }
+
+      .bci {
+        fill: #7a4132;
+      }
+
+      .bcj {
+        fill: #231f23;
+      }
+
+      .bck {
+        fill: #4c3226;
+      }
+
+      .bcl {
+        fill: #82462b;
+      }
+
+      .bcm {
+        fill: #b58c70;
+      }
+
+      .bcn {
+        fill: #28282c;
+      }
+
+      .bco {
+        fill: #00aeb8;
+      }
+
+      .bcp {
+        fill: #915537;
+      }
+
+      .bcq {
+        fill: #262d4c;
+      }
+
+      .bcr {
+        fill: #2e2c29;
+      }
+
+      .bcs {
+        fill: #6f3721;
+      }
+
+      .bct {
+        fill: #cacbcc;
+      }
+
+      .bcu {
+        fill: #1ba757;
+      }
+
+      .bcv {
+        fill: #2bae75;
+      }
+
+      .bcw {
+        fill: #e6bc2d;
+      }
+
+      .bcx {
+        fill: #6e3925;
+      }
+
+      .bcy {
+        fill: #c4c5c6;
+      }
+
+      .bcz {
+        fill: #d0d0d2;
+      }
+
+      .bda {
+        fill: #d83933;
+      }
+
+      .bdb {
+        fill: #2d2a2c;
+      }
+
+      .bdc {
+        fill: #02848d;
+      }
+
+      .bdd {
+        fill: #e5e5e6;
+      }
+
+      .bde {
+        fill: #992e3e;
+      }
+
+      .bdf {
+        fill: #167842;
+      }
+
+      .bdg {
+        fill: #1bbac4;
+      }
+
+      .bdh {
+        fill: #6c3d26;
+      }
+
+      .bdi {
+        fill: #f7c827;
+      }
+
+      .bdj {
+        fill: #b37250;
+      }
+
+      .bdk {
+        fill: #d0d0ce;
+      }
+
+      .bdl {
+        fill: #fac11b;
+      }
+
+      .bdm {
+        fill: #c9c8c8;
+      }
+
+      .bdn {
+        fill: #29b469;
+      }
+
+      .bdo {
+        fill: #8e8f90;
+      }
+
+      .bdp {
+        fill: #b06a4c;
+      }
+
+      .bdq {
+        fill: #2d262b;
+      }
+
+      .bdr {
+        fill: #d93935;
+      }
+
+      .bds {
+        fill: #28242a;
+      }
+
+      .bdt {
+        fill: #b26f4e;
+      }
+
+      .bdu {
+        fill: #cecfd0;
+      }
+
+      .bdv {
+        fill: #f2f3f2;
+      }
+
+      .bdw {
+        fill: #814024;
+      }
+
+      .bdx {
+        fill: #773b23;
+      }
+
+      .bdy {
+        fill: #232a47;
+      }
+
+      .bdz {
+        fill: #8e4a2c;
+      }
+
+      .bea {
+        fill: #c0c1c1;
+      }
+
+      .beb {
+        fill: #242c47;
+      }
+
+      .bec {
+        fill: #c6c6c9;
+      }
+
+      .bed {
+        fill: #f4cc34;
+      }
+
+      .bee {
+        fill: #232944;
+      }
+
+      .bef {
+        fill: #894b2f;
+      }
+
+      .beg {
+        fill: #fcbd1a;
+      }
+
+      .beh {
+        fill: #f7f8f7;
+      }
+
+      .bei {
+        fill: #e5443d;
+      }
+
+      .bej {
+        fill: #f3a217;
+      }
+
+      .bek {
+        fill: #d7d7d8;
+      }
+
+      .bel {
+        fill: #ededed;
+      }
+
+      .bem {
+        fill: #713821;
+      }
+
+      .ben {
+        fill: #b17038;
+      }
+
+      .beo {
+        fill: #fcb51a;
+      }
+
+      .bep {
+        fill: #af6544;
+      }
+
+      .beq {
+        fill: #b06b4b;
+      }
+
+      .ber {
+        fill: #eb6e43;
+      }
+
+      .bes {
+        fill: #363364;
+      }
+
+      .bet {
+        fill: #d7443b;
+      }
+
+      .beu {
+        fill: #825fc3;
+      }
+
+      .bev {
+        fill: #4b4b4d;
+      }
+
+      .bew {
+        fill: #616163;
+      }
+
+      .bex {
+        fill: #e4cbad;
+      }
+
+      .bey {
+        fill: #9b5541;
+      }
+
+      .bez {
+        fill: #2b2a2a;
+      }
+
+      .bfa {
+        fill: #dededf;
+      }
+
+      .bfb {
+        fill: #f4c719;
+      }
+
+      .bfc {
+        fill: #835bc3;
+      }
+
+      .bfd {
+        fill: #e54039;
+      }
+
+      .bfe {
+        fill: #8e253f;
+      }
+
+      .bff {
+        fill: #f8f9f8;
+      }
+
+      .bfg {
+        fill: #5a392d;
+      }
+
+      .bfh {
+        fill: #04a7b3;
+      }
+
+      .bfi {
+        fill: #282626;
+      }
+
+      .bfj {
+        fill: #e8e7e8;
+      }
+
+      .bfk {
+        fill: #19914e;
+      }
+
+      .bfl {
+        fill: #605246;
+      }
+
+      .bfm {
+        fill: #e0e1e2;
+      }
+
+      .bfn {
+        fill: #6f3921;
+      }
+
+      .bfo {
+        fill: #e5bf25;
+      }
+
+      .bfp {
+        fill: #c8c9c9;
+      }
+
+      .bfq {
+        fill: #262625;
+      }
+
+      .bfr {
+        fill: #a15b3c;
+      }
+
+      .bfs {
+        fill: #c8cbcb;
+      }
+
+      .bft {
+        fill: #e3403a;
+      }
+
+      .bfu {
+        fill: #7a192c;
+      }
+
+      .bfv {
+        fill: #e6e3e3;
+      }
+
+      .bfw {
+        fill: #8d4e2f;
+      }
+
+      .bfx {
+        fill: #8c4d30;
+      }
+
+      .bfy {
+        fill: #864a30;
+      }
+
+      .bfz {
+        fill: #b77352;
+      }
+
+      .bga {
+        fill: #e5403a;
+      }
+
+      .bgb {
+        fill: #f8d021;
+      }
+
+      .bgc {
+        fill: #cf7756;
+      }
+
+      .bgd {
+        fill: #3f4043;
+      }
+
+      .bge {
+        fill: #27b166;
+      }
+
+      .bgf {
+        fill: #874b2e;
+      }
+
+      .bgg {
+        fill: #29aa64;
+      }
+
+      .bgh {
+        fill: #9e5b3f;
+      }
+
+      .bgi {
+        fill: #9c333c;
+      }
+
+      .bgj {
+        fill: #f1f7f8;
+      }
+
+      .bgk {
+        fill: #c8c8c8;
+      }
+
+      .bgl {
+        fill: #242022;
+      }
+
+      .bgm {
+        fill: #f8cb1f;
+      }
+
+      .bgn {
+        fill: #252524;
+      }
+
+      .bgo {
+        fill: #7b55b7;
+      }
+
+      .bgp {
+        fill: #dcccca;
+      }
+
+      .bgq {
+        fill: #d9dcdc;
+      }
+
+      .bgr {
+        fill: #d1d1d3;
+      }
+
+      .bgs {
+        fill: #eb663d;
+      }
+
+      .bgt {
+        fill: #804228;
+      }
+
+      .bgu {
+        fill: #f9aa1a;
+      }
+
+      .bgv {
+        fill: #d3d3d3;
+      }
+
+      .bgw {
+        fill: #5c5f64;
+      }
+
+      .bgx {
+        fill: #eef1f0;
+      }
+
+      .bgy {
+        fill: #222221;
+      }
+
+      .bgz {
+        fill: #272828;
+      }
+
+      .bha {
+        fill: #8c4e2f;
+      }
+
+      .bhb {
+        fill: #e64b42;
+      }
+
+      .bhc {
+        fill: #2c2824;
+      }
+
+      .bhd {
+        fill: #242323;
+      }
+
+      .bhe {
+        fill: #83472c;
+      }
+
+      .bhf {
+        fill: #2c344e;
+      }
+
+      .bhg {
+        fill: #6a3f2f;
+      }
+
+      .bhh {
+        fill: #9f2c3f;
+      }
+
+      .bhi {
+        fill: #e9e8e7;
+      }
+
+      .bhj {
+        fill: #f88c17;
+      }
+
+      .bhk {
+        fill: #626263;
+      }
+
+      .bhl {
+        fill: #2c2b29;
+      }
+
+      .bhm {
+        fill: #ece7e3;
+      }
+
+      .bhn {
+        fill: #af6947;
+      }
+
+      .bho {
+        fill: #965538;
+      }
+
+      .bhp {
+        fill: #323131;
+      }
+
+      .bhq {
+        fill: #eee;
+      }
+
+      .bhr {
+        fill: #28344e;
+      }
+
+      .bhs {
+        fill: #8e4f30;
+      }
+
+      .bht {
+        fill: #5471b1;
+      }
+
+      .bhu {
+        fill: #93cee7;
+      }
+
+      .bhv {
+        fill: #d3d3d5;
+      }
+
+      .bhw {
+        fill: #19223c;
+      }
+
+      .bhx {
+        fill: #773b22;
+      }
+
+      .bhy {
+        fill: #c3c3c4;
+      }
+
+      .bhz {
+        fill: #f5f6f4;
+      }
+
+      .bia {
+        fill: #581926;
+      }
+
+      .bib {
+        fill: #c8c8ca;
+      }
+
+      .bic {
+        fill: #a8a8aa;
+      }
+
+      .bid {
+        fill: #dcdcdd;
+      }
+
+      .bie {
+        fill: #822b38;
+      }
+
+      .bif {
+        fill: #ab6b4c;
+      }
+
+      .big {
+        fill: #fdfefe;
+      }
+
+      .bih {
+        fill: #8b4b2e;
+      }
+
+      .bii {
+        fill: #242120;
+      }
+
+      .bij {
+        fill: #b26c49;
+      }
+
+      .bik {
+        fill: #ced0d1;
+      }
+
+      .bil {
+        fill: #eff1f0;
+      }
+
+      .bim {
+        fill: #d52e40;
+      }
+
+      .bin {
+        fill: #8e4f31;
+      }
+
+      .bio {
+        fill: #d1dace;
+      }
+
+      .bip {
+        fill: #854c31;
+      }
+
+      .biq {
+        fill: #fefdfe;
+      }
+
+      .bir {
+        fill: #a5694b;
+      }
+
+      .bis {
+        fill: #cf3530;
+      }
+
+      .bit {
+        fill: #efeeef;
+      }
+
+      .biu {
+        fill: #272525;
+      }
+
+      .biv {
+        fill: #57392d;
+      }
+
+      .biw {
+        fill: #fafbfa;
+      }
+
+      .bix {
+        fill: #2e3434;
+      }
+
+      .biy {
+        fill: #523936;
+      }
+
+      .biz {
+        fill: #b06b49;
+      }
+
+      .bja {
+        fill: #905336;
+      }
+
+      .bjb {
+        fill: #242426;
+      }
+
+      .bjc {
+        fill: #d5393c;
+      }
+
+      .bjd {
+        fill: #d73d39;
+      }
+
+      .bje {
+        fill: #262627;
+      }
+
+      .bjf {
+        fill: #c0c1c2;
+      }
+
+      .bjg {
+        fill: #1eb460;
+      }
+
+      .bjh {
+        fill: #f6c91c;
+      }
+
+      .bji {
+        fill: #d4d4d5;
+      }
+
+      .bjj {
+        fill: #703e2b;
+      }
+
+      .bjk {
+        fill: #05b2c5;
+      }
+
+      .bjl {
+        fill: #a45734;
+      }
+
+      .bjm {
+        fill: #c9cacb;
+      }
+
+      .bjn {
+        fill: #bfbdbf;
+      }
+
+      .bjo {
+        fill: #262425;
+      }
+
+      .bjp {
+        fill: #ebede8;
+      }
+
+      .bjq {
+        fill: #2a2133;
+      }
+
+      .bjr {
+        fill: #222;
+      }
+
+      .bjs {
+        fill: #242427;
+      }
+
+      .bjt {
+        fill: #282525;
+      }
+
+      .bju {
+        fill: #a75937;
+      }
+
+      .bjv {
+        fill: #b77859;
+      }
+
+      .bjw {
+        fill: #b16e4d;
+      }
+
+      .bjx {
+        fill: #21b960;
+      }
+
+      .bjy {
+        fill: #2e2c2d;
+      }
+
+      .bjz {
+        fill: #cfcfd1;
+      }
+
+      .bka {
+        fill: #e3413b;
+      }
+
+      .bkb {
+        fill: #abb2b6;
+      }
+
+      .bkc {
+        fill: #81482f;
+      }
+
+      .bkd {
+        fill: #7453bd;
+      }
+
+      .bke {
+        fill: #272526;
+      }
+
+      .bkf {
+        fill: #874c31;
+      }
+
+      .bkg {
+        fill: #8d4c30;
+      }
+
+      .bkh {
+        fill: #cfcfcf;
+      }
+
+      .bki {
+        fill: #b06c4a;
+      }
+
+      .bkj {
+        fill: #b36546;
+      }
+
+      .bkk {
+        fill: #db2e57;
+      }
+
+      .bkl {
+        fill: #b36d4a;
+      }
+
+      .bkm {
+        fill: #059da2;
+      }
+
+      .bkn {
+        fill: #02858c;
+      }
+
+      .bko {
+        fill: #252627;
+      }
+
+      .bkp {
+        fill: #854a2e;
+      }
+
+      .bkq {
+        fill: #ead7ba;
+      }
+
+      .bkr {
+        fill: #bfbdbd;
+      }
+
+      .bks {
+        fill: #8e452a;
+      }
+
+      .bkt {
+        fill: #d5d6d8;
+      }
+
+      .bku {
+        fill: #7f4228;
+      }
+
+      .bkv {
+        fill: #29304c;
+      }
+
+      .bkw {
+        fill: #e8e8e8;
+      }
+
+      .bkx {
+        fill: #f5b613;
+      }
+
+      .bky {
+        fill: #2f2d2b;
+      }
+
+      .bkz {
+        fill: #531826;
+      }
+
+      .bla {
+        fill: #46352c;
+      }
+
+      .blb {
+        fill: #fabc21;
+      }
+
+      .blc {
+        fill: #2c2b2b;
+      }
+
+      .bld {
+        fill: #733920;
+      }
+
+      .ble {
+        fill: #26ad60;
+      }
+
+      .blf {
+        fill: #c7c3c0;
+      }
+
+      .blg {
+        fill: #c92a38;
+      }
+
+      .blh {
+        fill: #85472c;
+      }
+
+      .bli {
+        fill: #8c4d2f;
+      }
+
+      .blj {
+        fill: #dbdcdd;
+      }
+
+      .blk {
+        fill: #8e5236;
+      }
+
+      .bll {
+        fill: #86492d;
+      }
+
+      .blm {
+        fill: #71361e;
+      }
+
+      .bln {
+        fill: #eaeaeb;
+      }
+
+      .blo {
+        fill: #1d3225;
+      }
+
+      .blp {
+        fill: #83492d;
+      }
+
+      .blq {
+        fill: #bd8667;
+      }
+
+      .blr {
+        fill: #e84139;
+      }
+
+      .bls {
+        fill: #262e4a;
+      }
+
+      .blt {
+        fill: #21212c;
+      }
+
+      .blu {
+        fill: #7e452c;
+      }
+
+      .blv {
+        fill: #69321d;
+      }
+
+      .blw {
+        fill: #dadbdc;
+      }
+
+      .blx {
+        fill: #ececec;
+      }
+
+      .bly {
+        fill: #b16e4e;
+      }
+
+      .blz {
+        fill: #b26f4f;
+      }
+
+      .bma {
+        fill: #d5d6d6;
+      }
+
+      .bmb {
+        fill: #7c7a7c;
+      }
+
+      .bmc {
+        fill: #bfbebe;
+      }
+
+      .bmd {
+        fill: #01afb8;
+      }
+
+      .bme {
+        fill: #f2b58a;
+      }
+
+      .bmf {
+        fill: #212020;
+      }
+
+      .bmg {
+        fill: #fdfdfd;
+      }
+
+      .bmh {
+        fill: #302f2e;
+      }
+
+      .bmi {
+        fill: #f9c610;
+      }
+
+      .bmj {
+        fill: #777772;
+      }
+
+      .bmk {
+        fill: #68331e;
+      }
+
+      .bml {
+        fill: #b26d4a;
+      }
+
+      .bmm {
+        fill: #b4205d;
+      }
+
+      .bmn {
+        fill: #fcfdfd;
+      }
+
+      .bmo {
+        fill: #6e3720;
+      }
+
+      .bmp {
+        fill: #753c24;
+      }
+    </style>
+  </defs>
+  <g>
+    <path class="bu" d="M571.16,390.12c.48.91,1.57,1.76,2.44,2.39,1.5.37,2.5.69,2.49,2.47,1.22.46,2.21,1.24,2.97,2.36.69-.08,5.01,1.34,5.32,1.77.29.4,1,5.2-.81,3.8-.44-.13-.8-.46-1.06-1.01-1.1.73-2.43,1.07-3.96,1.03l-.24.73c-1.93.17-3.87.26-5.83.28.08,1.69.02,3.36-.19,4.99,1.24.12,1.61.98,1.1,2.59,1.56-.12,2.07.27,1.53,1.17-2.54.31-5.66.3-8.27,0-.6-.01-.87-.37-.8-1.08-1.26-.49-1.51-1.46-1.4-2.71-1.43-.24-1.51-.74-1.33-2.05-1.28-.18-1.8-1.3-1.85-2.51l-.64.07c-.3-1.19-.3-2.44,0-3.76-.95.28-1.03-.01-.38-.75,1.26-2.28,1.75-4.51,3.76-6.39,1.56-1.46,4.37-2.72,6.39-3.38.36-.18.61-.18.75,0Z"/>
+    <path class="azt" d="M551.99,410.41c.94.27,1.25,1.29.92,3.07l.98.53c3.16,4.15,7.72,5.16,12.59,5.97.27.26.31.58.17.95-1.46-.11-3.5.1-4.67.01-.27-.02-.15-.79-.4-.78-.56.02-.85.64-1.13.65-.25,0-.98-1-1.31-.63-.56.62,1.99,2.69,2.5,2.96,1,.54,1.88-.06,2.41.59,1.63,1.97-2.76,1.05-3.22,1.03-1.82-.06-4.08.28-5.58.29-1.83,0-7.59-1.12-9.34-1.6-.78-.21-2.03-.67-2.76-.65-1.14.02-2.3,1.46-3,.02s.86-1.33,1.72-2.05c1.13-.95,4.21-4.73,5.06-5.09.45-.19.75.11.56.56-.39.91-3.36,2.86-3.75,3.77-.19.45.11.75.56.56.63-.27,4.25-4.17,4.33-4.88-.08-.99,1.1-.94,1.58-.29-.11-1.25.12-2.03.68-2.34.07-1.33.29-1.75,1.13-2.63Z"/>
+    <path class="beh" d="M621.53,405.9l.88.08c1.25-.3,3.3-.28,3.63,1.05.45-.32,1,.27.75.75.76-.72,2.74,1.57,3.01,2.26.2.51.43,3.41.33,3.76-.28,1.01-3.68,3.88-4.85,3.76-1.13,1.18-1.93,1.49-3.32,1.8l-1.19.07c-.09.33-.22.33-.38,0-.7.71-1.69.76-2.63.75l-.39.87c-3.36.56-6.73.89-10.14,1.01-2.13-.06-4.19.35-6.39.38-3.84.05-7.94.37-11.65.38s-7.84-.27-11.65-.38c-3.47-.08-6.86-.58-10.15-1.5-.25-.02-.5.02-.75,0-.34-.56-1.15-.26-1.77-.5-2.11-.84-3.45-.61-5.35-1.21-.77-.24-1.15-1.14-1.25-1.19-3.45-1.49-2.5-1.78-4.97-3.52-.41-.29-.89.05-.91.01-.52-.81.05-3.12-.4-4.12.12-.13.25-.25.38-.38-.61-.71,1-2.38,1.88-1.88.5-.41,1.28-.9,1.88-1.13,1.34-1.15,2.59-1.4,3.76-.75.11.18.03.6.38.75.27.49.27,1,0,1.5-.52.58-.77.34-.38-.38-1.32-.8-2.37-.02-3.5,1.14-4.93,5.09,4.08,8.51,8.01,9.38.4-.26.85-.41,1.32-.32,18.29,3.66,38.11,4.13,55.97-1.88l1.36.32c5.46-3.37,4.86-8.37-1.66-9.05l-.22-.34c-.94-.68-.93-1.2,0-1.88.36-.1.48.02.38.38Z"/>
+    <path class="aij" d="M560.63,404.4c1.12,1.1,1.09,3.02,0,4.13.7,1.47,1.12,2.8,0,4.13l1.68.22c.43-.89,1.65-.79,2.08.16.33.11.32.23,0,.38,2.91,1.61,6.07,2.67,9.27,3.55l.13.59c-.19.2-.37.35-.52.33-3.68-.6-7.56-1.62-10.54-3.82-.86.03-1.44-.18-1.73-.64-1.15,2.23-2.58-2.21-.75-3.01-.48-1-.48-1.63,0-1.88,0-.5,0-1,0-1.5,0-.63,0-1.25,0-1.88-1.21-2.33-1.09-3.83.38-4.51.14,1.13-.03,2.56,0,3.76Z"/>
+    <path class="arx" d="M560.26,405.15c-.89-1.84-2.35-2.77-3.39-4.32l2.12-2.03c1.32.08,1.02.48,1.27,1.09.1.23.35.57.38.75-.69,1.12-.37,3.09-.38,4.51Z"/>
+    <path class="azt" d="M554.24,408.16c-.39.32-1.41,1.4-1.88,1.88l-1.5-.19c1-.54,2.97-4.31,3.38-1.69Z"/>
+    <path class="azt" d="M559.88,406.28c-1.21-.28-2.02.62-2.98.93-.36.12-.74-.2-.77-.18.62-1.55,2.62-2.67,3.76-.75Z"/>
+    <path class="beh" d="M646.71,406.28c.25.61.22,1.25,0,1.88-.11.33-.23.32-.38,0-1.85-1.13-4.57,2.64-4.87,4.34s3.49,4.33,4.9,4.86c8.08,3.04,16.32,3.45,24.87,3.78,11.17.43,23.45.08,34.12-3.31,6.36-2.02,10.2-7.3,2.11-10.3l-.24-.49c-.26-.31-.32-.85,0-1.13,3.32-.41,9.52,3.78,8,7.4-.37.88-3.74,3.88-4.65,4.41-1.67.97-7.86,2.89-9.74,3.23-3.01.53-9.64,1.2-12.59,1.21-.52,0-1.1.38-1.47.32-.35-.05-.1-.91-.41-.78-3.3,1.38-10.83.79-14.85.75-1.48.33-3.59.63-5.16.68s-3.59,0-5.18-.23c-.77-.11-1.3-.22-1.34-.82-2.48.3-4.6-.08-6.36-1.13h-1.01c-.05,1.09-.96,1.01-1.24,0-.61.72-.83.54-.75-.38-3.16-.62-6.25-1.45-9.27-2.48-1.95-1.82-4.29-4.62-3.25-7.19.17-.43,3.45-3.71,4.02-4.1,1.32-.91,3.95-2.35,4.75-.51Z"/>
+    <path class="bmg" d="M632.43,410.41c.11-1.64.88-3.11,2.63-1.72.73-.55,2.31-1.13,2.33.1-1.1.99-2.13,2.03-3.08,3.13.18,1.38-1.28,2.91-2.63,3.01-1.95,1.55-4.03,3.76-4.89,5.79-2.49.76-5.24,2.12-1.36,3.36,2.74.91,5.54,1.59,8.41,2.02,1.66-.71,3.55-.94,5.68-.69,1.71-1.18,2.75-1.06,3.14.34,1.3-1.07,2.97-1.89,2.72.55l2.63-.83c2.11,1.06,4.58.87,6.68-.16-2.11-.4-2.97-1.83-2.56-4.3l1.35-.07c2.35.27,4.77.42,7.14.38l-.38.75c3.76.31,7.5.34,11.28.38-1.17,3.01-1.62.44-2.74.45-2.15.02-2.35,1.98-.34,2.84.95.41,1.71.02,2.41.2s1.24.79,1.8,1.02l-.4.73c-2.72.08-3.59,1.78-2.61,5.11l-.68,2.39c.72.69,1.07,1.33,1.06,1.91.14.43-.36.68-1.5.75.01,1.97-2.39,3.09-4.26,3.29l-1.25,1.94c-2.35.66-3.41,2-3.17,4.01-.13.99-.41,1.7-1.47,1.28l-.46-.22c.67-3.94-.09-5.99-1.98-1.39-2.85.9-3.77,1.69-2.74,2.38.03,2.49-.18,5.01-.62,7.55-.04,1.93,1.4,3.85.44.63,1.93-1.66,1.38-4.54.73-6.7-.03-1.99,2.67-1.75,2.37,0,.32.64.33,1.47,0,2.48.62,2.79.5,4.52-1.08,6.88.21.94.19,1.71-.05,2.3,1.01.34.69,1.21-.38,1.13-.4.32-.43.46,0,.38.66-.11,1.04,2.46,1.04,2.96,0,.3-.1.56-.28.8.64.03.73.66,0,.75,0,.48.26.73.75.75.75-.83,1.69-.29,1.5.75.65.06,1.05.47,1.2,1.23l1.43,1.77c1.2.34,2.45,3.01,1.88,4.13l1.01.29c1.21,2.26,2.93,4.18,4.91,5.8l.09,1.05c.02,1.14-1.83,1.39-2.26.38.09-.74-2.56-3.26-2.82-3.28s-.93.57-1.53.63c-1.13.12-2.7.3-3.78.36-.72.04-1.54-.52-2.17-.32-.87.28-1.53,3.46-1.7,3.56-1.71.95-3.86-1.06-2.69-2.94.07-.12,2.8-1.79.95-2.14-1-.19-1.18,1.74-1.34,1.85-1.46.95-.83-1.6-1.85-2.06-2.08,1.39-1.7-.53-2.63-1.11-.8-.49-3.07.16-3.75.76-.54.49-.66,1.52-.82,1.63-.21.13-2.69.16-3.06.06-.33-.08-.37-.66-.68-.89-.38-.28-.93-.26-1.26-.64s-.3-1.36-.96-1.7c-.46-.24-1.84.36-2.8.21-.87-.14-1.91-1.39-2.66-1.37-.46.01-.99.7-1.46.6-.51-.11-.77-1.4-1.34-1.67-.73-.35-1.98-.02-2.22-.22-.16-.13-.26-1.71-.44-1.83-.24-.17-.96.26-1.3.2-1.93-.37-1.36-.81-3.69-.13-3.25.95.06-2.72.1-2.94.17-.92-1.5-1.18-1.5-1.47.01-.56.72-1.09.69-1.79-.03-.65-.81-1.6-.7-2.27.07-.37.98-.34,1.13-.84.04-.14-.23-2.34-.24-2.96-.01-.49.35-1.09.3-1.46-.03-.23-2.47-1.4-2.28-2.31.22-1.02,1.87-.2,2.46-.18,2.51.08,1.75-1.95-.2-1.52-1.13-.97,5.7-3.02,6.12-3.36.69-.55.55-1.8,1.87-2.37,1.45-.63,4,1.34,4.99-.27,1.22-1.96-2.85-1.71-3.15-1.96-.11-.1-1.21-2.48-1.23-2.77-.08-1,1.38-1.19.79-2.8,1.71,1.23,3.91-1.32,2.24-2.06-.68-.3-1.38-.04-2.05-.58-1.58-1.26-.31-3.51-.57-3.75h-1.51s-.19-1.88-.19-1.88l-1.68.94c.94,1,2.24,1.1,1.87,2.82-1.01-.07-1.98-.56-2.66-1.29-.22-.24-1.76-2.59-1.8-2.74-.2-.74.46-1.8.33-1.98-.11-.15-3.37-1.37-3.56-1.36-.77.03-5.01,2.58-5.84,1.73-.47-1.68.88-2.14,1.12-3.37-2-.29-3.34-1.76-4.79-2.54-.88-.47-2.98-.75-3.1-.85-.83-.67,1.39-.99,1.65-1.16.59-.38.64-.81.99-1.19s.72-.25.74-.29c.59-.99-2.55-1.11-3-1.12,1.37-.6,3.26-.9,4.75-1.08,2.29-.28,3.55-.21,5.78-.8,1-.02,1.84-.09,2.63-.75.12-.01.25.01.38,0,1.79-.06,3.45-.86,4.8-2.06,2.52-.6,4.87-2.94,4.55-5.79l.8-.05c-.26-.8.66-1.71,1.5-1.13Z"/>
+    <path class="apj" d="M568.53,336.74c-1.87.54-4.07-.22-2.82-2.25.95-1.55,7.7-3.74,9.58-4.7-1.23-.74-4.23-3.33-1.87-4.51,2.23-1.12,3.7,2.6,6.01,2.07.53-.51-2.87-4.73,0-5.48,1.99-.52,2.81,2.97,3.96,3.98,1.91-1.03,4.05-7.02,6.42-5.29,2.11,1.55-.78,4.02-.59,4.16l4.6-1.6c1.96-2.32,6.78-3.03,5.55,1.23.2.57.82.69,1.88.38.24-.09,1.01-.36,1.13-.38.85.08.93.49.54,1.2.52,1.01,1.43,8.14,1.16,8.78-.33.75-4.23,3.64-5.42,3.79-1.24,1.56-2.7,1.5-4.37-.19-.45,1.31-1.01,1.92-1.68,1.84l-.52.62-3.64.22c-.19,1.89-.29,3.81-.3,5.76,0,2.46-3.66,3.32-3.81.92-.83.14-1.03-.25-1.1-.99-.5,1.88-1.71,3.32-3.77,2.68-.11,1.14-.84,2.07-1.89,1.31-.69-.08-1-.65-.94-1.71l-.56-2.05c-.25-.18-.5-.17-.75,0-.06.19-.14.36-.26.49-1.64,1.63-3.44-3.64-3.79-4.79-2.12-.86-2.9-1.93-2.34-3.22.21-.35.18-1.2.38-1.5.08-.75.78-1.24,1.5-1.13,1.18-.98,1.05-1.11-.38-.38-.23.64-.86.89-1.88.75Z"/>
+    <path class="wi" d="M617.02,393.12c2.32,1.98,3.26,4.22,3.76,7.14.05,1.34-.7,4.13-2.26,3.95,1.23.55,1.18,5.17,0,5.83-.12,1-.47.96-.75,0-.21-.03-.37-.07-.38-.11-.13-1.95-.24-6.25,0-8.1.01-.1.17-.17.38-.24-.29.38-.54.2-.75-.56.28.93.77,8.77.5,9.15-.09.13-.28.2-.5.25-.51.3-1.21.53-2.1.68-.15.88-.58,1.41-1.29,1.58-7.37.33-15.48.32-22.93,0l-.46-.26c.54-.95.83-2.06.88-3.31l6.23.05.18,1.17c1.05,1,1.15,1.66.31,1.97l.43-.75h6.55l.54.75c-2.32-.89-.95-3.51,1.48-3.18,1.15.18,1.91.11,2.28-.2-1.1-.42-.95-3.9-.38-4.89-4.11-.21-8.24-.21-12.4,0-.71-.12-.67-.41,0-.75.21-.61.88-.93,2-.97.25-2.02.8-4.36,3.01-4.85.51-1.36,1.36-1.72,2.55-.71,1.7-.97,3.1-2.4,4.2-4.29,1.23-.61,2.07-1.39,2.52-2.34.13-.33.25-.33.38,0,2.02.73,4.38,1.61,6.01,3.01Z"/>
+    <path class="bll" d="M607.24,357.79c1.39-.12,1.89.65,1.51,2.33,1.57.53,2.04-1.73.6-2.64l.14-.82c-1.05-.57-.76-2.29.38-2.63,2.95.15,4.08,2.92,3.01,5.64-.08.45-.33.77-.38,1.5-.1,1.86-1.48,2.74-4.13,2.63-.12.06-.48-.11-.67.08s-.02.55-.08.67c-.08,2.18-.57,5.09-2.26,6.39-.01.02-.21.1-.38.38.2,1.81-3.06,5.76-4.89,4.89-2.46,1.69-5.36-3.57-4.89-5.64-.36-.48-.35-.99.02-1.54-3.07.43-6.01.32-9.13.03.46.56.49,1.07.09,1.51-.22,1.29-1.69,4.22-2.68,5.23-.93.96-1.39,1.18-2.59.41-1.49-1.18-1.87-1.56-3.01-3.01.53-1.4,1.31-2.77,2.34-4.11.56-2.16,1.06-3.77,3.29-4.7l.38-.96-.09-.5c1.07-.77,2.1-1.48,3.09-2.13.11-.33.23-.32.38,0,1.4.29,1.27,2.14.75,3.01l.48-.13c1.34,1.2,2.93,1.24,4.79.13l.1-.44c-.77-.58-1.3-3.32.27-2.94.52-.49.7-.27.38.38.8.13,2.43,1.44,2.63,2.26l.42-.27c5.61,2.48,10.65-4.17,7.28-9.05l.19-.45c.11-.33.23-.32.38,0,.4-.61.86-.97,1.5-.38.97-.1,1.4,3.39,1.4,4.31l-.64.57Z"/>
+    <path class="agg" d="M605.74,377.71c.38.13,1.65,1.07,1.88,1.5,1.32.09,1.66,2.24.75,3.01.76,1.13.07,1.78-2.09,1.97-.71,3.7-3.14,5.44-7.27,5.24-.28,2.39-1.17,3.37-2.67,2.94-.37.9-1.3.51-1.88,0l-.6,1.91c-.55,1.65-.35,3.65.6,5.99,1.02,1.09,1.01,2.29,0,3.38-1.31.33-3.17.31-4.51,0,0-2.29-1.06-3.01-3.01-3.76l-.5-.23c.48-2.31.52-4.74.12-7.28-.53.12-.78.26-.43.2,0,.65.04,5.79-.19,5.98-.13.11-.31.17-.5.21,1.07.91.84,4.19-.38,4.89-2.24.3-4.53.29-6.77,0l-.94-.75c.85-1.17,2.45-.74,3.61-.97.71-.14,1.5-1.54,2.41-.14.27.41.09.91.18,1.11.34.22,1.11-.09,1.16-.14.45-.41-.52-10.77-1.21-12.01.11-.81.94-3.2,1.55-2.14l.29-.44c1.81.81,3.62,1.82,5.45,3.01,2.42-1.44,4.74-3.04,6.97-4.78l.82.33.08-.93c2.15-1.31,4-2.88,5.56-4.71l-.41-.82c.63-.71,1.02-1.57,1.16-2.56-.13-.37.12-.37.75,0Z"/>
+    <path class="akw" d="M604.99,323.96c.72.36,1.22.61,1.5.75,1.58,2.53-1.91,2.41-2.25,3.2-.16.37,1.12,0,1.13.56.4.3,1.03.42,1.88.38.19-.06.52.04.75,0,.33.12.32.25,0,.38.7.78-.99,4.04-1.67,4.98-2.08,2-3.97,4.06-5.1,6.67-.17,1.31-.04,2.69.38,4.13-.6-1.53-.6-2.66,0-3.38-.22-.96.42-1.43,1.9-1.42,1.99.51,3.09-.39,3.28-2.7.75-1.4,2.33-4.12,3.84-4.15.76-.77,1.06-.68.75.38l.55,1.28c4.73-.75,3.81,4.77-.38,2.09l-.92.02c.37.59.74,1.21,1.13,1.88,1.43.19,1.81,2.13,1.88,3.38.66,1.08.73,1.77,1.88,2.63,2.22,1.88-.96,5.4-2.63,2.63-.02-.09-.7-1.43-.75-1.5-.73.03-1.23.41-1.5,1.13.03.5-.03,1,0,1.5l-.38,3.38c-.02.24.03.51,0,.75.74.79.62,1.17-.38,1.13-.19.9-.23,2.07-.38,2.63,1.04,1.37-1.31,2.53-2.26,1.13-.22-.81-.6-3.78-.75-4.89-1.48-.77-1.04-2.8-.38-4.13-.22-.96-.47-1.34-.75-1.13-1.37,2.09-3.19,1.13-3.01-1.5-.43-.02-.68-.4-.75-1.13.42.99.78,3.18-.38,3.38-2.55,2.19-3.37.52-3.78-2.23-.18.48-.62.66-1.11.72-1.58,2.4-4.81-1.31-2.63-3.01.56-1.26.56-2.14,0-2.63-1.13.62-2.01-.64-1.13-1.5.69-.96.43-3.03,2.27-2.48.94.28,1.02,1.2,1.17,1.29.84.49,1.6-.81,2.31-1.14,2.64-1.24,1.99-.4,4.03-2.75.31-.36,1.01-.49,1.08-.61.17-.28-.53-2.91-.57-3.72-.09-1.71.32-2.26-.33-3.9-.14-.36-1.09-1.59-.18-1.16v-.93c.8-.07,1.29.32,1.71.34.24.01-.1-.69.92-.71Z"/>
+    <path class="y" d="M586.19,370.57l.86-.18c1.99,1.84,5.35,2.18,7.29.09l.88.09c1.42,2.04,1.8,5.41,4.89,5.64.32.12.32.24,0,.38-.49.89-.99,1.26-1.5,1.13-.04.25-.09.4-.38.38-.8,2.31-5.17,2.66-7.51,2.64s-6.68-.42-7.53-2.64c-.83.8-2.37-.53-1.88-1.5-.14-.1-.24-.27-.38-.38,2.89.16,3.12-4.23,5.26-5.64Z"/>
+    <path class="lv" d="M583.94,363.43c1.31,1.82-1.12,1.84-1.89,2.91-.63.87-.67,2.24-1.18,3.23-.43.84-1.54,2.28-2.15,3.12-.37.5.08.38-.79.51-1.11-1.41-1.83-2.26-2.58-4-.58-1.34-1.4-5.43-2.31-5.77-2.34-1.17-2.22-1.93.38-2.26-.96-.55-.96-.95,0-1.5.1-1.03.96-2,1.88-1.13.31-.03.57.05.69.31,1.53,3.35,3.83,4.81,7.6,4.17l.36.41Z"/>
+    <path class="asz" d="M568.9,338.99c-.28,1.49,2.31,1.84,3.03,2.9,1.17,1.75.47,4.58,3.37,4.62.58.28.27,1.46-.38,1.5.5,1.89.84,4.21-.75,5.64l-.82.09c-.73-3.02-2.21-4.43-4.45-4.23-.17-2.48,1.34-3.55,1.5-6.01-.4-.41-.78-.28-1.13.38-.29,1.36.05,1.43-1.13,2.63-2.3-1.04-1.08-4.24,0-6.01.16-.56.46-1.01.75-1.5Z"/>
+    <path class="bmg" d="M608,328.84c2.58-3.62,4.73-1.1,6.17,1.92.27.56.02,1.25.65,2.34.54.94,2.53,2.53,2.76,3.27.16.53-.46,2.67-.74,2.99-.61.71-3.47.7-3.2,3-.59-.96-1.58-2.06-1.88-3.38-.3-.39-.4-.82,0-1.13l.4-.39c3.47,1.73,4.17-2.84.38-2.4-.75-.23-1.28-.44-1.15-1.34-.22-.13-.41-.4-.75-.38l-.32-.84c1.78-1.62-.26-2.28-1.93-2.43l-.38-.87c.06-.09-.06-.29,0-.38Z"/>
+    <path class="bco" d="M576.42,377.71c.9.24,1.71,2.25,1.13,3.01.17,1.32.74,1.85,1.96,2.74,1.75.99,2.98,2.21,3.68,3.65.21.27.43.73.24.88-4.01,3.35-6.1,1.2-7.69-3.01-1.3-.52-2.2-1.32-2.7-2.38-.33-.11-.32-.23,0-.38.03-2.65.94-3.8,3.38-4.51Z"/>
+    <path class="bmg" d="M607.62,379.21c1.17-.75,1.48-2.02,3-.93.88.63-1,1.88-1.13,2.43,2.92-.36,1.37,1.79,1.67,2.26.6.95,1.98-.14,2.6-.04.45.08.28,1.64,1.74.79-.34,2.86-3.58,3.92-4.51,6.39-.11-.04-.26.04-.38,0-1.48,1.71-2.91-1.86-.75-1.88-.14-1.07-.36-2.22-.64-3.44-.8-.91-1.09-1.77-.86-2.58-.27-.8-.34-2.21-.75-3.01Z"/>
+    <path class="aky" d="M568.9,349.52c.1-.45.7-1.07.38-1.88.71-.12.18.73.43,1.06.17.21,1.61.21,2.18.65.53.4,1.73,3.47,2.27,4.31.96,1.25.57,3.64-.75,4.51-.77,1.46-2.74-.58-1.5-1.5-1.25.11-1.32-1.97-.38-2.63-.06-.3.08-1.06,0-1.13-.45-.39-3.78,1.65-2.63-3.38Z"/>
+    <path class="yp" d="M571.53,354.03c.15.76.19,2.03.38,2.63-1.21,2.35-.88,3.55,1,3.6l.51.91c0,.28-.34.63,0,1.12l-1.88-.37,1.78,1.04-.28.46c-.28-.11-.89.09-1.47-.21-4.03-2.06-4.21-7.37-.03-9.19Z"/>
+    <path class="ado" d="M583.19,378.09c.89.63.89,1,0,1.13-.35,1.7-4.27,1.94-5.64,1.5-.66-.87-1.12-1.9-1.13-3.01,1.65-.48,3.34-.49,4.89-1.13.46.33,1.77,1.44,1.88,1.5Z"/>
+    <path class="bmg" d="M604.99,371.32c1.3,2.23,0,2.55-1.5,3.95,1.25.51,1.12,1.77,2.25,2.44-.19-.07-.53.06-.75,0-1.32.79-3.86.39-4.89-.75-.33-.1-.32-.22,0-.38.05-.1-.06-.3,0-.38.14-.17,1.2-.59,1.7-1.12,1.13-1.19,2.32-2.37,3.19-3.77Z"/>
+    <path class="bmg" d="M615.51,345.01c.46.34,1.63.29,1.82.97.03.12,0,2.29-.03,2.51-.29,2.5-3.57,2.69-3.84,1.08-.16-.91.9-1.35-.96-1.18-.1-.07.4-.68.38-.75,2.17,1.16,2.93-.62,2.63-2.63Z"/>
+    <path class="apj" d="M568.15,346.51c-1.93,1.98-3.88,1.26-3.18-1.49l3.18-4.53c-.82,2.32-.69,3.73,0,6.01Z"/>
+    <path class="axg" d="M573.04,382.22v.38l.34.77c-1.53,1.81-2.18,3.71-.17,5.43.54,1.44-1.19,2.39-2.05,1.32-.21.06-.55-.06-.75,0,1.58-.7-.24-.93-.39-2.09-.17-1.33.61-7.49,3.02-5.8Z"/>
+    <path class="bmg" d="M610.25,352.9c-.42.95,2.27,1.11,2.47,1.1.81-.04,1-.88,1.66-1.1.56,1.26-.73,1.6-.76,1.75-.14.74.49,1.55.41,2.15-.02.17-.93,1.63-1.15,2.87.48-2.67-1.01-4.2-3.01-5.64.12-.56.37-1.06.38-1.13Z"/>
+    <path class="bmg" d="M607.62,364.55c.78,2.39.05,4.08-1.28,6.07-.39.58-.02.99-.97.33,1.06-1.9,1.41-4.45,2.26-6.39Z"/>
+    <path class="bmg" d="M612.51,361.17c-.01.21.46.63.23,1.52-.51,2.01-2.88,1.33-4.37,1.11,1.68-.81,2.96-.92,4.13-2.63Z"/>
+    <path class="bmg" d="M633.92,374.71l.39,1.49c-4.24,1.61-1.53-2.3-.39-1.49Z"/>
+    <path class="bmg" d="M612.13,346.13l-1.5,1.13c-.04-.63-.71-1.72-.37-2.63.54.41,1.53.99,1.88,1.5Z"/>
+    <path class="bt" d="M601.23,324.71c-.07.02-.15.47-.39.57-.93.42-1.67-.16-2.61-.2-.34-.22.82-.72,1.13-.75.66-.07,1.31.03,1.88.38Z"/>
+    <path class="aql" d="M570.41,335.99c.58-.19.68-.19.38.38-.33.31-1.34.88-1.5,1.13.09-.8.05-.84-.75-.75.3-.09,1.51-.59,1.88-.75Z"/>
+    <path class="apj" d="M607.24,328.84c-.92.29-1.09.53-2.25-.02.06-.15.37-.3.37-.35.6.02,1.56-.23,1.88.38Z"/>
+    <path class="bmg" d="M610.25,352.15c.11-1.08-.38-2.61.38-3.38.05,1.01.26,2.68-.38,3.38Z"/>
+    <path class="apj" d="M570.41,343.5l-1.13.38s-.3-.1-.19-.36c.26-.62,1.51-1.54,1.69-.58.02.11-.35.4-.37.56Z"/>
+    <path class="bmg" d="M617.02,353.65c.15,1.87-2.19.61-1.5,0,.11-.1,1.13.06,1.5,0Z"/>
+    <path class="apj" d="M606.49,324.71l-.18.37-1.32-1.12c.9-.02,1.05.03,1.5.75Z"/>
+    <path class="aar" d="M621.15,405.53c.02.62,0,1.25,0,1.88.72.21.72.54,0,.75.72.21.72.54,0,.75.96.55.96.95,0,1.5,1,.71,1.01,1.94,0,2.63-1.74.77-2.87.77-3.38,0-1.07.32-1.82.32-2.26,0-1.02.29-1.78.29-2.26,0l-3.25.72-.51-.72c-.4.28-.88.39-1.35.49-1.58.34-4.91.74-5.8-.49-8.39.74-16.8.74-25.19,0-1.61.75-3.26.7-4.89,0-1.24.54-2.62.54-4.13,0-.52.32-1.14.32-1.88,0-.57.57-1.2.38-1.88,0-1.18,0-2.89.31-3.76-.38.02-.73.31-.83.94-.75l-.94-3.38c-.02-1.37.04-2.76,0-4.13l.56-1.88c.87.86.56,2.28,1.31,3.23.6.78,2.04-.42,1.14,2.4l1.5-.37c.15.18-.04,2.08.15,2.47.25.51.93.54,1.17.93.32.52.12,1.49.19,1.49h8.27c-.09-.85-1.58.01-2.1-.73-.47-.68.13-1.57.04-2.11-.07-.4-.56-.76-.58-.92.06-.86.31-1.03.45-.19h10.05c.14-.31.27-.56.42-.56,8.23-.23,17.31-.3,25.47,0l.45.75c-.15,1.51-.54.24-2.03.37-2.05.19-2.52,1.19-1.73,3.01h-7.52s.07-.42-.14-.6c-1.54-1.35-.81-2.21-.99-2.4s-4.5.14-5.26,0c.41.75.3,1.95-.02,2.73-.2.48-.87.05-.73.65h22.93c.18-1.35,1.11-2.27.76-3.76l.75,1.5.56-.75,1.31.76v-9.4c.24-.03.75.5.75.56v8.46h.75v-5.83c0-.19,1.8-2.45,1.13-3.57l.75,1.12.37-1.5c.34,2,.31,3.23.38,5.26Z"/>
+    <path class="bgb" d="M578.3,403.65c2.25-.02,4.52.01,6.77,0,.34.07.32.2,0,.38-3.93.26-7.88.32-11.86.19-.64.2-.56,3.52.21,3.81l-.75.51c.08-.63.29-1.01.55-.47,1.05-.31,7.62.01,9.35.11.09,0,.17.16.25.36-1.73-.42-4.09-.56-7.08-.41-.68-.13-.87-.32-1.23-.86-1.48,1.64-2,.63-1.57-3.06,4.12.17,8.16.1,12.15-.19l.8.17c-.03,1.19.34,1.26,1.08.21,2.33-.31,5.15-.3,7.52,0,.59.23.88.87.87,1.91.2-.88.54-1.52,1.01-1.91,3.88-.65,8.35-.74,12.4-.38.59.59.48,3.83.38,4.89h-36.84c-.15-1.69.11-3.55,0-5.26,2,0,4.02.02,6.02,0Z"/>
+    <path class="m" d="M583.19,387.11c.83-.9,2.64.41,1.88,1.5,0,.02-.46-.02-.37.19.11.26.91.72.75.93-.03.04-.72.04-.94.36-.75,1.12.43,2.09.59,3.19.14.97.34,9.64-.02,9.98-.12.12-1.28.14-1.5-.38,1.71.16.31-1.94.2-2.47-.05-.26.27-.84.18-.92-.13-.11-2.43-.15-2.83-1.5-.76,1.93-.85.23-.99.1-.09-.08-1.55.44-2.01-.85l-.56.75c.57-2.15-1.62-1.97-2.07-2.63-.27-.4-.11-1.16-.37-1.51-.31-.43-1.31-.33-1.91-.72-.45-.3-1.97-1.64-2.43-2.08-.77-.74-.03-.48.38-.94.48-.14.93-.47,1.5-.38.09-.91-.9-1.23-1.22-1.97-.82-1.89.41-3.76,1.6-5.17.26-.31.29-.84.75-.75-.2,1.96,1.78,1.62,2.65,2.8s.95,3.79,3.28,4.27c.71.15,3.32-1.27,3.48-1.81Z"/>
+    <path class="va" d="M621.53,405.9c2.2-.01,2.79-2.65,3.6-3.73.15-.2,2.6-2.44,2.77-2.5,1.81-.62,2.09,1.11,2.79.95.4-.09.76-.96,1.25-1.07.72-.18,1.1.57,1.44.59s.79-.51,1.2-.53c1.54-.08,7.26-.76,7.93.36.26.43-.13,2.37,1.05,2.54.56.08,1.25-1.34,1.84-.36.45.73.11,2.69,1.31,3.39.32.18.23.45,0,.75-1.28-.65-3.25.45-4.32,1.13-.55.35-3.59,3.33-3.78,3.77-.27.63.13,1.07.08,1.63-.03.3-.53.62-.53.81,0,.47,3.01,3.1,3.37,3.85,1.81.09,3.02.93,4.6,1.43,1.49.47,3.07,1.2,4.34,1.67-.63.98-.03.95.75.38.75.05,1.09-.13,2.26,0-2.23-.16-.6.71-.46,1.41.08.42-.21.95-.09,1.24.39.95,2.56.79,3.18,1.67-1.72,1.52-4.45,1.82-6.66,1.58-.54-.06-.96-.63-1.42-.63-.72,0-4.27,2.5-3.2-1.13-1.42.99-2.56,2.68-3.19,0-.54.34-1.37.96-1.98,1.06-1.08.18-3.88-.12-4.74.04-.28.05-.2.8-.43.79-.22,0-3.42-.64-4.13-.77-1.85-.33-5.87-1.39-7.33-2.45-.52-.38.14-2.35.46-2.73.34-.42,1.65.02,2.53-.64,1.63-1.21,3.3-4.79,5.65-5.45-.01.67-.24,1.23-.72,1.67l3.06-3.29c1.02-.97,2.11-.05,1.62,1.22.25,1.21,2.65.39.61-1.15.29-1.05-.36-1.53-1.93-1.45.09-.1.09-.62.36-.94.7-.84,1.73-1.45,2.27-2.44l-2.82,1.5v-1.51c-.66.54-1.11,1.27-1.7,1.88-1.12.1-1.62.48-1.5,1.13-.07.07-.95,1.72-.56,1.88,1.15-.53,2.47-1.8,2.82-3.01.7-.07.37.8.18,1.12-.29.49-6.15,6.43-6.57,6.61s-.7-.61-1.13-.43c-.5.21-1.45,1.72-2.07,2.09-.45-1.59-.85-.28-1.57-.1-.45.11-.99-.31-1.25-.28l2.6-.97c1.58-1.21,5.44-3.23,6.15-5.15.77-2.08-1.13-4.31-2.73-5.54.14-.54-.46-1.25-.75-.75-.91-.33-3.62-.44-4.51-1.13Z"/>
+    <path class="bhq" d="M559.88,408.16c.06.17.22.3.38.38,0,.63-.01,1.25,0,1.88-3.01.01-1.12,3.83.72,4.79,6.43,2.77,13.46,3.83,20.33,4.6,8.98.67,18.3.51,27.31-.85,4.73-.72,20.34-3.48,12.53-10.05,0-.25,0-.5,0-.75.25-.75,1.45-.35,2.16-.09,5.72,2.12,3.57,6.21-.28,8.74-14.5,5.36-43.85,6.53-58.64,1.88-3.73-.81-12.99-4.42-8.04-9.34.91-.91,2.49-2.36,3.53-1.18Z"/>
+    <path class="acm" d="M564.39,418.68c-1.65.64-2.2-.65-2.77-.82-1.21-.36-2.91-.35-3.97-.9-.56-.29-3.1-2.96-3.26-3.54-.5-1.82.67-4,2.09-5.1,1.31-1.01,2.79-1.95,3.4-.17-1.41-.47-3.98,2.39-4.33,3.41-.65,1.9,3.16,4.01,4.05,5.51,1.84-.32,3.72,1.27,4.79,1.61Z"/>
+    <path class="ayt" d="M621.15,407.41c3.8-.27,8.1,2.57,5.58,6.51-1.29,2.02-1.7,2.14-3.7,2.88.68-.64,3.38-4.44,3.33-5.01-.11-1.34-3.59-4.19-5.21-3.64,0-.25,0-.5,0-.75Z"/>
+    <path class="va" d="M620.4,419.44c-.6,1.42-1.4.99-2.63.75.9-.24,1.44-.64,2.63-.75Z"/>
+    <path class="bmg" d="M626.04,407.03c-.97-1.62.87-.32,1.5.57l-.75.19c-.24-.18-.61-.7-.75-.75Z"/>
+    <path class="bma" d="M566.27,413.05c14.74,4.56,32.64,6.24,47.17.33l2.07-.33h2.26c-.18.78-2.62,2.28-3.45,2.57-8.29,2.94-19.38,3.06-28.19,2.64-7.47-.35-15.15-1.11-21.74-4.84v-.38c.63,0,1.25,0,1.88,0Z"/>
+    <path class="da" d="M560.26,410.41c.02.8-.17,2.12,0,2.76.11.4.74.22.76.25,7.02,4.07,15.66,5.53,24.09,5.84l.72.55c-1.46.3-2.96.3-4.51,0-5.75.05-15.44-1.43-20.66-3.96-2.19-1.06-4.21-5.13-1.14-6.38.72-.29.22.66.75.94Z"/>
+    <path class="amo" d="M561.01,413.42c2.92-.74,2.49,1.09,4.3,1.9,2.61,1.18,5.63,2.02,8.48,2.23.11-.76,1.17-.63,1.5,0,3.59.71,7.22,1.09,10.9,1.13l.63-.38c7.92.59,15.77-.35,23.44-1.28l.36.53c-1.1.74-2.48,1.11-4.13,1.13-.18.28-.37.51-.59.54-6.48.94-13.67,1.34-20.09.59-8.06-.53-15.92-1.58-23.03-4.98-.55-.26-1.53-.17-1.73-.35-.23-.2.03-.91-.05-1.05Z"/>
+    <path class="aco" d="M621.15,413.05c-.06.24-.12.46-.24.67-.65,1.19-8.27,4.38-10.29,3.84-3.34-.34-6.69.92-9.95,1.14-4.47.31-9.94.07-14.49-.01-3.63-.09-7.26-.47-10.9-1.13-.43-.03-.9.05-1.5,0-3.15-1.26-6.9-1.7-9.4-4.13,2.74.67,5.22,2.04,7.97,2.74,9.7,2.48,32.02,2.76,41.27-1.05,1.37-.56,2.43-1.83,4.14-2.07h3.38Z"/>
+    <path class="bu" d="M560.63,408.53c1.25,1.49,1.59,2.16,1.88,4.13h-1.88c-.02-1.37.02-2.76,0-4.13Z"/>
+    <path class="yg" d="M652.73,413.05c.32.04.44.17.38.38,3.44,2.43,7.1,3.12,11.31,3.65,10.1,1.29,24.44,1.56,33.94-1.89,1.63-1.17,3.33-1.89,5.12-2.14,1-.04,2.01.03,3.01,0-.03.09-1.26,1.39-1.36,1.45-3.19,1.97-9.76,3.24-13.54,3.76-8.53,1.17-17.45.43-26.07.43-4.83-.32-9.64-1.29-14.04-3.09-.62-.25-1.48-.81-1.58-1.48-1.01.16-2.71.03-2.8-1.07,1.63-.33,3.93-.31,5.64,0Z"/>
+    <path class="fg" d="M647.09,412.67c.32.12.32.24,0,.38.42.91,3.26.03,3.76.38.04.03-.37.53-.29.67.04.07,1.06,1.07,1.13,1.11.49.26,1.17-.04,1.51.11s.25.59.79.8c3.83,1.46,7.72,1.5,11.52,2.57-1.5,0-3.01,0-4.51,0-.09.33-.22.32-.38,0-4.64-.8-9.35-1.69-13.32-4.23-.83-.55-1.63-2.05-.59-2.54-.72-1.61-.72-2.49,0-2.63-.73-.34-.73-.78,0-1.13,0-.63-.01-1.25,0-1.88,0-.25-.01-.5,0-.75.07-1.64.14-2.58.38-4.13.34.19.67.45.81.83.19.5-.04,8.33-.15,9.55l-.66.9Z"/>
+    <path class="ph" d="M646.34,408.16h.38c0,.38,0,.75,0,1.13-2.42,1-3.14,4.43-.42,5.85l-.33.92c-.46-.09-.93.12-1.5-.18-.11-.06-1.62-1.59-1.68-1.69-1.15-2.21,1-5.9,3.55-6.02Z"/>
+    <path class="bmg" d="M650.47,420.56c.45.17.71.37.75.38.44,1.9-1.49.75-2.52.86-1.41.14-2.36,1.5-3.12-1.23h4.88Z"/>
+    <path class="ard" d="M646.71,409.29v2.63c-.95-.25-.37,1.38-.04,1.96,1.37,2.4,11.48,4.44,13.95,4.81.12.02.25-.02.38,0,10.2,1.57,21.97,1.76,32.33.38.4.33.02.58-1.13.75-12.8,1.3-26.05,1.12-38.72-1.13-.12-.01-.25.01-.38,0-2.44-.6-4.7-1.47-6.77-2.63-.12-.03-.25.02-.38,0-.31-.89-1.75-1.57-2.06-2.26-.49-1.07.76-6.14,2.82-4.5Z"/>
+    <path class="bmg" d="M634.31,411.92l7.14-5.63-4.88,5.08c-.26.75.73.5.72.72,0,.25-.42.7-.39,1.1.03.35.77.33.96.6.16.22-.13.89.1,1.4.65,1.43,2.24,2.23.1,2.76l-.56-1.13-3.2,3c-.05-1.35,1.93-2.76,3-3.39.12-.47.04-1-.55-.74-.36.15-3.68,3.66-3.95,3.38l2.63-3.57c.08-.25-.36-.27-.56-.18-.78.35-2.72,2.93-3.9,3.71-.26.17-.27.73-1.18.42,1.04-1.84,3.51-3.2,4.76-4.63.24-.27.82-1.13.31-1.38l-3.57,3.57-4.14,3.19c1.48-1.78,3.04-3.47,4.51-5.26.8-.98,1.75-1.98,2.63-3.01Z"/>
+    <path class="bmg" d="M630.93,411.54c-1.9-1.1.3-.97,0-1.69-.58-.15-2.86-2.61-2.63-2.82.79-.73,1.38.95,1.74,1.07.61.19,1.47-.1,2.04.23.77.45-.49,1.68.36,2.08-.61.64-1.44,1.06-1.5,1.13Z"/>
+    <path class="arx" d="M611,312.68c1.17-.25,1.38,1.65,1.13,1.88-.15.13-1.49-.13-1.99,0-.39.09-.65,1.28-1.2,1.5l-2.07-3c.9.34,1.67-.27,2.25-.38.56-.11,1.34.11,1.88,0Z"/>
+    <path class="arx" d="M617.39,321.32c-.25.23-1.49-.18-1.49-.56-.01-1.12,2.21-.1,1.49.56Z"/>
+    <path class="arx" d="M614.38,312.31c.22.22-.31,1.12-.56,1.12-1.04,0,0-1.69.56-1.12Z"/>
+    <path class="arx" d="M577.92,313.06c-.74,1.91.29,1.15,1.5,1.31-.7,1.31-3.04,2.53-3.4.38-.11-.65,1.2-.79,1.14-1.69.1-.31.55-.27.75,0Z"/>
+    <path class="arx" d="M581.68,313.43c.27.27-2.51,3.9-3,3.38-.44-.46,1.03-1.99,1.31-2.25.5-.46.89-1.24,1.7-1.13Z"/>
+    <path class="arx" d="M569.65,312.68c.62.12,1.55-.04,2.26,0-.41,1.28-1.8.04-2.81.76-.41.04-.38-1.11.56-.76Z"/>
+    <path class="arx" d="M576.42,313.06c-.13.54-.61.86-1.13.75v-.75s1.13,0,1.13,0Z"/>
+    <path class="aj" d="M579.05,312.68v.38c-.38,0-.75,0-1.13,0h-.75v-.38c.63.01,1.25-.01,1.88,0Z"/>
+    <path class="fl" d="M592.58,339.74c.36.35.24.89,1.13,1.5.54.6.54,1.48,0,2.63.09,2.2-.15,3.23,2.63,3.01,2.22-.08-.27,2.81-1.85,3.06-.18,1.73-1.08,3.29-2.73,4.66l.06.55c.01.27,0,.49-.05.5-.38.1-3.75.59-3.93.49-.16-.09-1.7-3.16-.9-3.25-.33-1.35-.72-1.39-2.26-1.5-.49.66-1.75.09-1.5-.75-2.33-.17-.57-4.05,1.13-3.38,5.17,3.15,2-6.3,3.76-7.34.41-.24,4.17-.53,4.51-.18Z"/>
+    <path class="om" d="M584.31,347.26c-.05.19-2.45,1.95-1.13,3.38-.4.75-3.4,1.15-3.76.38-1.31.89-2.19.89-2.63,0-.31-.11-.3-.23,0-.38-.17-.94,0-.94.75-.38,1.66-.59,1.01-1.82,1.13-3.38.77.17.52,1.47,1.68,1.5,2.82.05,2.29-6.17,3.77-7.89.2,1.79-.12,3.71-.19,5.46-.02.52.39,1.24.38,1.3Z"/>
+    <path class="bky" d="M577.55,350.27c-.2.07-.44.39-.75.38-.81.71-1.75-.23-1.13-1.13-.33-.97-.54-2.5.38-3.01,1.58,1.24,1.27,2.08,1.5,3.76Z"/>
+    <path class="azm" d="M580.17,340.87l.2,1.48-1.31,2.28c-.05-.95.13-1.92.36-2.84.16-.62-.38-1.1.75-.92Z"/>
+    <path class="acr" d="M576.04,346.51c-.06,1.01-.52,1.97-.38,3.01-.5.24-.75-.26-.75-1.5.06-.37.27-1.01.38-1.5.15-.69.56-1.47.56-2.26.32,0,.22,1.81.19,2.26Z"/>
+    <path class="yd" d="M570.78,336.36l-.38-.38c1.02-.45,2.17-1.35.38.38Z"/>
+    <path class="vy" d="M609.88,388.24c-.22.55-.94.82-.75,1.5.56-.07,1.01.2,1.5.38.98,1.9-.8,1.75-1.72,2.6-.98.91-2.03,2.85-2.8,3.59-.66.62-2.23.98-2.81,2.08l-.18-1.31c-.84-.8-.75.51-1.29.95-.43.35-1.13.3-1.52.75-.52.61-1.74,3.69-.95,4.5h-3.01c-1.09-2.31-1.14-5.62,0-7.89l.19-.48c4.19-1.5,8.1-3.12,11.73-4.85l-.27-.68c-1.28-1.64,2.52-4.59,1.88-1.13Z"/>
+    <path class="aje" d="M596.34,392.37c1.24-.02.91,1.69,0,2.26.79.01.55.29,0,.75,0,2.62.08,5.28,0,7.89,0,.25,0,.5,0,.75.33.07.32.2,0,.38-.05.92.4,2.5-.94,2.64-1.3,0-.9-1.81-.94-2.64-.34-.07-.32-.2,0-.38-.34-.07-.32-.2,0-.38-.03-1.12,0-2.26,0-3.38-.94-2.65-.93-5.24,0-7.89,1.09-.67,1.5.04,1.88,0Z"/>
+    <path class="vi" d="M608.75,404.02l-12.4.38c0-.12,0-.25,0-.38,3.35-.45,7.73-.67,11.12-.4.61.05.78-.1,1.28.4Z"/>
+    <path class="ha" d="M593.34,358.16c.57.33,1.05,1.93.38,2.26,0,.09-.26.35-.25.61.03,1.24.6,1.43-.12,2.77-1.93,1.12-3.49,1.09-4.67-.09l-.59.09c-.23-.45-.77-2.69-.75-3.01-.7-.15.76-4.68.98-4.83.45-.3,4.31-.43,4.68-.06l.36,2.26Z"/>
+    <path class="ob" d="M586.19,370.57c-.23-.27-.9-1.24-.97-1.49-.42-1.59,4.84-.38,5.65-.38,1.44,0,3.43-.78,5.09-.39.18,1-.25,1.52-.75,2.25-2.03,2.96-6.81,2.58-9.02,0Z"/>
+    <path class="agb" d="M598.97,350.65c.74-1.03,3.24-.68,3.01.75,1.15-.08,2.98.64,2.63,1.88,4.04,5.2-1.26,12.82-7.89,9.77-.92-.53-.63-.96.38-.75l.73-.49c4.93,1.94,8.95-5.38,4.54-8.4v-.88c-2.14-.29-4.05-.26-6.02.75l.18.85c-1.49,1.43-2.32,3.57-1.28,5.5l-.4.79c.41.97-.05,1.13-.75.38-.11-.14-.25-.26-.38-.38-.04-.48-.26-1.84-.38-2.26-.66-1.74-.62-2.66.1-2.74l.27-.64c-1.06-.79.27-2.69,1.5-2.26-.33-.95,1.02-1.41,1.88-1.13-.31-1.16,1.14-1.76,1.88-.75Z"/>
+    <path class="eu" d="M583.19,350.65c.08.01,1.2.61,1.5.75.96-.29,2.61.35,2.26,1.5,0,.14,1.03,2.54,1.15,2.63.15.11,2.84-.35,3.74-.37.1-.63.73-.76,1.88-.38-.26.86-.29,2.43-.38,3.38-.15-.53-.51-1.54-1.01-1.81-.71-.4-2.86-.37-3.51.12-.18.14-1.49,4.1-1.5,4.32h-.38c-.52.92-.96.62-.75-.38l-.36-.85c1.12-1.93.99-4.28-.8-5.75l.03-.92c-1.88-.56-3.73-.58-5.55-.04l-.47-.33c-.97.42-1.14-.07-.38-.75-.4-.31-.15-.56.75-.75,1.21-.08,2.64-.58,3.76-.38Z"/>
+    <path class="aat" d="M579.05,352.53c.44.52.24.62-.38.38.4.86-.97,2.41-1.88,2.26-.08,3.08.96,5.17,3.14,6.26l.24.88c.45-.52,1.17-.64,2.17-.36,1.03-.7,1.81-.83,2.34-.39.22-1.04.72-1.42,1.5-1.13l.75.38c-.07,1.12-2.04,2.31-3.01,2.63-3.55,1.19-7.96-1.22-8.65-4.89-1.69-.22-.45-5.34,1.13-4.89-.23-1.26,1.06-2.62,2.26-1.88l.38.75Z"/>
+    <path class="ns" d="M602.36,346.13c.41.58.49,1.21.24,1.9l.66.21c.36,1.47,1.19,1.65,2.49.52.11-.33.23-.32.38,0,.13,1.32.2,2.86.38,4.13-.51.38-.92.86-1.5.38-.66-1.32-1.52-1.81-3.01-1.88-.94-.44-1.93-.83-3.01-.75-1.44-1.09.11-1.55,1.39-1.58l.87-.67c.23-.71.32-2.52.38-3.38.04.08.61.43.75,1.13Z"/>
+    <path class="rw" d="M609.5,356.66c2.6,1.67,1.6,4.74-1.5,4.51-.1-.87.17-1.91-.02-2.73-.08-.34-.7-.53-.74-.66.81.26,2.05-.37,2.26-1.13Z"/>
+    <path class="azf" d="M588.07,363.8c-.28-1.43,1.73.23,2.5.27.69.04,1.27-.36,1.89-.57s.96-1,.87.31c-1.04,1.94-4.24,1.96-5.26,0Z"/>
+    <path class="awk" d="M597.09,362.3l-.38.75c-1.32-.61-1.78-1.13-2.63-2.26l.75-.38c.66-.92,2.7.9,2.26,1.88Z"/>
+    <path class="ahw" d="M604.99,353.28h-.38c-.45-.58-1.91-1.54-2.63-1.88,1.2-.72,3.55.02,3.01,1.88Z"/>
+    <path class="blp" d="M598.22,381.47c1.11.8,1.05,4.16.38,5.26-1.23.9-6.76,5.09-7.76,5.19-1.14.11-4.43-2.98-5.77-3.31-.36-.74-1.28-1.04-1.88-1.5-.73-1.24-.92-4.31-.74-5.81l.74-.58,1.05-.14c3.77,2.62,8.96,2.84,12.96.64l1.03.25Z"/>
+    <path class="ale" d="M608.37,382.22c.4,1.18.71.74,1.22,1.6.82,1.39.86,2.99.29,4.42l-.19-1.13c-.88.3-1.45,2.02-1.69,2.25.11.17.2.34.19.5-.02.93-10.35,4.57-11.85,4.76v-2.26c.09,0,.3-.47.53-.6.3-.17.82-.12.9-.21.27-.31-.16-2.15.83-2.76s4.53-.51,5.08-.92c1.43-1.07.95-4.01,2.79-4.72.82-.31,1.36,1,1.9-.95Z"/>
+    <path class="rd" d="M598.6,377.71c.6.41.85,1.04.75,1.88,1.3-.2,4.76-.61,4.89,1.5-.01.1.39.49.29.88-.23.97-4.83,3.95-5.93,4.76-.57-1.69-.38-3.51-.38-5.26-.74-1.11-.74-2.27,0-3.38.11-.07.23-.27.38-.38Z"/>
+    <path class="ado" d="M604.99,377.71c1.37,1.62-.68,2.77-.75,3.38-1.5-.98-3.28-.86-4.89-1.5l.24-.55c-.61-.78-.53-2.05.51-2.08,1.62.07,3.32.34,4.89.75Z"/>
+    <path class="bgx" d="M586.94,399.89c1.08,1.11,1.1,2.66,0,3.76.33.07.32.2,0,.38.33.07.32.2,0,.38-.07,1.31.45,2.88-1.5,2.63.42-.94-.37-2.57-.38-3.01,0-.13,0-.25,0-.38,0-1.17.34-3.32.38-4.89l.56-.6c-.06-1.85-.04-3.7.08-5.55l.49-.24c.69.75.38,6.03.38,7.52Z"/>
+    <path class="bfh" d="M586.94,399.89c1.81-1.44,5.04,2.66,3.01,3.76-.79.32-2.18.3-3.01,0,.03-1.25,0-2.51,0-3.76Z"/>
+    <path class="bx" d="M594.46,400.26c-.08-.99-2.28-3.62-2.27-3.95,0-.25.74-.12.76-.41.02-.3-.43-.67-.2-1.27.09-.23,1.4-2.09,1.7-2.27,0,2.63-.01,5.27,0,7.89Z"/>
+    <path class="ia" d="M586.57,392.37v7.14s-1.13-.75-1.13-.75c.03-1.31-.32-6,.37-6.58.62-.53.51-.07.76.19Z"/>
+    <path class="aqo" d="M589.95,403.65h4.51c0,.13,0,.25,0,.38-2.4.31-5.15.3-7.52,0,0-.13,0-.25,0-.38h3.01Z"/>
+    <path class="apj" d="M610.63,333.35c-.83,1.38-2.29,2.83-2.95,4-.38.67-1.07,3.36-1.23,3.46-.56.36-3.72-.34-4.83.8-.77.22-.91-.16-.38-.75.02-.04-.35-.49-.23-.86.88-2.83,2.57-4.01,4.39-5.8.6-.59,1.86-3.86,2.61-5,1.16.36,2.99.23,3.57,1.51.62,1.37-.36,1.66-.94,2.62Z"/>
+    <path class="apj" d="M611.38,333.73c1.29.74,3.93,1.3,4.05,2.52.24,2.29-2.03,2.19-3.68,1.61-.5.49-1.25-.13-1.13-.75.19-.15.38-.77.61-.77.82-.02,1.95,1.64,3.13,1.13,1.29-3.81-1.95-1.33-2.61-1.64-.6-.29-1.22-1.61-.38-2.1Z"/>
+    <path class="ll" d="M602.36,346.13c.27,1.09,1.1.32,1.12.37.53.96-1.47.66-.74,1.5.09.1,2.24-.39,2.63-.38.6-.37.72.67.38,1.13-.29,2.12-2.59,2.1-3.22-.36-.21-.84-.03-1.65-.16-2.28Z"/>
+    <path class="gp" d="M601.23,340.87c.09.25.32.51.38.75.34,1.32.08,2.12,0,3.38-.49-1.11-1.49-2.63-1.13-3.89.11-.39.74-.21.76-.25Z"/>
+    <path class="bt" d="M610.63,337.11c.28.39.69.6,1.13.75.5.39-.02,1.06,0,1.13l-1.88-1.69c-.02-.39.62-.09.75-.19Z"/>
+    <path class="g" d="M605.36,347.64c-.27-.78-.55-1.03.75-1.13.05.74-.07,1.52,0,2.25h-.38c.11-.77-.27-.83-.38-1.13Z"/>
+    <path class="awb" d="M596.34,346.89c.18-.61.47-1.15.54-1.82.1-.96-.78-2.52.58-3.07.07.96,1.1,6.42,1.55,6.72.4.28,1.73-.02,2.21-.33-.63,1.92-2,.44-2.26,2.26-.7.05-1.27.47-1.88.75-1.22-.11-1.71.14-1.88,1.13-.6.56-1.26,1.43-1.5,2.26-.54,1.35-1.09.36-1.88.38l-2.25-.75c.49,0,1.04.04,1.49-.2.27-.15,2.55-2.9,2.62-3.09.15-.42-.13-1.12.19-1.62.28-.43,1.85-.46,2.57-2,.2-.42-.12-.59-.11-.62Z"/>
+    <path class="apj" d="M593.71,343.88c-.04-1.05.34-1.76,0-2.63.02.01.23-.34.37-.21.68.62.18,2.07-.37,2.84Z"/>
+    <path class="aty" d="M598.22,378.09c0,1.13,0,2.26,0,3.38-4.36,2.92-11.01,2.62-15.04-.75-1.17-.07-.94-.98,0-1.5v-1.13c4.3,2.42,10.78,2.61,15.04,0Z"/>
+    <path class="aq" d="M600.1,376.58c-.04.08.03.24,0,.38-.04.21-.38.42-.28.86.21.94,1.76,1.97-.47,1.77-.14-.06-.56.13-.7-.04-.23-.3.02-1.36-.05-1.84.35-.26.57-1.26,1.5-1.13Z"/>
+    <path class="xx" d="M575.67,349.52c.33.46,1.02.86,1.13,1.13.03.07.02.3,0,.38.64.32.59.84-.15,1.57l-.23,1.06c-.82,1.27-1.41,3.4-1.13,4.89l-1.88,1.13c-1.22.03-1.17-1.28,0-1.5.29-1.55.52-2.95.75-4.51.27-1.82.46-3.8.75-5.64.39.44.4,1,.75,1.5Z"/>
+    <path class="xz" d="M571.91,356.66c.22.71.64,1.55,1.5,1.5-.22,1.19.01,1.11,0,1.5-.02.5,0,1,0,1.5-2.32-.63-3.53-.56-2.7-3.28.17-.55.4-1.44,1.2-1.23Z"/>
+    <path class="baa" d="M583.19,380.72c0,1.42.29,5.41,0,6.39-1.07-.83-6.48-4.46-6.34-5.39.01-.09.63-.95.7-1,1.24-.81,4.21-.68,5.64-1.5v1.5Z"/>
+    <path class="bfp" d="M577.17,413.05c4.28.59,8.6,1,12.93,1.09l11.96-.63.3-.46h7.14c.96,1.14-1.73,1.74-2.76,1.9-7.77,1.19-15.52,1.71-23.38,1.01-2.11-.19-10.2-1.06-11.13-2.33-.09-.12-.04-.33.05-.57,1.62,0,3.26,0,4.89,0Z"/>
+    <path class="avs" d="M568.15,413.05l4.09.67c11.24,3.55,23.84,3.01,35.19,1.06,1.86-.87,3.81-1.45,5.83-1.74h2.26c-1.47.14-2.98,1.42-4.04,1.78-11.58,3.85-30.59,3.29-42.19-.47-.99-.32-2.03-.93-3.01-1.31.63,0,1.25,0,1.88,0Z"/>
+    <path class="bkw" d="M581.31,419.81c1.5-.01,3.01,0,4.51,0,6.33.42,14.41-.08,20.67-1.13,2.7-.43,5.67-.93,8.26-1.82,2.36-.81,9.41-3.38,6.4-6.45.02-.5,0-1,0-1.5,2.21-.26,3.53,3.68,2.67,5.09-.26.43-1.24,1-1.72,1.3-7.67,4.85-25.77,5.28-34.9,5.12-1.76-.03-4.21-.14-5.89-.61Z"/>
+    <path class="axq" d="M572.28,413.05c.51.35,1.22.87,1.8,1.02,10.4,2.69,22.16,2.03,32.58.45.61-.09,2.53-.78,2.84-1.47h3.76c-1.47.25-2.82,1.39-4.06,1.77-2.41.73-8.11,1.5-10.77,1.63-10.17.5-20.72.15-30.28-3.39,1.37,0,2.76,0,4.13,0Z"/>
+    <path class="rr" d="M602.36,413.05c.74,1.15.23.59-.57.74-7.84,1.47-17.01,1.7-24.62-.74,8.39,0,16.8,0,25.19,0Z"/>
+    <path class="ib" d="M621.15,410.41c.89-.84,1.46.73,1.46,1.31s-.77,2.33-1.21,2.7c-.63.53-5.28,2.61-6.23,2.9-1.29.4-4.89,1.05-6.35,1.25-.78.11-1.55.16-2.33.11.92-.15,3.02-.79,4.13-1.13s3.29-.96,4.15-1.31c2.22-.89,4.22-2.2,6.38-3.21.02-.87-.03-1.76,0-2.63Z"/>
+    <path class="wi" d="M618.15,412.67c.06-.78,1.97-.5,2.21-.79.37-.44-.5-2.67.41-2.97.02,2.53.68,4.26-2.63,3.75Z"/>
+    <path class="dh" d="M585.07,404.02c-.15.64-1.17.36-1.69.38-3.43.14-6.92.02-10.34,0v3.38s1.31-1.49,1.31-1.49c.8.13,1.1,1.28,1.55,1.43.9.3,4.8-.12,6.35.06.69.08.6-.12.56.75h-10.15v-4.51s12.4,0,12.4,0Z"/>
+    <path class="aeo" d="M594.46,404.02c0,.13,0,.25,0,.38h-7.52c0-.12,0-.25,0-.38h7.52Z"/>
+    <path class="aja" d="M584.69,394.63c.08.71-.77.31-1.13.19-3.41-1.12-7.17-2.79-10.34-4.33-.16-.32-.31-1.33-.18-1.51.38-.52,10.21,5.78,11.65,5.64Z"/>
+    <path class="aij" d="M586.19,418.68c-3.67-.07-7.44.41-10.9-1.13,1.9.14,3.74.45,5.51.61,1.68.16,3.83-.2,5.39.51Z"/>
+    <path class="es" d="M646.71,411.92c.1.39-.12,1.05.07,1.61.34,1.01,6.32,3.21,7.66,3.63,2.02.63,4.16.93,6.18,1.53-2.51-.41-5.16-.53-7.82-1.39-3.2-1.03-8.37-2.56-6.83-6.88.38-.07.66,1.17.75,1.5Z"/>
+    <path class="af" d="M586.94,352.9c-.78-.41-1.48-1.13-2.26-1.5.31-.6,1.83-.51,2.27-.21.92.62-.02,1.57-.02,1.71Z"/>
+    <path class="cf" d="M579.43,351.02c-.25.23-.48.57-.75.75-.96.63-1.53.76-2.26,1.88-.96-1.03.22-2.03.38-2.63.87-.04,1.76.06,2.63,0Z"/>
+    <path class="eo" d="M608,389.36c1.05-.21.95.57.58,1.14-.79,1.21-10.37,3.76-12.23,4.87v-.75c2.52-1.47,9.85-3.49,11.65-5.26Z"/>
+    <path class="wy" d="M597.09,362.3c-.18-.09-2.17-1.76-2.26-1.88-1.7-2.5-.56-5.38,1.5-7.14,1.88-1.03,3.94-1.09,6.01-.75,5.96,3.25.89,12.84-5.26,9.77Z"/>
+    <path class="vh" d="M602.36,352.53c-1.71.65-4.07.39-6.01.75,2.01-1.71,3.48-2.13,6.01-.75Z"/>
+    <path class="ce" d="M597.09,351.4c-.76.35-1.22.52-1.88,1.13-1.3-1.15,1.05-2.18,1.88-1.13Z"/>
+    <path class="hm" d="M586.19,360.42c-.7,1.06-.78.69-1.5,1.13l-.63-.49c-.06-.97-.35-1.94-.87-2.9-.08-1.21-.59-2.08-1.5-2.63-.07-.83.55-1.59,1.88-2.26.21-.49.71-.62,1.5-.38,2.64,1.83,2.85,4.92,1.13,7.52Z"/>
+    <path class="tk" d="M585.07,352.9c-.25.49-1.04.42-1.5.38-1.05.59-5.05,1.68-4.89-.38.14-.1.26-.32.38-.38,2.17-1.06,4.02-1.01,6.01.38Z"/>
+    <path class="acs" d="M583.56,353.28c.34,1.36-1.27,1.63-1.88,2.26l.34.75c-.7.91-.31,1.54,1.16,1.88,1.36.07,1.95,2.29,1.5,3.38-2.02,1.24-2.11,1.47-4.51.75l-.39-1.59c-1.86-1.59-2.86-3.44-3-5.55.38-1.07.97-1.64,1.88-2.26,1.05.99,2.73.05,3.94.02.43-.01.78.34.95.36Z"/>
+    <path class="avh" d="M576.8,355.16c.74.8.9,1.82,1.57,2.76.72,1.02,3.69,3.19,1.82,4.38-3.23-.96-4.51-4-3.38-7.14Z"/>
+    <path class="bkm" d="M598.86,355.19c1.19-.31,2.54,1.61,1.26,2.79-2.04,1.89-3.54-2.19-1.26-2.79Z"/>
+    <path class="dp" d="M583.19,358.16c-.16,0-.65.48-1.23.32-1.43-.4-1.21-2-.27-2.95,2.02-.31,2.34,1.04,1.5,2.63Z"/>
+  </g>
+</svg>

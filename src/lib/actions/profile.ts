@@ -11,6 +11,7 @@ export type ProfileData = {
   username:       string | null
   email:          string
   avatarUrl:      string | null
+  avatarId:       string | null
   xpPoints:       number
   level:          string
   streakCount:    number
@@ -36,6 +37,7 @@ export async function getProfile(): Promise<ProfileData> {
       username:       users.username,
       email:          users.email,
       avatarUrl:      users.avatarUrl,
+      avatarId:       users.avatarId,
       xpPoints:       users.xpPoints,
       level:          users.level,
       streakCount:    users.streakCount,
@@ -178,6 +180,12 @@ export async function getDailyTip(): Promise<DailyTip | null> {
     .where(eq(financialTips.id, tipId))
 
   return tip ?? null
+}
+
+export async function updateAvatar(avatarId: string | null): Promise<void> {
+  const session = await auth()
+  if (!session?.user?.id) throw new Error('Unauthorized')
+  await db.update(users).set({ avatarId }).where(eq(users.id, session.user.id))
 }
 
 export async function updateProfile(data: { name?: string; email?: string }): Promise<void> {

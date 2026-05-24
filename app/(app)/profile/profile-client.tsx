@@ -20,7 +20,8 @@ import type { ImportRow } from '@/lib/actions/transactions'
 import { calcMoMoFee } from '@/lib/momo-fees'
 import type { FeeResult } from '@/lib/momo-fees'
 import type { ProfileData, EarnedBadge } from '@/lib/actions/profile'
-import { updateProfile } from '@/lib/actions/profile'
+import { updateProfile, updateAvatar } from '@/lib/actions/profile'
+import { UserAvatar } from '@/components/user-avatar'
 import { formatUGX } from '@/lib/format'
 import { FriendsTab } from '@/components/friends-tab'
 import { UsernameEditModal } from '@/components/username-edit-modal'
@@ -1068,6 +1069,7 @@ export function ProfileClient({
   const [editProfileOpen,  setEditProfileOpen]  = useState(false)
   const [profileName,      setProfileName]      = useState(profile.name)
   const [profileEmail,     setProfileEmail]     = useState(profile.email)
+  const [profileAvatarId,  setProfileAvatarId]  = useState<string | null>(profile.avatarId)
   const [profileSaving,    setProfileSaving]    = useState(false)
   const router = useRouter()
 
@@ -1083,7 +1085,10 @@ export function ProfileClient({
   const handleProfileSave = async () => {
     setProfileSaving(true)
     try {
-      await updateProfile({ name: profileName, email: profileEmail })
+      await Promise.all([
+        updateProfile({ name: profileName, email: profileEmail }),
+        updateAvatar(profileAvatarId),
+      ])
       toast.success('Profile updated')
       setEditProfileOpen(false)
       router.refresh()
@@ -1109,10 +1114,7 @@ export function ProfileClient({
       {/* Profile card */}
       <div className="rounded-2xl p-6" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
         <div className="flex items-center gap-4">
-          <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-2xl text-xl font-bold text-white"
-            style={{ background: 'var(--gradient-primary)' }}>
-            {initials}
-          </div>
+          <UserAvatar avatarId={profileAvatarId} name={profileName} size={64} />
           <div className="flex-1 min-w-0">
             <div className="text-lg font-bold" style={{ color: 'var(--foreground)' }}>{profileName}</div>
             <button
@@ -1357,6 +1359,37 @@ export function ProfileClient({
                 <X size={20} />
               </button>
             </div>
+            {/* Avatar picker */}
+            <div>
+              <div className="mb-2 flex items-center justify-between">
+                <label className="text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
+                  Choose your avatar
+                </label>
+                {profileAvatarId && (
+                  <button onClick={() => setProfileAvatarId(null)}
+                    className="text-xs font-semibold transition hover:opacity-80"
+                    style={{ color: 'var(--muted-foreground)' }}>
+                    Reset to initials
+                  </button>
+                )}
+              </div>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, maxHeight: 180, overflowY: 'auto', padding: 4 }}>
+                {Array.from({ length: 24 }, (_, i) => `avatar-${i}`).map((id) => (
+                  <button key={id} onClick={() => setProfileAvatarId(id)}
+                    style={{
+                      borderRadius: 10,
+                      padding: 3,
+                      border: profileAvatarId === id ? '2px solid var(--primary)' : '2px solid transparent',
+                      background: profileAvatarId === id ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
+                      cursor: 'pointer',
+                    }}>
+                    <img src={`/avatars/${id}.svg`} alt={id} width={40} height={40}
+                      style={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <div>
               <label className="mb-1.5 block text-sm font-medium" style={{ color: 'var(--muted-foreground)' }}>
                 Full name

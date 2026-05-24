@@ -88,6 +88,7 @@ export default async function DashboardPage() {
       user={{
         name:       user?.name        ?? '',
         username:   user?.username    ?? null,
+        avatarId:   user?.avatarId    ?? null,
         level:      user?.level       ?? 'Beginner',
         xp:         user?.xpPoints    ?? 0,
         streak:     user?.streakCount ?? 0,

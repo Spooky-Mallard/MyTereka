@@ -23,6 +23,7 @@ import { formatUGX } from "@/lib/format";
 import { categoryMeta } from "@/lib/mock-data";
 import { UsernameSetupBanner } from "@/components/username-setup-banner";
 import { markNotificationRead } from "@/lib/actions/notifications";
+import { UserAvatar } from "@/components/user-avatar";
 import { useSetRightRail } from "@/components/right-rail-context";
 import type { NudgeCard } from "@/lib/actions/nudges";
 import type { DailyQuestRow } from "@/lib/actions/quests";
@@ -71,6 +72,7 @@ type Props = {
   user: {
     name: string;
     username: string | null;
+    avatarId: string | null;
     level: string;
     xp: number;
     streak: number;
@@ -1168,24 +1170,12 @@ function MobileDashboard({
     <div style={{ padding: "14px 0", display: "flex", flexDirection: "column", gap: 12 }}>
       {/* Greeting */}
       <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-        <div
-          style={{
-            width: 45,
-            height: 45,
-            borderRadius: 9999,
-            flexShrink: 0,
-            background: "var(--gradient-primary)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            fontFamily: "Poppins, sans-serif",
-            fontWeight: 700,
-            fontSize: 13,
-            color: "#fff",
-          }}
-        >
-          {initials}
-        </div>
+        <UserAvatar
+          avatarId={user.avatarId}
+          name={user.name}
+          size={45}
+          style={{ borderRadius: 9999 }}
+        />
         <div style={{ flex: 1 }}>
           <div
             style={{
@@ -1550,7 +1540,7 @@ function MobileDashboard({
       {goals.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: -4 }}>
           <img
-            src="/mascot.png"
+            src={`/mascot/mood-${todayQuest?.completed ? 0 : user.streak >= 7 ? 1 : user.streak >= 3 ? 2 : user.streak === 0 ? 4 : 2}.svg`}
             alt="MyTereka mascot"
             style={{ width: 56, height: 56, objectFit: 'contain', flexShrink: 0 }}
           />
