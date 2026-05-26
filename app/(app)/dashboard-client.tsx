@@ -68,6 +68,12 @@ type GoalRow = {
   targetDate: string | null;
 };
 
+type EarnedBadge = {
+  triggerEvent: string | null;
+  name: string;
+  icon: string | null;
+};
+
 type Props = {
   user: {
     name: string;
@@ -87,6 +93,7 @@ type Props = {
   todayQuest: { quest: DailyQuestRow; completed: boolean } | null;
   insight: DashboardInsight | null;
   unreadCount: number;
+  earnedBadges: EarnedBadge[];
 };
 
 // ── Shared helpers ──────────────────────────────────────────────────────────
@@ -237,29 +244,30 @@ function TxnItem({ t, i }: { t: TxnRow; i: number }) {
 
 // ── Desktop right rail ───────────────────────────────────────────────────────
 
+const ALL_DASHBOARD_BADGES = [
+  { triggerEvent: 'first_transaction', icon: '🐾', name: 'First Steps' },
+  { triggerEvent: 'streak_7',          icon: '🔥', name: 'Streak Master' },
+  { triggerEvent: 'goal_completed',    icon: '🎯', name: 'Goal Getter' },
+  { triggerEvent: 'budget_completed',  icon: '💰', name: 'Budget Boss' },
+  { triggerEvent: 'group_joined',      icon: '🤝', name: 'Team Player' },
+];
+
 function DesktopRightRail({
   goals,
   dailyTip,
   user,
   xpNext,
   xpPct,
+  earnedBadges,
 }: {
   goals: GoalRow[];
   dailyTip: Props["dailyTip"];
   user: Props["user"];
   xpNext: number;
   xpPct: number;
+  earnedBadges: EarnedBadge[];
 }) {
-  const badgeMock = [
-    { e: "🔥", earned: user.streak >= 7, name: "Streak" },
-    { e: "💰", earned: user.xp >= 100, name: "100 XP" },
-    { e: "📚", earned: user.xp >= 300, name: "Consistent" },
-    { e: "🏆", earned: user.xp >= 700, name: "Master" },
-    { e: "🚀", earned: user.xp >= 500, name: "Booster" },
-    { e: "💎", earned: user.xp >= 1500, name: "Grand" },
-    { e: "🎁", earned: true, name: "First steps" },
-    { e: "🏠", earned: goals.length > 0, name: "Goal getter" },
-  ];
+  const earnedSet = new Set(earnedBadges.map((b) => b.triggerEvent).filter(Boolean));
 
   return (
     <>
@@ -365,51 +373,54 @@ function DesktopRightRail({
 
       {/* Badges */}
       <div className="rail-card flex flex-col gap-3">
-        <div className="eyebrow">Badges this month</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
-          {badgeMock.map((b, i) => (
-            <div
-              key={i}
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-                gap: 4,
-                opacity: b.earned ? 1 : 0.35,
-              }}
-            >
+        <div className="eyebrow">Badges</div>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
+          {ALL_DASHBOARD_BADGES.map((b) => {
+            const earned = earnedSet.has(b.triggerEvent);
+            return (
               <div
+                key={b.triggerEvent}
                 style={{
-                  width: 40,
-                  height: 40,
-                  borderRadius: 12,
-                  background: b.earned ? "rgba(0,184,148,0.18)" : "var(--surface-alt)",
-                  border: b.earned ? "1.5px solid var(--primary)" : "1px solid var(--border)",
                   display: "flex",
+                  flexDirection: "column",
                   alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 18,
-                  filter: b.earned ? "none" : "grayscale(1)",
+                  gap: 4,
+                  opacity: earned ? 1 : 0.35,
                 }}
               >
-                {b.e}
+                <div
+                  style={{
+                    width: 40,
+                    height: 40,
+                    borderRadius: 12,
+                    background: earned ? "rgba(0,184,148,0.18)" : "var(--surface-alt)",
+                    border: earned ? "1.5px solid var(--primary)" : "1px solid var(--border)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 18,
+                    filter: earned ? "none" : "grayscale(1)",
+                  }}
+                >
+                  {b.icon}
+                </div>
+                <div
+                  style={{
+                    fontFamily: "Poppins, sans-serif",
+                    fontSize: 9,
+                    fontWeight: 600,
+                    color: "var(--muted-foreground)",
+                    textAlign: "center",
+                  }}
+                >
+                  {b.name}
+                </div>
               </div>
-              <div
-                style={{
-                  fontFamily: "Poppins, sans-serif",
-                  fontSize: 9,
-                  fontWeight: 600,
-                  color: "var(--muted-foreground)",
-                  textAlign: "center",
-                }}
-              >
-                {b.name}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
         <Link
-          href="/profile"
+          href="/profile?tab=badges"
           style={{
             fontSize: 11,
             fontWeight: 600,
@@ -1798,6 +1809,7 @@ export function DashboardClient({
   todayQuest,
   insight,
   unreadCount,
+  earnedBadges,
 }: Props) {
   const [hideBalance, setHideBalance] = useState(true);
 
@@ -1811,6 +1823,7 @@ export function DashboardClient({
       user={user}
       xpNext={xpNext}
       xpPct={xpPct}
+      earnedBadges={earnedBadges}
     />,
   );
 

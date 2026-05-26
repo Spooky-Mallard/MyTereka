@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation'
 import { todayISO } from '@/lib/format'
 import { DashboardClient } from './dashboard-client'
 import { getRecentNudges } from '@/lib/actions/nudges'
-import { getDailyTip } from '@/lib/actions/profile'
+import { getDailyTip, getEarnedBadges } from '@/lib/actions/profile'
 import { getTodayQuest } from '@/lib/actions/quests'
 import { getDashboardInsight } from '@/lib/actions/analytics'
 import { getUnreadCount } from '@/lib/actions/notifications'
@@ -28,6 +28,7 @@ export default async function DashboardPage() {
     todayQuest,
     insight,
     unreadCount,
+    earnedBadges,
   ] = await Promise.all([
     db.query.users.findFirst({ where: eq(users.id, userId) }),
     db.select().from(accounts).where(eq(accounts.userId, userId)),
@@ -79,6 +80,7 @@ export default async function DashboardPage() {
     getTodayQuest(),
     getDashboardInsight(),
     getUnreadCount(),
+    getEarnedBadges(),
   ])
 
   const totalBalance = userAccounts.reduce((s, a) => s + a.balance, 0)
@@ -103,6 +105,7 @@ export default async function DashboardPage() {
       todayQuest={todayQuest}
       insight={insight}
       unreadCount={unreadCount}
+      earnedBadges={earnedBadges}
     />
   )
 }
