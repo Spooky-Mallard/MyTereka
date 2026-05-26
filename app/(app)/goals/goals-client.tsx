@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useTransition } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import {
   Plus, Lock, Trophy, X, Loader2,
@@ -578,7 +578,10 @@ export function GoalsClient({
   sharedGoals: SharedGoalCard[]
   sharedInvites: SharedGoalInvite[]
 }) {
-  const [section, setSection] = useState<Section>('personal')
+  const searchParams = useSearchParams()
+  const [section, setSection] = useState<Section>(
+    searchParams.get('section') === 'shared' ? 'shared' : 'personal'
+  )
   const [personalView, setPersonalView] = useState<PersonalView>('goals')
   const [showNew, setShowNew] = useState(false)
   const [showNewShared, setShowNewShared] = useState(false)

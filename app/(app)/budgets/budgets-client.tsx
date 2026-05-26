@@ -193,7 +193,12 @@ function BudgetsRightRail({ data, totalSpent, totalLimit, overall }: {
                   background: meta?.tint ? `${meta.tint}22` : b.categoryColor ? `${b.categoryColor}22` : 'var(--surface-alt)',
                   color: meta?.tint ?? b.categoryColor ?? 'var(--muted-foreground)',
                 }}>
-                {Icon && <Icon size={14} />}
+                {Icon
+                  ? <Icon size={14} />
+                  : b.categoryIcon && b.categoryIcon.codePointAt(0)! > 127
+                    ? <span style={{ fontSize: 14 }}>{b.categoryIcon}</span>
+                    : <span className="text-xs font-bold">{b.categoryName[0]}</span>
+                }
               </div>
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between text-xs font-semibold mb-1">
@@ -340,7 +345,12 @@ export function BudgetsClient({ data }: { data: BudgetRow[] }) {
                   <div className="flex items-center gap-3 mb-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl"
                       style={{ background: `${tint}22`, color: tint }}>
-                      {Icon && <Icon size={18} />}
+                      {Icon
+                        ? <Icon size={18} />
+                        : b.categoryIcon && b.categoryIcon.codePointAt(0)! > 127
+                          ? <span style={{ fontSize: 18 }}>{b.categoryIcon}</span>
+                          : <span className="text-xs font-bold">{b.categoryName[0]}</span>
+                      }
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="font-bold text-sm truncate" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>

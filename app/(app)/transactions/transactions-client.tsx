@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Search, X, Pencil, CalendarDays, ChevronDown, Loader2, TrendingUp, Trash2 } from 'lucide-react'
+import { Search, X, Pencil, CalendarDays, ChevronDown, Loader2, TrendingUp, Trash2, ArrowRightLeft } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
 import { categoryMeta } from '@/lib/mock-data'
@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 
-type Filter = 'all' | 'income' | 'expense' | 'investment'
+type Filter = 'all' | 'income' | 'expense' | 'investment' | 'transfer'
 type CategoryOption = { id: string; name: string; type: string; icon: string | null; color: string | null }
 type AccountOption  = { id: string; name: string; balance: number; type: string }
 
@@ -304,7 +304,7 @@ export function TransactionsClient({ initialData }: { initialData: TransactionRo
       initialData
         .filter((t) => (filter === 'all' ? true : t.type === filter))
         .filter((t) =>
-          q ? `${t.note ?? ''} ${t.categoryName} ${t.accountName}`.toLowerCase().includes(q.toLowerCase()) : true,
+          q ? `${t.note ?? ''} ${t.categoryName ?? ''} ${t.accountName}`.toLowerCase().includes(q.toLowerCase()) : true,
         ),
     [filter, q, initialData],
   )
@@ -358,7 +358,7 @@ export function TransactionsClient({ initialData }: { initialData: TransactionRo
           )}
         </div>
         <div className="flex rounded-full p-1 flex-wrap gap-0.5" style={{ background: 'var(--surface-alt)' }}>
-          {(['all', 'income', 'expense', 'investment'] as Filter[]).map((f) => (
+          {(['all', 'income', 'expense', 'investment', 'transfer'] as Filter[]).map((f) => (
             <button key={f} onClick={() => setFilter(f)}
               className="rounded-full px-3 py-1.5 text-sm font-medium capitalize transition"
               style={filter === f
@@ -396,12 +396,13 @@ export function TransactionsClient({ initialData }: { initialData: TransactionRo
               <div className="overflow-hidden rounded-2xl"
                 style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
                 {items.map((t, i) => {
-                  const meta         = categoryMeta[t.categoryName]
+                  const meta         = t.categoryName ? categoryMeta[t.categoryName] : undefined
                   const Icon         = meta?.icon
                   const isIncome     = t.type === 'income'
                   const isInvest     = t.type === 'investment'
-                  const amountColor  = isIncome ? 'var(--success)' : isInvest ? 'var(--primary)' : 'var(--danger)'
-                  const amountPrefix = isIncome ? '+' : '−'
+                  const isTransfer   = t.type === 'transfer'
+                  const amountColor  = isIncome ? 'var(--success)' : isInvest || isTransfer ? 'var(--primary)' : 'var(--danger)'
+                  const amountPrefix = isIncome ? '+' : isTransfer ? '' : '−'
                   const acctName     = t.accountName || 'Deleted Account'
                   const acctMuted    = !t.accountName
 
@@ -411,23 +412,28 @@ export function TransactionsClient({ initialData }: { initialData: TransactionRo
                       style={{ borderTop: i > 0 ? '1px solid var(--border)' : undefined }}
                       onClick={() => setEditTx(t)}>
                       <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl"
-                        style={{
-                          background: meta?.tint ? `${meta.tint}22` : t.categoryColor ? `${t.categoryColor}22` : 'var(--surface-alt)',
-                          color: meta?.tint ?? t.categoryColor ?? 'var(--muted-foreground)',
-                        }}>
-                        {Icon
-                          ? <Icon size={18} />
-                          : t.categoryIcon && t.categoryIcon.codePointAt(0)! > 127
-                            ? <span style={{ fontSize: 18 }}>{t.categoryIcon}</span>
-                            : isInvest ? <TrendingUp size={18} /> : <span className="text-xs font-bold">{t.categoryName[0]}</span>
+                        style={isTransfer
+                          ? { background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }
+                          : {
+                              background: meta?.tint ? `${meta.tint}22` : t.categoryColor ? `${t.categoryColor}22` : 'var(--surface-alt)',
+                              color: meta?.tint ?? t.categoryColor ?? 'var(--muted-foreground)',
+                            }
+                        }>
+                        {isTransfer
+                          ? <ArrowRightLeft size={18} />
+                          : Icon
+                            ? <Icon size={18} />
+                            : t.categoryIcon && t.categoryIcon.codePointAt(0)! > 127
+                              ? <span style={{ fontSize: 18 }}>{t.categoryIcon}</span>
+                              : isInvest ? <TrendingUp size={18} /> : <span className="text-xs font-bold">{(t.categoryName ?? '?')[0]}</span>
                         }
                       </span>
                       <div className="flex-1 min-w-0">
                         <div className="truncate text-sm font-medium" style={{ color: 'var(--foreground)' }}>
-                          {t.note || t.categoryName}
+                          {t.note || t.categoryName || 'Transfer'}
                         </div>
                         <div className="text-xs flex items-center gap-1" style={{ color: 'var(--muted-foreground)' }}>
-                          <span>{t.categoryName}</span>
+                          <span>{t.categoryName ?? 'Transfer'}</span>
                           <span>·</span>
                           <span style={acctMuted ? { color: 'var(--muted-foreground)', fontStyle: 'italic' } : {}}>
                             {acctName}

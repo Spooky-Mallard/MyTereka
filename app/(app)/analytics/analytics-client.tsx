@@ -172,7 +172,8 @@ export function AnalyticsClient({ data }: { data: TransactionRow[] }) {
 
     const catMap = new Map<string, number>()
     for (const t of data.filter((t) => t.type === 'expense')) {
-      catMap.set(t.categoryName, (catMap.get(t.categoryName) ?? 0) + t.amount)
+      const name = t.categoryName ?? 'Uncategorized'
+      catMap.set(name, (catMap.get(name) ?? 0) + t.amount)
     }
     const pieData = Array.from(catMap.entries())
       .sort((a, b) => b[1] - a[1])

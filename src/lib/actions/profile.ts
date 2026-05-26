@@ -19,11 +19,12 @@ export type ProfileData = {
 }
 
 export type EarnedBadge = {
-  id:          string
-  name:        string
-  description: string | null
-  icon:        string | null
-  earnedAt:    Date
+  id:           string
+  name:         string
+  description:  string | null
+  icon:         string | null
+  triggerEvent: string | null
+  earnedAt:     Date
 }
 
 export async function getProfile(): Promise<ProfileData> {
@@ -56,11 +57,12 @@ export async function getEarnedBadges(): Promise<EarnedBadge[]> {
 
   return db
     .select({
-      id:          badges.id,
-      name:        badges.name,
-      description: badges.description,
-      icon:        badges.icon,
-      earnedAt:    userBadges.earnedAt,
+      id:           badges.id,
+      name:         badges.name,
+      description:  badges.description,
+      icon:         badges.icon,
+      triggerEvent: badges.triggerEvent,
+      earnedAt:     userBadges.earnedAt,
     })
     .from(userBadges)
     .innerJoin(badges, eq(userBadges.badgeId, badges.id))

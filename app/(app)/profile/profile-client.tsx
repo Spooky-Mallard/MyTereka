@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
-  User, Bell,
+  User, Bell, Lock,
   LogOut, Trash2, ChevronRight, Moon, Sun, Star, Flame,
   Upload, FileText, CheckCircle2, AlertCircle, Loader2,
   Plus, X, Wallet, Banknote, Building2, Users, ArrowRightLeft, CalendarDays, Smartphone, Pencil,
@@ -1055,16 +1055,18 @@ function CategoriesManager() {
 export function ProfileClient({
   profile,
   earnedBadges,
+  initialTab,
 }: {
   profile:      ProfileData
   earnedBadges: EarnedBadge[]
+  initialTab?:  ProfileTab
 }) {
   const { dark, toggle } = useTheme()
   const [budgetAlerts,  setBudgetAlerts]  = useState(true)
   const [goalReminders, setGoalReminders] = useState(true)
   const [streakAlerts,  setStreakAlerts]  = useState(true)
   const [logoutOpen,       setLogoutOpen]       = useState(false)
-  const [activeTab,        setActiveTab]        = useState<ProfileTab>('settings')
+  const [activeTab,        setActiveTab]        = useState<ProfileTab>(initialTab ?? 'settings')
   const [usernameOpen,     setUsernameOpen]     = useState(false)
   const [editProfileOpen,  setEditProfileOpen]  = useState(false)
   const [profileName,      setProfileName]      = useState(profile.name)
@@ -1076,7 +1078,7 @@ export function ProfileClient({
   const initials    = profileName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
   const xpNext      = LEVEL_XP[profile.level] ?? 9999
   const xpPct       = Math.min(100, Math.round((profile.xpPoints / xpNext) * 100))
-  const earnedSet   = new Set(earnedBadges.map((b) => b.name))
+  const earnedSet   = new Set(earnedBadges.map((b) => b.triggerEvent).filter(Boolean))
 
   const handleLogout = async () => {
     await signOut({ callbackUrl: '/auth/login' })
@@ -1248,21 +1250,32 @@ export function ProfileClient({
       {activeTab === 'badges' && (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {ALL_BADGES.map((badge) => {
-            const earned = earnedSet.has(badge.name)
+            const earned = earnedSet.has(badge.triggerEvent)
             return (
               <div key={badge.triggerEvent}
-                className="flex flex-col items-center gap-2 rounded-2xl p-4 text-center"
+                className="relative flex flex-col items-center gap-2 rounded-2xl p-4 text-center"
                 style={{
                   background: earned ? 'var(--card)' : 'var(--surface-alt)',
-                  boxShadow: earned ? 'var(--shadow-card)' : 'none',
+                  boxShadow: earned ? '0 0 16px rgba(0,184,148,0.25), var(--shadow-card)' : 'none',
+                  filter: earned ? 'none' : 'grayscale(1)',
                   opacity: earned ? 1 : 0.5,
                 }}>
+                {!earned && (
+                  <div className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full"
+                    style={{ background: 'var(--muted)', color: 'var(--muted-foreground)' }}>
+                    <Lock size={10} />
+                  </div>
+                )}
                 <div className="text-4xl">{badge.icon}</div>
                 <div className="text-sm font-bold" style={{ color: 'var(--foreground)' }}>{badge.name}</div>
                 <div className="text-xs leading-snug" style={{ color: 'var(--muted-foreground)' }}>
                   {badge.description}
                 </div>
-                {earned && <span className="level-badge text-[10px]">Earned</span>}
+                {earned && (
+                  <span className="level-badge text-[10px]" style={{ background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }}>
+                    ✓ Earned
+                  </span>
+                )}
               </div>
             )
           })}

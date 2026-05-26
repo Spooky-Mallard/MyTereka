@@ -70,7 +70,7 @@ export const transactions = pgTable('transactions', {
   id:          uuid('id').defaultRandom().primaryKey(),
   userId:      uuid('user_id').references(() => users.id,     { onDelete: 'cascade' }).notNull(),
   accountId:   uuid('account_id').references(() => accounts.id).notNull(),
-  categoryId:  uuid('category_id').references(() => categories.id).notNull(),
+  categoryId:  uuid('category_id').references(() => categories.id, { onDelete: 'set null' }),
   type:        transactionTypeEnum('type').notNull(),
   amount:      integer('amount').notNull(),
   note:        text('note'),
@@ -84,7 +84,7 @@ export const transactions = pgTable('transactions', {
 export const budgets = pgTable('budgets', {
   id:              uuid('id').defaultRandom().primaryKey(),
   userId:          uuid('user_id').references(() => users.id,     { onDelete: 'cascade' }).notNull(),
-  categoryId:      uuid('category_id').references(() => categories.id).notNull(),
+  categoryId:      uuid('category_id').references(() => categories.id, { onDelete: 'restrict' }).notNull(),
   limitAmount:     integer('limit_amount').notNull(),
   spentAmount:     integer('spent_amount').default(0).notNull(),
   period:          periodEnum('period').notNull(),

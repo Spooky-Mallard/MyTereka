@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, Suspense } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Bell, House, BarChart2, Plus, Target, User, Wallet, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles } from 'lucide-react'
@@ -309,7 +309,9 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
       <div className="flex min-h-screen w-full" style={{ background: 'var(--background)' }}>
         {/* Sidebar hidden on mobile, shown on md+ */}
         <div className="hidden md:block">
-          <AppSidebar onAdd={() => setAddOpen(true)} />
+          <Suspense>
+            <AppSidebar onAdd={() => setAddOpen(true)} />
+          </Suspense>
         </div>
 
         <div className="flex flex-1 flex-col min-w-0">

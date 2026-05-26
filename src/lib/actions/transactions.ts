@@ -172,8 +172,8 @@ export type TransactionRow = {
   amount:       number
   note:         string | null
   date:         string
-  categoryId:   string
-  categoryName: string
+  categoryId:   string | null
+  categoryName: string | null
   categoryIcon: string | null
   categoryColor:string | null
   accountId:    string
@@ -208,7 +208,7 @@ export async function getTransactions(filters?: {
       transferFee:   transactions.transferFee,
     })
     .from(transactions)
-    .innerJoin(categories, eq(transactions.categoryId, categories.id))
+    .leftJoin(categories, eq(transactions.categoryId, categories.id))
     .innerJoin(accounts,   eq(transactions.accountId,  accounts.id))
     .where(
       and(
@@ -245,7 +245,7 @@ export async function deleteTransaction(id: string) {
       .set({ balance: sql`balance + ${balanceDelta}`, updatedAt: sql`now()` })
       .where(eq(accounts.id, tx.accountId))
 
-    if (tx.type === 'expense') {
+    if (tx.type === 'expense' && tx.categoryId) {
       const today = todayISO()
       await dbTx
         .update(budgets)
@@ -411,7 +411,7 @@ export async function updateTransaction(
       .where(eq(accounts.id, old.accountId))
 
     // Reverse old budget effect — clamped at zero
-    if (old.type === 'expense') {
+    if (old.type === 'expense' && old.categoryId) {
       const today = todayISO()
       await tx
         .update(budgets)
@@ -436,7 +436,7 @@ export async function updateTransaction(
       .where(eq(accounts.id, newAccountId))
 
     // Apply new budget effect
-    if (newType === 'expense') {
+    if (newType === 'expense' && newCategoryId) {
       const today = todayISO()
       await tx
         .update(budgets)
@@ -647,7 +647,7 @@ export async function deleteAccount(id: string) {
       .where(eq(transactions.accountId, id))
 
     for (const t of linkedTxns) {
-      if (t.type === 'expense') {
+      if (t.type === 'expense' && t.categoryId) {
         const today = todayISO()
         await tx
           .update(budgets)

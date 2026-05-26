@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import { usePathname, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
 import {
@@ -13,6 +13,7 @@ import {
   SidebarGroupContent, SidebarGroupLabel, SidebarHeader,
   SidebarMenu, SidebarMenuButton, SidebarMenuItem,
 } from '@/components/ui/sidebar'
+import { UserAvatar } from '@/components/user-avatar'
 
 const moneyNav = [
   { title: 'Home',         url: '/',             icon: House },
@@ -22,20 +23,38 @@ const moneyNav = [
 ]
 
 const questNav = [
-  { title: 'Goals',        url: '/goals',        icon: Target },
-  { title: 'Streak',       url: '/streak',       icon: Flame },
-  { title: 'Badges',       url: '/profile',      icon: Trophy },
-  { title: 'Shared Goals', url: '/goals',        icon: Users  },
+  { title: 'Goals',        url: '/goals',              icon: Target },
+  { title: 'Streak',       url: '/streak',             icon: Flame },
+  { title: 'Badges',       url: '/profile?tab=badges', icon: Trophy },
+  { title: 'Shared Goals', url: '/goals?section=shared', icon: Users },
 ]
 
 export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
   const pathname = usePathname()
+  const searchParams = useSearchParams()
   const { data: session } = useSession()
-  const isActive = (path: string) =>
-    path === '/' ? pathname === '/' : pathname.startsWith(path)
+
+  // Precise active detection — avoids dual-highlight for Goals/SharedGoals/Badges/Profile
+  function isActive(url: string): boolean {
+    const [urlPath, urlQuery] = url.split('?')
+    if (urlPath === '/') return pathname === '/'
+    if (!pathname.startsWith(urlPath)) return false
+    if (!urlQuery) {
+      // Plain path — only active if no conflicting search params
+      if (urlPath === '/goals') return !searchParams.has('section')
+      if (urlPath === '/profile') return !searchParams.has('tab')
+      return true
+    }
+    // Has query params — all must match
+    const expected = new URLSearchParams(urlQuery)
+    for (const [k, v] of expected.entries()) {
+      if (searchParams.get(k) !== v) return false
+    }
+    return true
+  }
 
   const name     = session?.user?.name ?? 'User'
-  const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+  const avatarId = (session?.user as { avatarId?: string | null })?.avatarId ?? null
 
   function NavItem({ item }: { item: { title: string; url: string; icon: React.ElementType } }) {
     const active = isActive(item.url)
@@ -146,9 +165,9 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
               asChild
               tooltip="Profile"
               className="h-10 rounded-xl font-medium transition-all"
-              isActive={pathname.startsWith('/profile')}
+              isActive={isActive('/profile')}
               style={
-                pathname.startsWith('/profile')
+                isActive('/profile')
                   ? { background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }
                   : { color: 'var(--sidebar-foreground)' }
               }
@@ -156,7 +175,7 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
               <Link href="/profile" className="flex items-center gap-3 px-3">
                 <User
                   size={18}
-                  style={{ color: pathname.startsWith('/profile') ? 'var(--primary)' : 'var(--muted-foreground)' }}
+                  style={{ color: isActive('/profile') ? 'var(--primary)' : 'var(--muted-foreground)' }}
                 />
                 <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500 }}>Profile</span>
               </Link>
@@ -180,12 +199,7 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
           className="mt-3 flex items-center gap-2.5 rounded-xl p-3 group-data-[collapsible=icon]:hidden"
           style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}
         >
-          <div
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-            style={{ background: 'var(--gradient-primary)' }}
-          >
-            {initials}
-          </div>
+          <UserAvatar avatarId={avatarId} name={name} size={36} style={{ borderRadius: '50%' }} />
           <div className="flex-1 min-w-0">
             <div
               className="truncate text-sm font-bold"

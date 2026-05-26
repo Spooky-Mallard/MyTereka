@@ -1,3 +1,4 @@
+import { Suspense } from 'react'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { getGoals } from '@/lib/actions/goals'
@@ -13,5 +14,9 @@ export default async function GoalsPage() {
     getSharedGoalsForUser(),
     getSharedGoalInvites(),
   ])
-  return <GoalsClient data={data} sharedGoals={sharedGoals} sharedInvites={sharedInvites} />
+  return (
+    <Suspense>
+      <GoalsClient data={data} sharedGoals={sharedGoals} sharedInvites={sharedInvites} />
+    </Suspense>
+  )
 }

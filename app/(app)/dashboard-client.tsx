@@ -1058,7 +1058,12 @@ function DesktopDashboard({
                 <div key={b.id}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
                     <span style={{ fontSize: 14 }}>
-                      {meta ? <meta.icon size={14} /> : b.categoryName[0]}
+                      {meta
+                        ? <meta.icon size={14} />
+                        : b.categoryIcon && b.categoryIcon.codePointAt(0)! > 127
+                          ? b.categoryIcon
+                          : b.categoryName[0]
+                      }
                     </span>
                     <span
                       style={{
