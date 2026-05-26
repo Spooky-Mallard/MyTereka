@@ -1387,7 +1387,7 @@ export function ProfileClient({
                 )}
               </div>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 6, maxHeight: 180, overflowY: 'auto', padding: 4 }}>
-                {Array.from({ length: 24 }, (_, i) => `avatar-${i}`).map((id) => (
+                {Array.from({ length: 36 }, (_, i) => `avatar-${i}`).map((id) => (
                   <button key={id} onClick={() => setProfileAvatarId(id)}
                     style={{
                       borderRadius: 10,
@@ -1396,7 +1396,7 @@ export function ProfileClient({
                       background: profileAvatarId === id ? 'rgba(0,184,148,0.12)' : 'var(--surface-alt)',
                       cursor: 'pointer',
                     }}>
-                    <img src={`/avatars/${id}.svg`} alt={id} width={40} height={40}
+                    <img src={`/avatars/${id}.png`} alt={id} width={40} height={40}
                       style={{ width: 40, height: 40, objectFit: 'contain', display: 'block' }} />
                   </button>
                 ))}

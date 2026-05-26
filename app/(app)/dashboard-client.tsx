@@ -1545,7 +1545,7 @@ function MobileDashboard({
       {goals.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: -4 }}>
           <img
-            src={`/mascot/mood-${todayQuest?.completed ? 0 : user.streak >= 7 ? 1 : user.streak >= 3 ? 2 : user.streak === 0 ? 4 : 2}.svg`}
+            src={`/mascot/mood-${todayQuest?.completed ? 0 : user.streak >= 7 ? 1 : user.streak >= 3 ? 2 : user.streak === 0 ? 4 : 2}.png`}
             alt="MyTereka mascot"
             style={{ width: 56, height: 56, objectFit: 'contain', flexShrink: 0 }}
           />

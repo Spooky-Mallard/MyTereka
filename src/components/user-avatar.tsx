@@ -19,7 +19,7 @@ export function UserAvatar({ avatarId, name, size = 48, className, style }: User
   if (avatarId) {
     return (
       <img
-        src={`/avatars/${avatarId}.svg`}
+        src={`/avatars/${avatarId}.png`}
         alt={name}
         width={size}
         height={size}

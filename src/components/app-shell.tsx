@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect, Suspense } from 'react'
 import { usePathname, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { Bell, House, BarChart2, Plus, Target, User, Wallet, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles } from 'lucide-react'
+import { Bell, House, BarChart2, Plus, Target, User, Wallet, LogOut, ChevronDown, UserPlus, UserCheck, Trophy, Users as UsersIcon, Sparkles, ArrowLeftRight, Flame, Menu, X as XIcon } from 'lucide-react'
 import { signOut, useSession } from 'next-auth/react'
 import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AppSidebar } from '@/components/app-sidebar'
@@ -14,17 +14,158 @@ import type { NotificationRow } from '@/lib/types/notifications'
 import { RightRailProvider, useRightRail } from '@/components/right-rail-context'
 
 const mobileNavItems = [
-  { title: 'Home',      url: '/',          icon: House },
-  { title: 'Analytics', url: '/analytics', icon: BarChart2 },
-  { title: 'Add',       url: '#',          icon: Plus,   fab: true },
-  { title: 'Goals',     url: '/goals',     icon: Target },
-  { title: 'Budgets',   url: '/budgets',   icon: Wallet },
+  { title: 'Home',      url: '/',                       icon: House },
+  { title: 'Analytics', url: '/analytics',              icon: BarChart2 },
+  { title: 'Add',       url: '#',                       icon: Plus,   fab: true },
+  { title: 'Goals',     url: '/goals',                  icon: Target },
+  { title: 'Accounts',  url: '/profile?tab=accounts',   icon: Wallet },
 ]
 
+const drawerNavGroups = [
+  {
+    label: 'Money',
+    items: [
+      { title: 'Home',         url: '/',             icon: House },
+      { title: 'Transactions', url: '/transactions', icon: ArrowLeftRight },
+      { title: 'Analytics',    url: '/analytics',    icon: BarChart2 },
+      { title: 'Budgets',      url: '/budgets',      icon: Wallet },
+    ],
+  },
+  {
+    label: 'Quests',
+    items: [
+      { title: 'Goals',        url: '/goals',                   icon: Target },
+      { title: 'Streak',       url: '/streak',                  icon: Flame },
+      { title: 'Badges',       url: '/profile?tab=badges',      icon: Trophy },
+      { title: 'Shared Goals', url: '/goals?section=shared',    icon: UsersIcon },
+    ],
+  },
+  {
+    label: 'Account',
+    items: [
+      { title: 'Profile',  url: '/profile', icon: User },
+    ],
+  },
+]
+
+function MobileDrawer({ open, onClose }: { open: boolean; onClose: () => void }) {
+  const pathname  = usePathname()
+  const router    = useRouter()
+
+  function isActive(url: string) {
+    const [urlPath, urlQuery] = url.split('?')
+    if (urlPath === '/') return pathname === '/'
+    if (!pathname.startsWith(urlPath)) return false
+    if (!urlQuery) return true
+    const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    const expected = new URLSearchParams(urlQuery)
+    for (const [k, v] of expected.entries()) {
+      if (searchParams.get(k) !== v) return false
+    }
+    return true
+  }
+
+  function navigate(url: string) {
+    onClose()
+    router.push(url)
+  }
+
+  return (
+    <>
+      {/* Backdrop */}
+      {open && (
+        <div
+          className="fixed inset-0 z-40 md:hidden"
+          style={{ background: 'rgba(0,0,0,0.55)' }}
+          onClick={onClose}
+        />
+      )}
+      {/* Drawer panel */}
+      <div
+        className="fixed inset-y-0 left-0 z-50 w-72 flex flex-col md:hidden transition-transform duration-300"
+        style={{
+          background: 'var(--sidebar)',
+          borderRight: '1px solid var(--sidebar-border)',
+          transform: open ? 'translateX(0)' : 'translateX(-100%)',
+        }}
+      >
+        {/* Header */}
+        <div className="flex items-center justify-between px-5 py-5" style={{ borderBottom: '1px solid var(--sidebar-border)' }}>
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl overflow-hidden" style={{ background: 'var(--primary)' }}>
+              <img src="/logo.svg" alt="MyTereka" className="h-6 w-6 object-contain" />
+            </div>
+            <span className="text-base font-bold" style={{ color: 'var(--primary)', fontFamily: 'Poppins, sans-serif' }}>MyTereka</span>
+          </div>
+          <button onClick={onClose} style={{ color: 'var(--muted-foreground)' }}>
+            <XIcon size={20} />
+          </button>
+        </div>
+
+        {/* Nav groups */}
+        <div className="flex-1 overflow-y-auto px-3 py-4 flex flex-col gap-5">
+          {drawerNavGroups.map((group) => (
+            <div key={group.label}>
+              <div className="mb-1 px-2 text-[10px] font-semibold uppercase tracking-widest" style={{ color: 'var(--muted-foreground)' }}>
+                {group.label}
+              </div>
+              <div className="flex flex-col gap-0.5">
+                {group.items.map((item) => {
+                  const active = isActive(item.url)
+                  return (
+                    <button
+                      key={item.title}
+                      onClick={() => navigate(item.url)}
+                      className="flex items-center gap-3 rounded-xl px-3 h-11 w-full text-left transition"
+                      style={active
+                        ? { background: 'rgba(0,184,148,0.15)', color: 'var(--primary)' }
+                        : { color: 'var(--sidebar-foreground)' }
+                      }
+                    >
+                      <item.icon size={18} strokeWidth={active ? 2.5 : 2}
+                        style={{ color: active ? 'var(--primary)' : 'var(--muted-foreground)', flexShrink: 0 }} />
+                      <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: active ? 700 : 500 }}>
+                        {item.title}
+                      </span>
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {/* Footer — log out */}
+        <div className="px-3 pb-6" style={{ borderTop: '1px solid var(--sidebar-border)', paddingTop: 12 }}>
+          <button
+            onClick={() => { onClose(); signOut({ callbackUrl: '/auth/login' }) }}
+            className="flex items-center gap-3 rounded-xl px-3 h-11 w-full transition hover:opacity-80"
+            style={{ color: 'var(--danger)' }}
+          >
+            <LogOut size={18} />
+            <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 13, fontWeight: 500 }}>Log out</span>
+          </button>
+        </div>
+      </div>
+    </>
+  )
+}
+
 function MobileBottomNav({ onAdd }: { onAdd: () => void }) {
-  const pathname = usePathname()
-  const isActive = (url: string) =>
-    url === '/' ? pathname === '/' : pathname.startsWith(url)
+  const pathname    = usePathname()
+
+  function isActive(url: string) {
+    const [urlPath, urlQuery] = url.split('?')
+    if (urlPath === '/') return pathname === '/'
+    if (!pathname.startsWith(urlPath)) return false
+    if (!urlQuery) return true
+    const searchParams = new URLSearchParams(typeof window !== 'undefined' ? window.location.search : '')
+    const expected = new URLSearchParams(urlQuery)
+    for (const [k, v] of expected.entries()) {
+      if (searchParams.get(k) !== v) return false
+    }
+    return true
+  }
 
   return (
     <nav className="bottom-nav md:hidden" aria-label="Bottom navigation">
@@ -301,7 +442,8 @@ function NotificationBell() {
 }
 
 function AppShellInner({ children }: { children: React.ReactNode }) {
-  const [addOpen, setAddOpen] = useState(false)
+  const [addOpen,    setAddOpen]    = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const rightRail = useRightRail()
 
   return (
@@ -326,8 +468,12 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
           >
             <SidebarTrigger className="hidden md:flex" style={{ color: 'var(--foreground)' }} />
 
-            {/* Mobile: logo */}
-            <Link href="/" className="flex items-center gap-2 md:hidden">
+            {/* Mobile: logo — taps open drawer */}
+            <button
+              onClick={() => setDrawerOpen(true)}
+              className="flex items-center gap-2 md:hidden"
+              aria-label="Open navigation"
+            >
               <div
                 className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl overflow-hidden"
                 style={{ background: 'var(--primary)' }}
@@ -340,7 +486,7 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
               >
                 MyTereka
               </span>
-            </Link>
+            </button>
 
             <div className="ml-auto flex items-center gap-2">
               <NotificationBell />
@@ -369,6 +515,9 @@ function AppShellInner({ children }: { children: React.ReactNode }) {
 
       {/* Bottom nav — mobile only */}
       <MobileBottomNav onAdd={() => setAddOpen(true)} />
+
+      {/* Mobile slide-in drawer — full nav */}
+      <MobileDrawer open={drawerOpen} onClose={() => setDrawerOpen(false)} />
 
       <AddTransactionSheet open={addOpen} onClose={() => setAddOpen(false)} />
       <Toaster position="top-right" richColors />
