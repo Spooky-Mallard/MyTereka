@@ -252,6 +252,14 @@ const ALL_DASHBOARD_BADGES = [
   { triggerEvent: 'group_joined',      icon: '🤝', name: 'Team Player' },
 ];
 
+function getMascotMood(streak: number, questCompleted: boolean): { mood: number; msg: string } {
+  if (questCompleted) return { mood: 0, msg: "Quest done! You're on fire 🔥" }
+  if (streak >= 7)    return { mood: 1, msg: `${streak}-day streak! Legendary 🏆` }
+  if (streak >= 3)    return { mood: 2, msg: "Keep it up! Streak growing 🌱" }
+  if (streak === 0)   return { mood: 4, msg: "Log a transaction to start your streak!" }
+  return                     { mood: 2, msg: "Good progress! Keep saving 🌟" }
+}
+
 function DesktopRightRail({
   goals,
   dailyTip,
@@ -259,6 +267,7 @@ function DesktopRightRail({
   xpNext,
   xpPct,
   earnedBadges,
+  todayQuest,
 }: {
   goals: GoalRow[];
   dailyTip: Props["dailyTip"];
@@ -266,8 +275,10 @@ function DesktopRightRail({
   xpNext: number;
   xpPct: number;
   earnedBadges: EarnedBadge[];
+  todayQuest: Props["todayQuest"];
 }) {
   const earnedSet = new Set(earnedBadges.map((b) => b.triggerEvent).filter(Boolean));
+  const { mood, msg } = getMascotMood(user.streak, todayQuest?.completed ?? false);
 
   return (
     <>
@@ -432,6 +443,29 @@ function DesktopRightRail({
         >
           View all badges
         </Link>
+      </div>
+
+      {/* Mascot */}
+      <div className="rail-card flex items-end gap-3">
+        <img
+          src={`/mascot/mood-${mood}.png`}
+          alt="MyTereka mascot"
+          style={{ width: 52, height: 52, objectFit: 'contain', flexShrink: 0 }}
+        />
+        <div style={{
+          flex: 1,
+          background: 'var(--surface-alt)',
+          borderRadius: '14px 14px 14px 4px',
+          padding: '8px 12px',
+          fontSize: 11,
+          fontWeight: 600,
+          color: 'var(--foreground)',
+          fontFamily: 'Poppins, sans-serif',
+          lineHeight: 1.4,
+          border: '1px solid var(--border)',
+        }}>
+          {msg}
+        </div>
       </div>
 
       {/* XP progress */}
@@ -1556,7 +1590,7 @@ function MobileDashboard({
       {goals.length > 0 && (
         <div style={{ display: 'flex', alignItems: 'flex-end', gap: 10, marginBottom: -4 }}>
           <img
-            src={`/mascot/mood-${todayQuest?.completed ? 0 : user.streak >= 7 ? 1 : user.streak >= 3 ? 2 : user.streak === 0 ? 4 : 2}.png`}
+            src={`/mascot/mood-${getMascotMood(user.streak, todayQuest?.completed ?? false).mood}.png`}
             alt="MyTereka mascot"
             style={{ width: 56, height: 56, objectFit: 'contain', flexShrink: 0 }}
           />
@@ -1824,6 +1858,7 @@ export function DashboardClient({
       xpNext={xpNext}
       xpPct={xpPct}
       earnedBadges={earnedBadges}
+      todayQuest={todayQuest}
     />,
   );
 
