@@ -1,13 +1,10 @@
+import { Suspense } from 'react'
 import { auth } from '@/lib/auth'
 import { redirect } from 'next/navigation'
 import { getProfile, getEarnedBadges } from '@/lib/actions/profile'
 import { ProfileClient } from './profile-client'
 
-export default async function ProfilePage({
-  searchParams,
-}: {
-  searchParams: { tab?: string }
-}) {
+export default async function ProfilePage() {
   const session = await auth()
   if (!session?.user?.id) redirect('/auth/login')
 
@@ -17,10 +14,11 @@ export default async function ProfilePage({
   ])
 
   return (
-    <ProfileClient
-      profile={profile}
-      earnedBadges={earnedBadges}
-      initialTab={searchParams.tab as 'settings' | 'friends' | 'accounts' | 'categories' | 'badges' | 'import' | undefined}
-    />
+    <Suspense>
+      <ProfileClient
+        profile={profile}
+        earnedBadges={earnedBadges}
+      />
+    </Suspense>
   )
 }

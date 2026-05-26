@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect, useRef } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { signOut } from 'next-auth/react'
 import Link from 'next/link'
 import {
@@ -1055,18 +1055,18 @@ function CategoriesManager() {
 export function ProfileClient({
   profile,
   earnedBadges,
-  initialTab,
 }: {
   profile:      ProfileData
   earnedBadges: EarnedBadge[]
-  initialTab?:  ProfileTab
 }) {
   const { dark, toggle } = useTheme()
+  const searchParams = useSearchParams()
+  const tabFromUrl = (searchParams.get('tab') as ProfileTab) ?? 'settings'
   const [budgetAlerts,  setBudgetAlerts]  = useState(true)
   const [goalReminders, setGoalReminders] = useState(true)
   const [streakAlerts,  setStreakAlerts]  = useState(true)
   const [logoutOpen,       setLogoutOpen]       = useState(false)
-  const [activeTab,        setActiveTab]        = useState<ProfileTab>(initialTab ?? 'settings')
+  const [activeTab,        setActiveTab]        = useState<ProfileTab>(tabFromUrl)
   const [usernameOpen,     setUsernameOpen]     = useState(false)
   const [editProfileOpen,  setEditProfileOpen]  = useState(false)
   const [profileName,      setProfileName]      = useState(profile.name)
@@ -1074,6 +1074,11 @@ export function ProfileClient({
   const [profileAvatarId,  setProfileAvatarId]  = useState<string | null>(profile.avatarId)
   const [profileSaving,    setProfileSaving]    = useState(false)
   const router = useRouter()
+
+  // Sync tab state when URL changes (back/forward nav or sidebar clicks)
+  useEffect(() => {
+    setActiveTab(tabFromUrl)
+  }, [tabFromUrl])
 
   const initials    = profileName.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
   const xpNext      = LEVEL_XP[profile.level] ?? 9999
@@ -1171,8 +1176,10 @@ export function ProfileClient({
           { key: 'badges',      label: '🏅 Badges' },
           { key: 'import',      label: '📥 Import' },
         ] as { key: ProfileTab; label: string }[]).map(({ key, label }) => (
-          <button key={key} onClick={() => setActiveTab(key)}
-            className="shrink-0 rounded-xl py-2.5 px-3 text-xs font-semibold transition whitespace-nowrap"
+          <button key={key} onClick={() => {
+            router.replace(`/profile?tab=${key}`, { scroll: false })
+          }}
+            className="flex-1 min-w-[60px] rounded-xl py-2.5 px-2 text-xs font-semibold transition whitespace-nowrap text-center"
             style={activeTab === key
               ? { background: 'var(--card)', color: 'var(--primary)', boxShadow: 'var(--shadow-sm)' }
               : { color: 'var(--muted-foreground)' }}>
