@@ -1162,7 +1162,7 @@ export function ProfileClient({
       </div>
 
       {/* Tabs */}
-      <div className="flex rounded-2xl p-1 flex-wrap gap-1" style={{ background: 'var(--surface-alt)' }}>
+      <div className="flex rounded-2xl p-1 gap-1 overflow-x-auto" style={{ background: 'var(--surface-alt)', scrollbarWidth: 'none' }}>
         {([
           { key: 'settings',    label: '⚙️ Settings' },
           { key: 'friends',     label: '👥 Friends' },
@@ -1172,7 +1172,7 @@ export function ProfileClient({
           { key: 'import',      label: '📥 Import' },
         ] as { key: ProfileTab; label: string }[]).map(({ key, label }) => (
           <button key={key} onClick={() => setActiveTab(key)}
-            className="flex-1 rounded-xl py-2.5 text-xs font-semibold transition"
+            className="shrink-0 rounded-xl py-2.5 px-3 text-xs font-semibold transition whitespace-nowrap"
             style={activeTab === key
               ? { background: 'var(--card)', color: 'var(--primary)', boxShadow: 'var(--shadow-sm)' }
               : { color: 'var(--muted-foreground)' }}>

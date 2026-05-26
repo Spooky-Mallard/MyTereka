@@ -1,6 +1,7 @@
 'use client'
 
 import Link from 'next/link'
+import { useEffect, useRef } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
 import { useSession } from 'next-auth/react'
 import { signOut } from 'next-auth/react'
@@ -86,8 +87,57 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
     )
   }
 
+  const dragRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const handle = dragRef.current
+    if (!handle) return
+
+    let startX = 0
+    let startWidth = 0
+
+    function onMouseMove(e: MouseEvent) {
+      const newWidth = Math.min(320, Math.max(180, startWidth + e.clientX - startX))
+      const wrapper = handle!.closest('.group\\/sidebar-wrapper') as HTMLElement | null
+      if (wrapper) wrapper.style.setProperty('--sidebar-width', `${newWidth}px`)
+      localStorage.setItem('mt-sidebar-width', `${newWidth}px`)
+    }
+
+    function onMouseUp() {
+      document.removeEventListener('mousemove', onMouseMove)
+      document.removeEventListener('mouseup', onMouseUp)
+      document.body.style.cursor = ''
+      document.body.style.userSelect = ''
+    }
+
+    function onMouseDown(e: MouseEvent) {
+      e.preventDefault()
+      startX = e.clientX
+      const wrapper = handle!.closest('.group\\/sidebar-wrapper') as HTMLElement | null
+      startWidth = wrapper
+        ? parseFloat(getComputedStyle(wrapper).getPropertyValue('--sidebar-width')) || 256
+        : 256
+      document.body.style.cursor = 'col-resize'
+      document.body.style.userSelect = 'none'
+      document.addEventListener('mousemove', onMouseMove)
+      document.addEventListener('mouseup', onMouseUp)
+    }
+
+    handle.addEventListener('mousedown', onMouseDown)
+    return () => handle.removeEventListener('mousedown', onMouseDown)
+  }, [])
+
+  // Restore saved width on mount
+  useEffect(() => {
+    const saved = localStorage.getItem('mt-sidebar-width')
+    if (!saved || !dragRef.current) return
+    const wrapper = dragRef.current.closest('.group\\/sidebar-wrapper') as HTMLElement | null
+    if (wrapper) wrapper.style.setProperty('--sidebar-width', saved)
+  }, [])
+
   return (
-    <Sidebar collapsible="icon" style={{ background: 'var(--sidebar)' }}>
+    <div className="relative">
+      <Sidebar collapsible="icon" style={{ background: 'var(--sidebar)' }}>
       {/* Logo */}
       <SidebarHeader className="px-4 py-5">
         <Link href="/" className="flex items-center gap-3">
@@ -214,5 +264,27 @@ export function AppSidebar({ onAdd }: { onAdd?: () => void }) {
         </div>
       </SidebarFooter>
     </Sidebar>
+    {/* Drag handle — only visible on desktop when sidebar is expanded */}
+    <div
+      ref={dragRef}
+      className="absolute right-0 top-0 hidden md:block group-data-[state=collapsed]:hidden"
+      style={{
+        width: 6,
+        height: '100%',
+        cursor: 'col-resize',
+        zIndex: 50,
+      }}
+    >
+      <div
+        className="h-full transition-opacity opacity-0 hover:opacity-100"
+        style={{
+          width: 2,
+          marginLeft: 2,
+          background: 'var(--primary)',
+          borderRadius: 9999,
+        }}
+      />
+    </div>
+  </div>
   )
 }

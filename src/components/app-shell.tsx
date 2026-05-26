@@ -12,6 +12,7 @@ import { AddTransactionSheet } from '@/components/add-transaction-sheet'
 import { getNotifications, getUnreadCount, markAllNotificationsRead, markNotificationRead } from '@/lib/actions/notifications'
 import type { NotificationRow } from '@/lib/types/notifications'
 import { RightRailProvider, useRightRail } from '@/components/right-rail-context'
+import { UserAvatar } from '@/components/user-avatar'
 
 const mobileNavItems = [
   { title: 'Home',      url: '/',                       icon: House },
@@ -209,7 +210,7 @@ function UserMenu() {
   }, [])
 
   const name     = session?.user?.name ?? 'User'
-  const initials = name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2)
+  const avatarId = (session?.user as { avatarId?: string | null })?.avatarId ?? null
 
   return (
     <div ref={ref} className="relative">
@@ -218,12 +219,7 @@ function UserMenu() {
         className="flex items-center gap-2.5 rounded-xl px-2 py-1.5 transition hover:opacity-80"
         style={{ background: open ? 'var(--surface-alt)' : 'transparent' }}
       >
-        <div
-          className="flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold text-white shrink-0"
-          style={{ background: 'var(--gradient-primary)' }}
-        >
-          {initials}
-        </div>
+        <UserAvatar avatarId={avatarId} name={name} size={32} style={{ borderRadius: '50%', flexShrink: 0 }} />
         <span className="hidden text-sm font-semibold md:block" style={{ color: 'var(--foreground)' }}>
           {name}
         </span>
