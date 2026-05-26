@@ -374,7 +374,7 @@ function DesktopRightRail({
       {/* Badges */}
       <div className="rail-card flex flex-col gap-3">
         <div className="eyebrow">Badges</div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 10 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12 }}>
           {ALL_DASHBOARD_BADGES.map((b) => {
             const earned = earnedSet.has(b.triggerEvent);
             return (
