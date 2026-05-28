@@ -19,6 +19,7 @@ type Props = {
   targetAmount?:    number
   currentAmount?:   number
   userInitials?:    string
+  fullScreen?:      boolean
 }
 
 // Zigzag x positions for the path
@@ -126,7 +127,90 @@ function RegionBanner({ y, label, kicker }: { y: number; label: string; kicker: 
   )
 }
 
-export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targetAmount, currentAmount, userInitials }: Props) {
+// Mascot image beside a tile — mood-0 for completed, mood-2 for current
+function MascotBubble({ x, y, side, mood, message }: {
+  x: number; y: number; side: 'left' | 'right'; mood: number; message?: string
+}) {
+  const offset = side === 'left' ? -64 : 64
+  return (
+    <div style={{
+      position: 'absolute',
+      left: x + offset - 22,
+      top: y - 44,
+      pointerEvents: 'none',
+      zIndex: 15,
+      display: 'flex',
+      flexDirection: side === 'left' ? 'row-reverse' : 'row',
+      alignItems: 'flex-end',
+      gap: 4,
+    }}>
+      <img
+        src={`/avatars/mood-${mood}.png`}
+        alt="mascot"
+        width={44}
+        height={44}
+        style={{ imageRendering: 'auto' }}
+      />
+      {message && (
+        <div style={{
+          background: 'rgba(13,25,41,0.92)',
+          border: '1px solid rgba(0,184,148,0.35)',
+          borderRadius: 10,
+          padding: '4px 8px',
+          fontFamily: 'Poppins, sans-serif',
+          fontSize: 9,
+          fontWeight: 700,
+          color: '#fff',
+          maxWidth: 90,
+          whiteSpace: 'pre-wrap',
+          lineHeight: 1.3,
+        }}>
+          {message}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// Progress arc overlay on the current tile showing progress toward next milestone
+function ProgressArc({ pct, nextPct, prevPct, size }: { pct: number; nextPct: number; prevPct: number; size: number }) {
+  const progress = nextPct > prevPct ? (pct - prevPct) / (nextPct - prevPct) : 0
+  const clampedProgress = Math.max(0, Math.min(1, progress))
+  const r = size / 2 - 4
+  const circumference = 2 * Math.PI * r
+  const dashOffset = circumference * (1 - clampedProgress)
+  return (
+    <svg
+      width={size}
+      height={size}
+      style={{ position: 'absolute', top: 0, left: 0, pointerEvents: 'none', transform: 'rotate(-90deg)' }}
+    >
+      {/* Track */}
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.12)" strokeWidth={4} />
+      {/* Fill */}
+      <circle
+        cx={size / 2} cy={size / 2} r={r}
+        fill="none"
+        stroke="#FBBF24"
+        strokeWidth={4}
+        strokeDasharray={circumference}
+        strokeDashoffset={dashOffset}
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+const MASCOT_MESSAGES: Record<string, string> = {
+  start: 'Journey\nbegins! 🚀',
+  '10':  'Nice start\n10%! 💪',
+  '25':  'Quarter\ndone! ⚡',
+  '50':  'Halfway\nthere! 🔥',
+  '75':  'Almost\nthere! ⭐',
+  '100': 'Goal\ncomplete! 🏆',
+}
+
+export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targetAmount, currentAmount, userInitials, fullScreen }: Props) {
   const earnedSet = new Set(earnedMilestones)
 
   const nodes = MILESTONE_NODES.map((m, i) => {
@@ -145,7 +229,6 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
   const CONTENT_HEIGHT = ROW_H * MILESTONE_NODES.length + 120
 
   // Tile positions (bottom-anchored: last milestone at bottom, scroll up to flag)
-  // Node 0 = bottom, node 5 = top
   const tilePositions = MILESTONE_NODES.map((_, i) => {
     const rev = MILESTONE_NODES.length - 1 - i
     return {
@@ -200,39 +283,50 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
   const bannerY1 = CONTENT_HEIGHT * 0.7
   const bannerY2 = CONTENT_HEIGHT * 0.35
 
+  const containerStyle: React.CSSProperties = fullScreen
+    ? {
+        position: 'absolute',
+        inset: 0,
+        width: '100%',
+        height: '100%',
+      }
+    : {
+        width: '100%',
+        maxWidth: 340,
+        margin: '0 auto',
+        height: '70vh',
+        minHeight: 420,
+        maxHeight: 680,
+        position: 'relative',
+        borderRadius: 'var(--radius-2xl)',
+        overflow: 'hidden',
+        boxShadow: 'var(--shadow-lg)',
+      }
+
   return (
-    <div style={{
-      width: '100%',
-      maxWidth: 340,
-      margin: '0 auto',
-      height: '70vh',
-      minHeight: 420,
-      maxHeight: 680,
-      position: 'relative',
-      borderRadius: 'var(--radius-2xl)',
-      overflow: 'hidden',
-      boxShadow: 'var(--shadow-lg)',
-    }}>
-      {/* Corner banner (sticky) */}
-      <div style={{
-        position: 'absolute', top: 0, left: 0, zIndex: 30,
-        width: 170, height: 90,
-        background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 70%)',
-        clipPath: 'polygon(0 0, 100% 0, 65% 50%, 0 100%)',
-        padding: '12px 10px 12px 12px',
-        boxSizing: 'border-box',
-        pointerEvents: 'none',
-      }}>
-        <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 9, color: '#fff', letterSpacing: '0.16em', textShadow: '0 1px 0 rgba(0,0,0,0.18)' }}>
-          GOAL MAP
+    <div style={containerStyle}>
+      {/* Corner banner (only in non-fullscreen mode — fullscreen has floating overlay) */}
+      {!fullScreen && (
+        <div style={{
+          position: 'absolute', top: 0, left: 0, zIndex: 30,
+          width: 170, height: 90,
+          background: 'linear-gradient(135deg, var(--primary-light) 0%, var(--primary) 70%)',
+          clipPath: 'polygon(0 0, 100% 0, 65% 50%, 0 100%)',
+          padding: '12px 10px 12px 12px',
+          boxSizing: 'border-box',
+          pointerEvents: 'none',
+        }}>
+          <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 9, color: '#fff', letterSpacing: '0.16em', textShadow: '0 1px 0 rgba(0,0,0,0.18)' }}>
+            GOAL MAP
+          </div>
+          <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1.1, marginTop: 2, textShadow: '0 1px 0 rgba(0,0,0,0.18)' }}>
+            {goalName ?? 'Quest'}
+          </div>
+          <div style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 9, color: 'rgba(255,255,255,0.9)', fontWeight: 700, marginTop: 3 }}>
+            {pctLabel}
+          </div>
         </div>
-        <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 15, color: '#fff', lineHeight: 1.1, marginTop: 2, textShadow: '0 1px 0 rgba(0,0,0,0.18)' }}>
-          {goalName ?? 'Quest'}
-        </div>
-        <div style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 9, color: 'rgba(255,255,255,0.9)', fontWeight: 700, marginTop: 3 }}>
-          {pctLabel}
-        </div>
-      </div>
+      )}
 
       {/* Scrolling map */}
       <div style={{
@@ -240,6 +334,8 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
         overflowY: 'auto', overflowX: 'hidden',
         position: 'relative',
         background: 'radial-gradient(ellipse at center top, #11304a 0%, #0a1c2f 60%, #050e1c 100%)',
+        // Extra top padding in fullscreen to clear the floating overlay
+        paddingTop: fullScreen ? 64 : 0,
       }}>
         <div style={{ position: 'relative', height: CONTENT_HEIGHT, width: '100%' }}>
           {/* Ground atmosphere */}
@@ -309,6 +405,30 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
           {nodes.map((node, i) => {
             const pos = tilePositions[i]
             const isRight = node.side === 'right'
+            const TILE_SIZE = 80
+
+            // Tile color scheme
+            const c = node.state === 'completed'
+              ? { face: '#00B894', light: '#1DD1A1', side: '#007a60' }
+              : node.state === 'current'
+              ? { face: '#F59E0B', light: '#FBBF24', side: '#b8730a' }
+              : { face: '#E76F51', light: '#F08769', side: '#a14130' }
+
+            // Previous/next milestone pct for progress arc
+            const prevMilestone = i > 0 ? MILESTONE_NODES[i - 1] : null
+            const prevPct = prevMilestone ? prevMilestone.pct : 0
+
+            // Mascot: show on completed + current
+            const showMascot = node.state === 'completed' || node.state === 'current'
+            const mascotMood = node.state === 'completed' ? 0 : 2
+            // Show speech bubble on 25% and 75% milestones
+            const showBubble = node.key === '25' || node.key === '75' || node.key === 'start'
+            const mascotMessage = showBubble ? MASCOT_MESSAGES[node.key] : undefined
+            // Position mascot on opposite side of tile zigzag
+            const mascotSide: 'left' | 'right' = isRight ? 'left' : 'right'
+
+            const NodeIcon = node.Icon
+
             return (
               <div key={node.key} style={{
                 position: 'absolute',
@@ -321,12 +441,24 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
               }}>
                 <div className="flex flex-col items-center gap-2.5">
                   <div style={{ position: 'relative', paddingTop: 40, paddingBottom: 20 }}>
+
+                    {/* Mascot beside tile */}
+                    {showMascot && (
+                      <MascotBubble
+                        x={isRight ? -50 : 50}
+                        y={40}
+                        side={mascotSide}
+                        mood={mascotMood}
+                        message={mascotMessage}
+                      />
+                    )}
+
                     {node.state === 'current' && (
                       <div className="tile-pulse" style={{
                         position: 'absolute',
                         inset: '-4px',
                         top: 36,
-                        borderRadius: 80 * 0.28,
+                        borderRadius: TILE_SIZE * 0.28,
                         pointerEvents: 'none',
                       }}/>
                     )}
@@ -360,7 +492,7 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
                       <div style={{
                         position: 'relative',
                         width: 30, height: 30,
-                        background: node.state === 'locked' ? '#1A2F45' : '#0a0a0a',
+                        background: '#0a0a0a',
                         borderRadius: '50% 50% 50% 50% / 60% 60% 40% 40%',
                         display: 'flex', alignItems: 'center', justifyContent: 'center',
                         color: '#fff',
@@ -378,60 +510,78 @@ export function GoalMapTileCanvas({ currentPct, earnedMilestones, goalName, targ
                           position: 'absolute', bottom: -4, left: '50%',
                           transform: 'translateX(-50%) rotate(45deg)',
                           width: 9, height: 9,
-                          background: node.state === 'locked' ? '#1A2F45' : '#0a0a0a',
+                          background: '#0a0a0a',
                         }}/>
                       </div>
                     </div>
 
                     {/* Tile face */}
-                    {(() => {
-                      const c = node.state === 'completed'
-                        ? { face: '#00B894', light: '#1DD1A1', side: '#007a60' }
-                        : node.state === 'current'
-                        ? { face: '#F59E0B', light: '#FBBF24', side: '#b8730a' }
-                        : { face: '#1A2F45', light: '#243B55', side: '#0A1929' }
-                      const NodeIcon = node.Icon
-                      return (
+                    <div style={{
+                      width: TILE_SIZE, height: TILE_SIZE,
+                      borderRadius: TILE_SIZE * 0.28,
+                      background: `linear-gradient(160deg, ${c.light} 0%, ${c.face} 75%)`,
+                      boxShadow: `0 13px 0 ${c.side}, 0 16px 0 rgba(0,0,0,0.25), 0 24px 26px rgba(0,0,0,0.5)`,
+                      position: 'relative',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {/* Progress arc on current tile */}
+                      {node.state === 'current' && (
+                        <ProgressArc
+                          pct={currentPct}
+                          nextPct={node.pct}
+                          prevPct={prevPct}
+                          size={TILE_SIZE}
+                        />
+                      )}
+
+                      <NodeIcon size={28} color="#ffffff" strokeWidth={2}/>
+
+                      {/* Star pill on completed tiles */}
+                      {node.state === 'completed' && (
                         <div style={{
-                          width: 80, height: 80,
-                          borderRadius: 80 * 0.28,
-                          background: `linear-gradient(160deg, ${c.light} 0%, ${c.face} 75%)`,
-                          boxShadow: `0 13px 0 ${c.side}, 0 16px 0 rgba(0,0,0,0.25), 0 24px 26px rgba(0,0,0,0.5)`,
-                          position: 'relative',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center',
-                          opacity: node.state === 'locked' ? 0.6 : 1,
-                          transition: 'opacity 0.4s',
+                          position: 'absolute', left: '50%', top: '60%',
+                          transform: 'translate(-50%, -50%)',
+                          background: '#F2C94C', borderRadius: 9999,
+                          padding: '3px 6px', display: 'flex', alignItems: 'center', gap: 2,
+                          boxShadow: '0 2px 0 rgba(0,0,0,0.18)',
                         }}>
-                          <NodeIcon size={28} color={node.state === 'locked' ? 'var(--muted-foreground)' : '#ffffff'} strokeWidth={2}/>
-                          {node.state === 'completed' && (
-                            <div style={{
-                              position: 'absolute', left: '50%', top: '60%',
-                              transform: 'translate(-50%, -50%)',
-                              background: '#F2C94C', borderRadius: 9999,
-                              padding: '3px 6px', display: 'flex', alignItems: 'center', gap: 2,
-                              boxShadow: '0 2px 0 rgba(0,0,0,0.18)',
-                            }}>
-                              {[0,1,2].map(si => (
-                                <svg key={si} width="9" height="9" viewBox="0 0 24 24" fill="#fff">
-                                  <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
-                                </svg>
-                              ))}
-                            </div>
-                          )}
+                          {[0,1,2].map(si => (
+                            <svg key={si} width="9" height="9" viewBox="0 0 24 24" fill="#fff">
+                              <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+                            </svg>
+                          ))}
                         </div>
-                      )
-                    })()}
+                      )}
+
+                      {/* Target % label on locked tiles */}
+                      {node.state === 'locked' && node.pct > 0 && (
+                        <div style={{
+                          position: 'absolute', bottom: 6, left: 0, right: 0,
+                          textAlign: 'center',
+                          fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 11,
+                          color: 'rgba(255,255,255,0.85)',
+                          textShadow: '0 1px 3px rgba(0,0,0,0.5)',
+                        }}>
+                          {node.pct}%
+                        </div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Label */}
                   <div style={{ textAlign: 'center' }}>
                     <div style={{
                       fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 10,
-                      color: node.state === 'current' ? 'var(--warning)' : node.state === 'completed' ? 'var(--primary)' : 'var(--muted-foreground)',
+                      color: node.state === 'current' ? 'var(--warning)' : node.state === 'completed' ? 'var(--primary)' : 'rgba(231,111,81,0.9)',
                     }}>{node.label}</div>
                     {node.state !== 'locked' && (
                       <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 9, color: 'var(--muted-foreground)' }}>
                         +{node.xp} XP
+                      </div>
+                    )}
+                    {node.state === 'locked' && (
+                      <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 600, fontSize: 9, color: 'rgba(231,111,81,0.7)' }}>
+                        Reach {node.pct}%
                       </div>
                     )}
                   </div>
