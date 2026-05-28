@@ -3,7 +3,7 @@
 import { useState, useTransition } from 'react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
-import { ArrowLeft, Plus, Loader2, X, CalendarDays } from 'lucide-react'
+import { ArrowLeft, Plus, Loader2, X } from 'lucide-react'
 import { toast } from 'sonner'
 import { formatUGX } from '@/lib/format'
 import { contributeToGoal, getGoalMapData } from '@/lib/actions/goals'
@@ -160,7 +160,6 @@ export function GoalMapScreen({
   }
 
   function handleContributionResult(res: { newlyReachedMilestones: string[]; coinsCollected: number[]; completed: boolean }) {
-    // Refresh server data then update local state
     router.refresh()
     if (res.newlyReachedMilestones.length > 0) {
       setEarnedMilestones((prev) => [...new Set([...prev, ...res.newlyReachedMilestones])])
@@ -168,7 +167,6 @@ export function GoalMapScreen({
     if (res.coinsCollected.length > 0) {
       setCollectedCoins((prev) => [...new Set([...prev, ...res.coinsCollected])])
     }
-    // Refetch to get updated currentAmount
     getGoalMapData(goal.id).then((data) => {
       if (!data) return
       const newPct = data.goal.targetAmount > 0
@@ -182,79 +180,65 @@ export function GoalMapScreen({
   const pct = currentPct
   const isCompleted = goal.isCompleted || pct >= 100
 
-  // Fire confetti once on initial load if already completed
   useEffect(() => {
     if (isCompleted) fireConfetti()
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-4">
-      {/* Fixed header */}
-      <div className="rounded-2xl p-5" style={{ background: 'var(--card)', boxShadow: 'var(--shadow-card)' }}>
-        <div className="flex items-center gap-3 mb-4">
-          <Link href="/goals"
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-            style={{ background: 'var(--surface-alt)', color: 'var(--foreground)' }}>
-            <ArrowLeft size={16} />
-          </Link>
-          <div className="flex-1 min-w-0">
-            <h1 className="truncate text-lg font-bold tracking-tight"
-              style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
-              {goal.name}
-            </h1>
-            {goal.targetDate && (
-              <div className="flex items-center gap-1 text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                <CalendarDays size={11} />
-                {new Date(goal.targetDate).toLocaleDateString('en-UG', { day: 'numeric', month: 'short', year: 'numeric' })}
-              </div>
-            )}
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--background)', zIndex: 0, overflow: 'hidden' }}>
+      {/* Floating top overlay */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20,
+        padding: '12px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'linear-gradient(to bottom, rgba(10,25,41,0.95) 0%, transparent 100%)',
+      }}>
+        <Link href="/goals" style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.12)', color: '#fff',
+          textDecoration: 'none',
+        }}>
+          <ArrowLeft size={16} />
+        </Link>
+        <div style={{ textAlign: 'center', flex: 1, padding: '0 12px' }}>
+          <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 15, color: '#fff', letterSpacing: '-0.01em' }}>
+            {goal.name}
+          </div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 1 }}>
+            {pct}% · {formatUGX(goal.currentAmount)} of {formatUGX(goal.targetAmount)}
           </div>
         </div>
-
-        <div className="flex items-center gap-4 mb-3">
-          <div className="flex-1">
-            <div className="flex items-baseline gap-1.5">
-              <span id="goal-map-xp-counter" className="text-2xl font-bold" style={{ color: 'var(--primary)' }}>{pct}%</span>
-              <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>complete</span>
-            </div>
-            <div className="text-xs mt-0.5" style={{ color: 'var(--muted-foreground)' }}>
-              {formatUGX(goal.currentAmount)} of {formatUGX(goal.targetAmount)}
-            </div>
+        {!isCompleted ? (
+          <button onClick={() => setShowContribute(true)} style={{
+            padding: '8px 14px', borderRadius: 9999, border: 'none',
+            background: 'var(--gradient-primary)', color: '#fff',
+            fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 12,
+            display: 'flex', alignItems: 'center', gap: 5, cursor: 'pointer',
+            boxShadow: '0 4px 12px rgba(0,184,148,0.4)',
+          }}>
+            <Plus size={13} strokeWidth={2.5} /> Contribute
+          </button>
+        ) : (
+          <div style={{
+            padding: '8px 14px', borderRadius: 9999,
+            background: 'var(--gradient-primary)', color: '#fff',
+            fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 12,
+          }}>
+            Complete 🎉
           </div>
-          {!isCompleted && (
-            <button onClick={() => setShowContribute(true)}
-              className="flex items-center gap-1.5 rounded-full px-4 py-2.5 text-sm font-bold text-white transition hover:opacity-90"
-              style={{ background: 'var(--gradient-primary)' }}>
-              <Plus size={15} strokeWidth={2.5} /> Contribute
-            </button>
-          )}
-          {isCompleted && (
-            <div className="flex flex-col items-end gap-0.5">
-              <div className="rounded-full px-4 py-2 text-sm font-bold"
-                style={{ background: 'var(--gradient-primary)', color: '#ffffff' }}>
-                Goal Complete 🎉
-              </div>
-              <span className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-                {formatUGX(goal.targetAmount)} saved
-              </span>
-            </div>
-          )}
-        </div>
-
-        <div className="progress-track" style={{ height: 6 }}>
-          <div className="progress-fill"
-            style={{ width: `${pct}%`, background: 'var(--gradient-primary)', borderRadius: 'var(--radius-full)', transition: 'width 0.8s ease' }} />
-        </div>
+        )}
       </div>
 
-      {/* Map canvas */}
+      {/* Map — fills full screen */}
       <GoalMapTileCanvas
         currentPct={currentPct}
         earnedMilestones={earnedMilestones}
         goalName={goal.name}
         targetAmount={goal.targetAmount}
         currentAmount={goal.currentAmount}
+        fullScreen
       />
 
       {showContribute && (

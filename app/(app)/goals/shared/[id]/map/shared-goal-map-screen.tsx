@@ -3,37 +3,42 @@
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { GoalMapTileCanvas } from '@/components/goal-map-tile-canvas'
-import { useSetRightRail } from '@/components/right-rail-context'
 import { formatUGX } from '@/lib/format'
 import type { SharedGoalMapData } from '@/lib/actions/shared-goals'
 
 function Leaderboard({ members, goalName }: { members: SharedGoalMapData['members']; goalName: string }) {
   return (
-    <div className="rail-card flex flex-col gap-4">
-      <div>
-        <div className="eyebrow">Leaderboard</div>
-        <div className="text-sm font-bold mt-0.5" style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
-          {goalName}
-        </div>
+    <div style={{
+      position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
+      zIndex: 20,
+      background: 'rgba(13,25,41,0.92)',
+      backdropFilter: 'blur(8px)',
+      border: '1px solid rgba(0,184,148,0.25)',
+      borderRadius: 16,
+      padding: '12px 16px',
+      minWidth: 260, maxWidth: 340,
+    }}>
+      <div style={{ fontFamily: 'Poppins, sans-serif', fontSize: 10, fontWeight: 700, color: 'var(--primary)', textTransform: 'uppercase', letterSpacing: '0.1em', marginBottom: 8 }}>
+        Leaderboard · {goalName}
       </div>
       {members.length === 0 ? (
-        <p className="text-sm" style={{ color: 'var(--muted-foreground)' }}>No contributions yet.</p>
+        <div style={{ fontFamily: 'Nunito Sans, sans-serif', fontSize: 12, color: 'var(--muted-foreground)' }}>No contributions yet.</div>
       ) : (
-        <div className="flex flex-col gap-2">
-          {members.map((m, i) => (
-            <div key={m.userId} className="flex items-center gap-3 py-2 border-b last:border-0"
-              style={{ borderColor: 'var(--border)' }}>
-              <span className="text-sm font-bold w-6 text-center" style={{ color: 'var(--muted-foreground)' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+          {members.slice(0, 5).map((m, i) => (
+            <div key={m.userId} style={{ display: 'flex', alignItems: 'center', gap: 10, paddingBottom: i < members.length - 1 ? 6 : 0, borderBottom: i < Math.min(members.length, 5) - 1 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+              <span style={{ fontFamily: 'Poppins, sans-serif', fontSize: 12, fontWeight: 700, width: 22, textAlign: 'center', color: 'var(--muted-foreground)' }}>
                 {i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `${i + 1}.`}
               </span>
-              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold text-white"
-                style={{ background: 'var(--gradient-primary)' }}>
+              <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'var(--gradient-primary)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#fff', fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 11, flexShrink: 0 }}>
                 {m.name[0].toUpperCase()}
               </div>
-              <span className="flex-1 text-sm font-medium truncate" style={{ color: 'var(--foreground)' }}>
+              <span style={{ flex: 1, fontFamily: 'Nunito Sans, sans-serif', fontSize: 12, fontWeight: 500, color: '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                 {m.name}
               </span>
-              <span className="text-sm font-bold amount-income">{formatUGX(m.totalContributed)}</span>
+              <span style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 700, fontSize: 12, color: 'var(--success)' }}>
+                {formatUGX(m.totalContributed)}
+              </span>
             </div>
           ))}
         </div>
@@ -45,41 +50,46 @@ function Leaderboard({ members, goalName }: { members: SharedGoalMapData['member
 export function SharedGoalMapScreen({ data }: { data: SharedGoalMapData }) {
   const { goal, members, currentPct, earnedMilestones } = data
 
-  useSetRightRail(<Leaderboard members={members} goalName={goal.name} />)
-
   return (
-    <div className="mx-auto flex max-w-lg flex-col gap-4">
-      {/* Header */}
-      <div className="flex items-center gap-3 mb-2">
-        <Link href={`/goals/shared/${goal.id}`}
-          className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full"
-          style={{ background: 'var(--surface-alt)', color: 'var(--foreground)' }}>
+    <div style={{ position: 'fixed', inset: 0, background: 'var(--background)', zIndex: 0, overflow: 'hidden' }}>
+      {/* Floating top overlay */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, zIndex: 20,
+        padding: '12px 16px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        background: 'linear-gradient(to bottom, rgba(10,25,41,0.95) 0%, transparent 100%)',
+      }}>
+        <Link href={`/goals/shared/${goal.id}`} style={{
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          width: 36, height: 36, borderRadius: '50%',
+          background: 'rgba(255,255,255,0.12)', color: '#fff',
+          textDecoration: 'none',
+        }}>
           <ArrowLeft size={16} />
         </Link>
-        <div className="flex-1 min-w-0">
-          <h1 className="truncate text-lg font-bold tracking-tight"
-            style={{ color: 'var(--foreground)', fontFamily: 'Poppins, sans-serif' }}>
+        <div style={{ textAlign: 'center', flex: 1, padding: '0 12px' }}>
+          <div style={{ fontFamily: 'Poppins, sans-serif', fontWeight: 800, fontSize: 15, color: '#fff', letterSpacing: '-0.01em' }}>
             {goal.name}
-          </h1>
-          <p className="text-xs" style={{ color: 'var(--muted-foreground)' }}>
-            {currentPct}% complete · {formatUGX(goal.currentAmount)} of {formatUGX(goal.targetAmount)}
-          </p>
+          </div>
+          <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.7)', marginTop: 1 }}>
+            {currentPct}% · {formatUGX(goal.currentAmount)} of {formatUGX(goal.targetAmount)} · {members.length} members
+          </div>
         </div>
+        <div style={{ width: 36 }} />
       </div>
 
-      {/* Map canvas */}
+      {/* Map — fills full screen */}
       <GoalMapTileCanvas
         currentPct={currentPct}
         earnedMilestones={earnedMilestones}
         goalName={goal.name}
         targetAmount={goal.targetAmount}
         currentAmount={goal.currentAmount}
+        fullScreen
       />
 
-      {/* Leaderboard (mobile — hidden on xl where right rail shows) */}
-      <div className="xl:hidden">
-        <Leaderboard members={members} goalName={goal.name} />
-      </div>
+      {/* Leaderboard overlay at bottom */}
+      <Leaderboard members={members} goalName={goal.name} />
     </div>
   )
 }
